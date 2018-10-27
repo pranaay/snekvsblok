@@ -1,4 +1,4 @@
-package sample;
+package Snek;
 
 public class Controller {
 }

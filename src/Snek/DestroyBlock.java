@@ -1,4 +1,4 @@
-package sample;
+package Snek;
 
 import javafx.scene.shape.Rectangle;
 
