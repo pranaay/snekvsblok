@@ -57,11 +57,12 @@ public class Main extends Application{
 
             Text text =  new Text(Integer.toString(rect.getBoxValue()));
             text.setStyle("-fx-font-size: 18px;style: \"-fx-font-weight: bold\";");
+            text.setY(-boxHeight/2);
 
             StackPane stackPane = new StackPane();
             stackPane.getChildren().addAll(rect, text);
             boxes[x] = stackPane;
-
+            boxes[x].setTranslateY(-boxHeight);
             gridPaneBoard.add(boxes[x], x, 1);
         }
 
