@@ -26,7 +26,7 @@ public class Main extends Application{
     private boolean alternateFall = true;
 
     private DestroyBlock createBlok(){
-        DestroyBlock rect = new DestroyBlock(0, -boxHeight/2, boxWidth, boxHeight);
+        DestroyBlock rect = new DestroyBlock(0, -boxHeight, boxWidth, boxHeight);
 
         Random rand = new Random();
         int selectColor = rand.nextInt(10);
@@ -72,19 +72,21 @@ public class Main extends Application{
 
                 Text text =  new Text(Integer.toString(rect.getBoxValue()));
                 text.setStyle("-fx-font-size: 18px;style: \"-fx-font-weight: bold\";");
-                text.setY(-boxHeight/2);
+                text.setY(-boxHeight);
 
                 StackPane stackPane = new StackPane();
                 stackPane.getChildren().addAll(rect, text);
                 if(x < numberOfBoxes){
                     boxes[x] = stackPane;
                     boxes[x].setTranslateY(-boxHeight);
-                    gridPaneBoard.add(boxes[x], x, 1);
+//                    boxes[x].setLayoutY(-boxHeight);
+                    gridPaneBoard.add(boxes[x], x, 0);
                 }
                 else{
                     boxesAlternate[x-numberOfBoxes] = stackPane;
                     boxesAlternate[x-numberOfBoxes].setTranslateY(-boxHeight);
-                    gridPaneBoard.add(boxesAlternate[x-numberOfBoxes], x-numberOfBoxes, 1);
+//                    boxesAlternate[x-numberOfBoxes].setLayoutY(-boxHeight);
+                    gridPaneBoard.add(boxesAlternate[x-numberOfBoxes], x-numberOfBoxes, 0);
                 }
             }
         }
@@ -100,13 +102,14 @@ public class Main extends Application{
 
                 Text text =  new Text(Integer.toString(rect.getBoxValue()));
                 text.setStyle("-fx-font-size: 18px;style: \"-fx-font-weight: bold\";");
-                text.setY(-boxHeight/2);
+                text.setY(-boxHeight);
 
                 StackPane stackPane = new StackPane();
                 stackPane.getChildren().addAll(rect, text);
                 boxes[x] = stackPane;
                 boxes[x].setTranslateY(-boxHeight);
-                gridPaneBoard.add(boxes[x], x, 1);
+//                boxes[x].setLayoutY(-boxHeight);
+                gridPaneBoard.add(boxes[x], x, 0);
             }
         }
 
@@ -117,7 +120,8 @@ public class Main extends Application{
         for(int i=0; i<pathBoxes.length; i++){
             pathBoxes[i] = new Path();
 
-            pathBoxes[i].getElements().add(new MoveTo(boxes[i].getLayoutX() + boxWidth/2, boxes[i].getLayoutY() - boxHeight/2));
+            pathBoxes[i].getElements().add(new MoveTo(boxes[i].getLayoutX() + boxWidth/2, boxes[i].getLayoutY() - boxHeight));
+            System.out.println(boxes[i].getLayoutY() - boxHeight);
             pathBoxes[i].getElements().add(new LineTo(boxes[i].getLayoutX() + boxWidth/2, windowHeight));
             PathTransition pathTransition = new PathTransition();
             pathTransition.setDuration(Duration.millis(3000));
@@ -134,7 +138,7 @@ public class Main extends Application{
             for(int i=0; i<pathBoxesAlternate.length; i++){
                 pathBoxesAlternate[i] = new Path();
 
-                pathBoxesAlternate[i].getElements().add(new MoveTo(boxesAlternate[i].getLayoutX() + boxWidth/2, boxes[i].getLayoutY() - boxHeight/2));
+                pathBoxesAlternate[i].getElements().add(new MoveTo(boxesAlternate[i].getLayoutX() + boxWidth/2, boxes[i].getLayoutY() - boxHeight));
                 pathBoxesAlternate[i].getElements().add(new LineTo(boxesAlternate[i].getLayoutX() + boxWidth/2, windowHeight));
                 PathTransition pathTransition = new PathTransition();
                 pathTransition.setDuration(Duration.millis(3000));
@@ -181,7 +185,18 @@ public class Main extends Application{
         numberOfBoxes = (int) Math.floor(windowWidth/boxWidth);
 
         nextCycle();
+//        gridPaneBoard.getChildren().add(new Ball(10));
+//        StackPane ball = new StackPane();
+//        Ball temp = new Ball(10);
+//        temp.setFill(Color.PINK);
+//        Text text = new Text("5");
+//        ball.getChildren().addAll(temp, text);
+//        ball.setTranslateX(100);
+//        ball.setTranslateY(100);
+//        gridPaneBoard.getChildren().add(ball);
+
     }
+
 
     public static void main(String[] args) {
         launch(args);
