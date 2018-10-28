@@ -20,81 +20,177 @@ public class Main extends Application{
     private double boxHeight = 50;
 
     private StackPane[] boxes;
+    private StackPane[] boxesAlternate;
     private GridPane gridPaneBoard;
     private int numberOfBoxes;
+    private boolean alternateFall = true;
 
     private void createBoxes(){
-        for (int x = 0; x < numberOfBoxes; x++) {
-            DestroyBlock rect = new DestroyBlock(0, -boxHeight/2, boxWidth, boxHeight);
+        if(this.alternateFall){
+//            this.alternateFall = false;
+            for (int x = 0; x < 2*numberOfBoxes; x++) {
+                DestroyBlock rect = new DestroyBlock(0, -boxHeight/2, boxWidth, boxHeight);
 
-            Random rand = new Random();
-            int selectColor = rand.nextInt(10);
-            switch (selectColor){
-                case 0: rect.setFill(Color.BLUEVIOLET);
+                Random rand = new Random();
+                int selectColor = rand.nextInt(10);
+                switch (selectColor){
+                    case 0: rect.setFill(Color.BLUEVIOLET);
                         break;
-                case 1: rect.setFill(Color.AQUA);
-                    break;
-                case 2: rect.setFill(Color.TOMATO);
-                    break;
-                case 3: rect.setFill(Color.PINK);
-                    break;
-                case 4: rect.setFill(Color.ORANGE);
-                    break;
-                case 5: rect.setFill(Color.RED);
-                    break;
-                case 6: rect.setFill(Color.MISTYROSE);
-                    break;
-                case 7: rect.setFill(Color.YELLOW);
-                    break;
-                case 8: rect.setFill(Color.MAGENTA);
-                    break;
-                case 9: rect.setFill(Color.MINTCREAM);
-                    break;
-            }
-            rect.setStroke(Color.BLACK);
-            int inactiveBlock = rand.nextInt(25);
-            if(inactiveBlock == 0){
-                rect.setFill(Color.BLACK);
-                rect.setInactive();
-            }
+                    case 1: rect.setFill(Color.AQUA);
+                        break;
+                    case 2: rect.setFill(Color.TOMATO);
+                        break;
+                    case 3: rect.setFill(Color.PINK);
+                        break;
+                    case 4: rect.setFill(Color.ORANGE);
+                        break;
+                    case 5: rect.setFill(Color.RED);
+                        break;
+                    case 6: rect.setFill(Color.MISTYROSE);
+                        break;
+                    case 7: rect.setFill(Color.YELLOW);
+                        break;
+                    case 8: rect.setFill(Color.MAGENTA);
+                        break;
+                    case 9: rect.setFill(Color.MINTCREAM);
+                        break;
+                }
+                rect.setStroke(Color.BLACK);
+                int inactiveBlock = rand.nextInt(25);
+                if(inactiveBlock == 0){
+                    rect.setFill(Color.BLACK);
+                    rect.setInactive();
+                }
 
-            Text text =  new Text(Integer.toString(rect.getBoxValue()));
-            text.setStyle("-fx-font-size: 18px;style: \"-fx-font-weight: bold\";");
-            text.setY(-boxHeight/2);
+                Text text =  new Text(Integer.toString(rect.getBoxValue()));
+                text.setStyle("-fx-font-size: 18px;style: \"-fx-font-weight: bold\";");
+                text.setY(-boxHeight/2);
 
-            StackPane stackPane = new StackPane();
-            stackPane.getChildren().addAll(rect, text);
-            boxes[x] = stackPane;
-            boxes[x].setTranslateY(-boxHeight);
-            gridPaneBoard.add(boxes[x], x, 1);
+                StackPane stackPane = new StackPane();
+                stackPane.getChildren().addAll(rect, text);
+                if(x < numberOfBoxes){
+                    boxes[x] = stackPane;
+                    boxes[x].setTranslateY(-boxHeight);
+                    gridPaneBoard.add(boxes[x], x, 1);
+                }
+                else{
+                    boxesAlternate[x-numberOfBoxes] = stackPane;
+                    boxesAlternate[x-numberOfBoxes].setTranslateY(-boxHeight);
+                    gridPaneBoard.add(boxesAlternate[x-numberOfBoxes], x-numberOfBoxes, 1);
+                }
+            }
+        }
+        else {
+            for (int x = 0; x < numberOfBoxes; x++) {
+                DestroyBlock rect = new DestroyBlock(0, -boxHeight/2, boxWidth, boxHeight);
+
+                Random rand = new Random();
+                int selectColor = rand.nextInt(10);
+                switch (selectColor){
+                    case 0: rect.setFill(Color.BLUEVIOLET);
+                            break;
+                    case 1: rect.setFill(Color.AQUA);
+                        break;
+                    case 2: rect.setFill(Color.TOMATO);
+                        break;
+                    case 3: rect.setFill(Color.PINK);
+                        break;
+                    case 4: rect.setFill(Color.ORANGE);
+                        break;
+                    case 5: rect.setFill(Color.RED);
+                        break;
+                    case 6: rect.setFill(Color.MISTYROSE);
+                        break;
+                    case 7: rect.setFill(Color.YELLOW);
+                        break;
+                    case 8: rect.setFill(Color.MAGENTA);
+                        break;
+                    case 9: rect.setFill(Color.MINTCREAM);
+                        break;
+                }
+                rect.setStroke(Color.BLACK);
+                int inactiveBlock = rand.nextInt(25);
+                if(inactiveBlock == 0){
+                    rect.setFill(Color.BLACK);
+                    rect.setInactive();
+                }
+
+                Text text =  new Text(Integer.toString(rect.getBoxValue()));
+                text.setStyle("-fx-font-size: 18px;style: \"-fx-font-weight: bold\";");
+                text.setY(-boxHeight/2);
+
+                StackPane stackPane = new StackPane();
+                stackPane.getChildren().addAll(rect, text);
+                boxes[x] = stackPane;
+                boxes[x].setTranslateY(-boxHeight);
+                gridPaneBoard.add(boxes[x], x, 1);
+            }
         }
 
-    }
-
-    private void nextCycle(){
-        boxes = new StackPane[numberOfBoxes];
-        createBoxes();
-        boxesFall();
     }
 
     private void boxesFall(){
 
-        Path [] pathBoxes = new Path[boxes.length];
+        if(this.alternateFall){
+            this.alternateFall = false;
 
-        for(int i=0; i<pathBoxes.length; i++){
-            pathBoxes[i] = new Path();
+            Path [] pathBoxes = new Path[boxes.length];
+            Path [] pathBoxesAlternate = new Path[boxesAlternate.length];
 
-            pathBoxes[i].getElements().add(new MoveTo(boxes[i].getLayoutX() + boxWidth/2, boxes[i].getLayoutY() - boxHeight/2));
-            pathBoxes[i].getElements().add(new LineTo(boxes[i].getLayoutX() + boxWidth/2, windowHeight));
-            PathTransition pathTransition = new PathTransition();
-            pathTransition.setDuration(Duration.millis(3000));
-            pathTransition.setPath(pathBoxes[i]);
-            pathTransition.setNode(boxes[i]);
-            pathTransition.play();
-            if(i == 5)
-                pathTransition.setOnFinished(e -> nextCycle());
+            for(int i=0; i<pathBoxes.length; i++){
+                pathBoxes[i] = new Path();
+
+                pathBoxes[i].getElements().add(new MoveTo(boxes[i].getLayoutX() + boxWidth/2, boxes[i].getLayoutY() - boxHeight/2));
+                pathBoxes[i].getElements().add(new LineTo(boxes[i].getLayoutX() + boxWidth/2, windowHeight));
+                PathTransition pathTransition = new PathTransition();
+                pathTransition.setDuration(Duration.millis(3000));
+                pathTransition.setPath(pathBoxes[i]);
+                pathTransition.setNode(boxes[i]);
+                pathTransition.play();
+                if(i == 5)
+                    pathTransition.setOnFinished(e -> nextCycle());
+            }
+            for(int i=0; i<pathBoxesAlternate.length; i++){
+                pathBoxesAlternate[i] = new Path();
+
+                pathBoxesAlternate[i].getElements().add(new MoveTo(boxesAlternate[i].getLayoutX() + boxWidth/2, boxes[i].getLayoutY() - boxHeight/2));
+                pathBoxesAlternate[i].getElements().add(new LineTo(boxesAlternate[i].getLayoutX() + boxWidth/2, windowHeight));
+                PathTransition pathTransition = new PathTransition();
+                pathTransition.setDuration(Duration.millis(3000));
+                pathTransition.setPath(pathBoxes[i]);
+                pathTransition.setNode(boxesAlternate[i]);
+                pathTransition.setDelay(new Duration(1500));
+                pathTransition.play();
+            }
         }
-//        pathTransition.setDelay(new Duration(2000));
+        else{
+            Path [] pathBoxes = new Path[boxes.length];
+            for(int i=0; i<pathBoxes.length; i++){
+                pathBoxes[i] = new Path();
+
+                pathBoxes[i].getElements().add(new MoveTo(boxes[i].getLayoutX() + boxWidth/2, boxes[i].getLayoutY() - boxHeight/2));
+                pathBoxes[i].getElements().add(new LineTo(boxes[i].getLayoutX() + boxWidth/2, windowHeight));
+                PathTransition pathTransition = new PathTransition();
+                pathTransition.setDuration(Duration.millis(3000));
+                pathTransition.setPath(pathBoxes[i]);
+                pathTransition.setNode(boxes[i]);
+                pathTransition.play();
+                if(i == 5)
+                    pathTransition.setOnFinished(e -> nextCycle());
+            }
+        }
+    }
+
+    private void nextCycle(){
+        boxes = new StackPane[numberOfBoxes];
+        boxesAlternate = new StackPane[numberOfBoxes];
+        Random rand = new Random();
+        int alternate = rand.nextInt(5);
+        if(alternate == 0){
+            this.alternateFall = true;
+        }
+        createBoxes();
+        boxesFall();
     }
 
     @Override
