@@ -52,6 +52,11 @@ public class Main extends Application{
                     break;
             }
             rect.setStroke(Color.BLACK);
+            int inactiveBlock = rand.nextInt(25);
+            if(inactiveBlock == 0){
+                rect.setFill(Color.BLACK);
+                rect.setInactive();
+            }
 
             Text text =  new Text(Integer.toString(rect.getBoxValue()));
             text.setStyle("-fx-font-size: 18px;style: \"-fx-font-weight: bold\";");
@@ -89,6 +94,7 @@ public class Main extends Application{
             if(i == 5)
                 pathTransition.setOnFinished(e -> nextCycle());
         }
+//        pathTransition.setDelay(new Duration(2000));
     }
 
     @Override
