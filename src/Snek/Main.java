@@ -25,37 +25,45 @@ public class Main extends Application{
     private int numberOfBoxes;
     private boolean alternateFall = true;
 
-    private void createBoxes(){
-        if(this.alternateFall){
-//            this.alternateFall = false;
-            for (int x = 0; x < 2*numberOfBoxes; x++) {
-                DestroyBlock rect = new DestroyBlock(0, -boxHeight/2, boxWidth, boxHeight);
+    private DestroyBlock createBlok(){
+        DestroyBlock rect = new DestroyBlock(0, -boxHeight/2, boxWidth, boxHeight);
 
-                Random rand = new Random();
-                int selectColor = rand.nextInt(10);
-                switch (selectColor){
-                    case 0: rect.setFill(Color.BLUEVIOLET);
-                        break;
-                    case 1: rect.setFill(Color.AQUA);
-                        break;
-                    case 2: rect.setFill(Color.TOMATO);
-                        break;
-                    case 3: rect.setFill(Color.PINK);
-                        break;
-                    case 4: rect.setFill(Color.ORANGE);
-                        break;
-                    case 5: rect.setFill(Color.RED);
-                        break;
-                    case 6: rect.setFill(Color.MISTYROSE);
-                        break;
-                    case 7: rect.setFill(Color.YELLOW);
-                        break;
-                    case 8: rect.setFill(Color.MAGENTA);
-                        break;
-                    case 9: rect.setFill(Color.MINTCREAM);
-                        break;
-                }
-                rect.setStroke(Color.BLACK);
+        Random rand = new Random();
+        int selectColor = rand.nextInt(10);
+        switch (selectColor){
+            case 0: rect.setFill(Color.BLUEVIOLET);
+                break;
+            case 1: rect.setFill(Color.AQUA);
+                break;
+            case 2: rect.setFill(Color.TOMATO);
+                break;
+            case 3: rect.setFill(Color.PINK);
+                break;
+            case 4: rect.setFill(Color.ORANGE);
+                break;
+            case 5: rect.setFill(Color.RED);
+                break;
+            case 6: rect.setFill(Color.MISTYROSE);
+                break;
+            case 7: rect.setFill(Color.YELLOW);
+                break;
+            case 8: rect.setFill(Color.MAGENTA);
+                break;
+            case 9: rect.setFill(Color.MINTCREAM);
+                break;
+        }
+        rect.setStroke(Color.BLACK);
+        return rect;
+    }
+
+    private void createBoxes(){
+        Random rand = new Random();
+
+        if(this.alternateFall){
+
+            for (int x = 0; x < 2*numberOfBoxes; x++) {
+                DestroyBlock rect = createBlok();
+
                 int inactiveBlock = rand.nextInt(25);
                 if(inactiveBlock == 0){
                     rect.setFill(Color.BLACK);
@@ -82,33 +90,8 @@ public class Main extends Application{
         }
         else {
             for (int x = 0; x < numberOfBoxes; x++) {
-                DestroyBlock rect = new DestroyBlock(0, -boxHeight/2, boxWidth, boxHeight);
+                DestroyBlock rect = createBlok();
 
-                Random rand = new Random();
-                int selectColor = rand.nextInt(10);
-                switch (selectColor){
-                    case 0: rect.setFill(Color.BLUEVIOLET);
-                            break;
-                    case 1: rect.setFill(Color.AQUA);
-                        break;
-                    case 2: rect.setFill(Color.TOMATO);
-                        break;
-                    case 3: rect.setFill(Color.PINK);
-                        break;
-                    case 4: rect.setFill(Color.ORANGE);
-                        break;
-                    case 5: rect.setFill(Color.RED);
-                        break;
-                    case 6: rect.setFill(Color.MISTYROSE);
-                        break;
-                    case 7: rect.setFill(Color.YELLOW);
-                        break;
-                    case 8: rect.setFill(Color.MAGENTA);
-                        break;
-                    case 9: rect.setFill(Color.MINTCREAM);
-                        break;
-                }
-                rect.setStroke(Color.BLACK);
                 int inactiveBlock = rand.nextInt(25);
                 if(inactiveBlock == 0){
                     rect.setFill(Color.BLACK);
@@ -129,27 +112,25 @@ public class Main extends Application{
 
     }
 
-    private void boxesFall(){
+    private void createAnimation(){
+        Path [] pathBoxes = new Path[boxes.length];
+        for(int i=0; i<pathBoxes.length; i++){
+            pathBoxes[i] = new Path();
 
-        if(this.alternateFall){
-            this.alternateFall = false;
-
-            Path [] pathBoxes = new Path[boxes.length];
+            pathBoxes[i].getElements().add(new MoveTo(boxes[i].getLayoutX() + boxWidth/2, boxes[i].getLayoutY() - boxHeight/2));
+            pathBoxes[i].getElements().add(new LineTo(boxes[i].getLayoutX() + boxWidth/2, windowHeight));
+            PathTransition pathTransition = new PathTransition();
+            pathTransition.setDuration(Duration.millis(3000));
+            pathTransition.setPath(pathBoxes[i]);
+            pathTransition.setNode(boxes[i]);
+            pathTransition.play();
+            if(i == 5)
+                pathTransition.setOnFinished(e -> nextCycle());
+        }
+        if(alternateFall){
+            alternateFall = false;
             Path [] pathBoxesAlternate = new Path[boxesAlternate.length];
 
-            for(int i=0; i<pathBoxes.length; i++){
-                pathBoxes[i] = new Path();
-
-                pathBoxes[i].getElements().add(new MoveTo(boxes[i].getLayoutX() + boxWidth/2, boxes[i].getLayoutY() - boxHeight/2));
-                pathBoxes[i].getElements().add(new LineTo(boxes[i].getLayoutX() + boxWidth/2, windowHeight));
-                PathTransition pathTransition = new PathTransition();
-                pathTransition.setDuration(Duration.millis(3000));
-                pathTransition.setPath(pathBoxes[i]);
-                pathTransition.setNode(boxes[i]);
-                pathTransition.play();
-                if(i == 5)
-                    pathTransition.setOnFinished(e -> nextCycle());
-            }
             for(int i=0; i<pathBoxesAlternate.length; i++){
                 pathBoxesAlternate[i] = new Path();
 
@@ -157,28 +138,16 @@ public class Main extends Application{
                 pathBoxesAlternate[i].getElements().add(new LineTo(boxesAlternate[i].getLayoutX() + boxWidth/2, windowHeight));
                 PathTransition pathTransition = new PathTransition();
                 pathTransition.setDuration(Duration.millis(3000));
-                pathTransition.setPath(pathBoxes[i]);
+                pathTransition.setPath(pathBoxesAlternate[i]);
                 pathTransition.setNode(boxesAlternate[i]);
                 pathTransition.setDelay(new Duration(1500));
                 pathTransition.play();
             }
         }
-        else{
-            Path [] pathBoxes = new Path[boxes.length];
-            for(int i=0; i<pathBoxes.length; i++){
-                pathBoxes[i] = new Path();
+    }
 
-                pathBoxes[i].getElements().add(new MoveTo(boxes[i].getLayoutX() + boxWidth/2, boxes[i].getLayoutY() - boxHeight/2));
-                pathBoxes[i].getElements().add(new LineTo(boxes[i].getLayoutX() + boxWidth/2, windowHeight));
-                PathTransition pathTransition = new PathTransition();
-                pathTransition.setDuration(Duration.millis(3000));
-                pathTransition.setPath(pathBoxes[i]);
-                pathTransition.setNode(boxes[i]);
-                pathTransition.play();
-                if(i == 5)
-                    pathTransition.setOnFinished(e -> nextCycle());
-            }
-        }
+    private void boxesFall(){
+        createAnimation();
     }
 
     private void nextCycle(){
