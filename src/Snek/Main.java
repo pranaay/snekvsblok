@@ -2,9 +2,11 @@ package Snek;
 
 import javafx.animation.PathTransition;
 import javafx.application.Application;
+import javafx.geometry.Orientation;
+import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.control.SplitPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.text.Text;
@@ -19,10 +21,20 @@ public class Main extends Application{
     private double boxWidth = 80;
     private double boxHeight = 50;
 
+    private double gamePaneWidth;
+    private double gamePaneHeight;
+    private double optionsPaneWidth;
+    private double optionsPaneHeight;
+
     private StackPane[] boxes;
     private StackPane[] boxesAlternate;
+    private StackPane[] balls;
+
     private GridPane gridPaneBoard;
-    private int numberOfBoxes;
+
+    private int numberOfBoxes = 8;
+    private int numberOfBalls;
+
     private boolean alternateFall = true;
 
     private DestroyBlock createBlok(){
@@ -120,9 +132,8 @@ public class Main extends Application{
         for(int i=0; i<pathBoxes.length; i++){
             pathBoxes[i] = new Path();
 
-            pathBoxes[i].getElements().add(new MoveTo(boxes[i].getLayoutX() + boxWidth/2, boxes[i].getLayoutY() - boxHeight));
-            System.out.println(boxes[i].getLayoutY() - boxHeight);
-            pathBoxes[i].getElements().add(new LineTo(boxes[i].getLayoutX() + boxWidth/2, windowHeight));
+            pathBoxes[i].getElements().add(new MoveTo(boxes[i].getLayoutX() + boxWidth/2, boxes[i].getTranslateY()));
+            pathBoxes[i].getElements().add(new LineTo(boxes[i].getLayoutX() + boxWidth/2, gamePaneHeight + boxHeight/2));
             PathTransition pathTransition = new PathTransition();
             pathTransition.setDuration(Duration.millis(3000));
             pathTransition.setPath(pathBoxes[i]);
@@ -139,7 +150,7 @@ public class Main extends Application{
                 pathBoxesAlternate[i] = new Path();
 
                 pathBoxesAlternate[i].getElements().add(new MoveTo(boxesAlternate[i].getLayoutX() + boxWidth/2, boxes[i].getLayoutY() - boxHeight));
-                pathBoxesAlternate[i].getElements().add(new LineTo(boxesAlternate[i].getLayoutX() + boxWidth/2, windowHeight));
+                pathBoxesAlternate[i].getElements().add(new LineTo(boxesAlternate[i].getLayoutX() + boxWidth/2, gamePaneHeight + boxHeight/2));
                 PathTransition pathTransition = new PathTransition();
                 pathTransition.setDuration(Duration.millis(3000));
                 pathTransition.setPath(pathBoxesAlternate[i]);
@@ -154,35 +165,110 @@ public class Main extends Application{
         createAnimation();
     }
 
+    private void createBalls(){
+        Random rand = new Random();
+
+        for(int i=0; i<numberOfBalls; i++){
+            int x = rand.nextInt(numberOfBoxes);
+            int y = 0;
+            while(y == 0){
+                y = rand.nextInt(10);
+                y *= -1;
+            }
+
+            StackPane ball = new StackPane();
+            Ball rawBall = new Ball(10);
+            rawBall.setFill(Color.PINK);
+            Text text = new Text(Integer.toString(rand.nextInt(10)));
+            ball.getChildren().addAll(rawBall, text);
+
+            gridPaneBoard.add(ball, x, 0);
+            balls[i] = ball;
+
+            balls[i].setTranslateY(boxHeight * (y - boxHeight));
+        }
+    }
+
+    private void ballsFall(){
+        Path [] pathBalls = new Path[balls.length];
+
+        for(int i=0; i<pathBalls.length; i++){
+            pathBalls[i] = new Path();
+
+            pathBalls[i].getElements().add(new MoveTo(balls[i].getLayoutX() + boxWidth/2, balls[i].getLayoutY()));
+            pathBalls[i].getElements().add(new LineTo(balls[i].getLayoutX() + boxWidth/2, windowHeight));
+            PathTransition pathTransition = new PathTransition();
+            pathTransition.setDuration(Duration.millis(3000));
+            pathTransition.setPath(pathBalls[i]);
+            pathTransition.setNode(balls[i]);
+            pathTransition.play();
+            System.out.println(balls[i].getTranslateY() + "  " + boxes[i].getTranslateY());
+        }
+    }
+
     private void nextCycle(){
         boxes = new StackPane[numberOfBoxes];
         boxesAlternate = new StackPane[numberOfBoxes];
+
         Random rand = new Random();
         int alternate = rand.nextInt(5);
         if(alternate == 0){
             this.alternateFall = true;
         }
+
         createBoxes();
         boxesFall();
+
+//        numberOfBalls = 1 + rand.nextInt(numberOfBoxes/2);
+//        balls = new StackPane[numberOfBalls];
+//
+//        createBalls();
+//        ballsFall();
     }
 
     @Override
     public void start(Stage primaryStage) {
 
         gridPaneBoard = new GridPane();
-        primaryStage.setResizable(false );
-        Scene scene = new Scene(gridPaneBoard);
+        HBox hBox = new HBox();
+        hBox.setTranslateX(20);
+        hBox.setTranslateY(20);
+        primaryStage.setResizable(false);
+        Scene scene = new Scene(new Group(hBox));
         primaryStage.show();
         primaryStage.setMinHeight(windowHeight);
         primaryStage.setMinWidth(windowWidth);
         primaryStage.setScene(scene);
         primaryStage.setMaximized(true);
-        scene.setFill(Color.BLACK);
+        scene.setFill(Color.DARKGREY);
         primaryStage.setTitle("Snek");
 
         windowWidth = primaryStage.getWidth();
         windowHeight = primaryStage.getHeight();
-        numberOfBoxes = (int) Math.floor(windowWidth/boxWidth);
+
+        gamePaneWidth = 0.6 * windowWidth - 40;
+        gamePaneHeight = windowHeight - 60;
+        optionsPaneWidth = 0.4 * windowWidth - 40;
+        optionsPaneHeight = windowHeight - 60;
+
+//        numberOfBoxes = (int) Math.floor(gamePaneWidth/boxWidth);
+        boxWidth = Math.floor(gamePaneWidth/numberOfBoxes);
+
+        System.out.println(gamePaneHeight + " " + gamePaneWidth);
+
+        SplitPane gamePane = new SplitPane();
+        gamePane.setOrientation(Orientation.VERTICAL);
+        gamePane.setPrefSize(gamePaneWidth, gamePaneHeight);
+        hBox.getChildren().add(gamePane);
+        gamePane.getItems().add(gridPaneBoard);
+        gridPaneBoard.setBackground(Background.EMPTY);
+
+        SplitPane optionsPane = new SplitPane();
+        optionsPane.setOrientation(Orientation.VERTICAL);
+        optionsPane.setPrefSize(optionsPaneWidth, optionsPaneHeight);
+        hBox.getChildren().add(optionsPane);
+
+
 
         nextCycle();
 //        gridPaneBoard.getChildren().add(new Ball(10));
