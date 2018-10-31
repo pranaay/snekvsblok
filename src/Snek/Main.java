@@ -238,6 +238,7 @@ public class Main extends Application{
         HBox hBox = new HBox();
         hBox.setTranslateX(20);
         hBox.setTranslateY(20);
+        hBox.setSpacing(40);
         primaryStage.setResizable(false);
         Scene scene = new Scene(new Group(hBox));
         primaryStage.show();
@@ -266,7 +267,9 @@ public class Main extends Application{
         gamePane.setPrefSize(gamePaneWidth, gamePaneHeight);
         hBox.getChildren().add(gamePane);
         gamePane.getItems().add(gridPaneBoard);
-        gridPaneBoard.setBackground(Background.EMPTY);
+
+//        gridPaneBoard.setBackground(Background.EMPTY);
+        gamePane.setStyle("-fx-background-color: #000000");
 
         SplitPane optionsPane = new SplitPane();
         optionsPane.setOrientation(Orientation.VERTICAL);
