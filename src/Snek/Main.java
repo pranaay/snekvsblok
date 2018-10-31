@@ -196,18 +196,23 @@ public class Main extends Application{
 
     private void ballsFall(){
         Path [] pathBalls = new Path[balls.length];
+        Random rand = new Random();
 
         for(int i=0; i<pathBalls.length; i++){
+
+            if(boxes[i] == null)
+                continue;
             pathBalls[i] = new Path();
 
-            pathBalls[i].getElements().add(new MoveTo(balls[i].getLayoutX() + boxWidth/2, balls[i].getLayoutY()));
-            pathBalls[i].getElements().add(new LineTo(balls[i].getLayoutX() + boxWidth/2, windowHeight));
+            pathBalls[i].getElements().add(new MoveTo(balls[i].getLayoutX() + boxWidth/2, balls[i].getLayoutY() - boxHeight));
+            pathBalls[i].getElements().add(new LineTo(balls[i].getLayoutX() + boxWidth/2, gamePaneHeight + boxHeight));
             PathTransition pathTransition = new PathTransition();
             pathTransition.setDuration(Duration.millis(3000));
             pathTransition.setPath(pathBalls[i]);
             pathTransition.setNode(balls[i]);
+            pathTransition.setDelay(new Duration(700 + rand.nextInt(500)));
             pathTransition.play();
-            System.out.println(balls[i].getTranslateY() + "  " + boxes[i].getTranslateY());
+//            System.out.println(balls[i].getTranslateY() + "  " + boxes[i].getTranslateY());
         }
     }
 
@@ -224,11 +229,11 @@ public class Main extends Application{
         createBoxes();
         boxesFall();
 
-//        numberOfBalls = 1 + rand.nextInt(numberOfBoxes/2);
-//        balls = new StackPane[numberOfBalls];
+        numberOfBalls = 1 + rand.nextInt(numberOfBoxes/2);
+        balls = new StackPane[numberOfBalls];
 //
-//        createBalls();
-//        ballsFall();
+        createBalls();
+        ballsFall();
     }
 
     @Override
@@ -279,16 +284,6 @@ public class Main extends Application{
 
 
         nextCycle();
-//        gridPaneBoard.getChildren().add(new Ball(10));
-//        StackPane ball = new StackPane();
-//        Ball temp = new Ball(10);
-//        temp.setFill(Color.PINK);
-//        Text text = new Text("5");
-//        ball.getChildren().addAll(temp, text);
-//        ball.setTranslateX(100);
-//        ball.setTranslateY(100);
-//        gridPaneBoard.getChildren().add(ball);
-
     }
 
 
