@@ -76,10 +76,9 @@ public class Main extends Application{
             for (int x = 0; x < 2*numberOfBoxes; x++) {
                 DestroyBlock rect = createBlok();
 
-                int inactiveBlock = rand.nextInt(25);
+                int inactiveBlock = rand.nextInt(10);
                 if(inactiveBlock == 0){
-                    rect.setFill(Color.BLACK);
-                    rect.setInactive();
+                    continue;
                 }
 
                 Text text =  new Text(Integer.toString(rect.getBoxValue()));
@@ -108,8 +107,7 @@ public class Main extends Application{
 
                 int inactiveBlock = rand.nextInt(25);
                 if(inactiveBlock == 0){
-                    rect.setFill(Color.BLACK);
-                    rect.setInactive();
+                    continue;
                 }
 
                 Text text =  new Text(Integer.toString(rect.getBoxValue()));
@@ -130,6 +128,9 @@ public class Main extends Application{
     private void createAnimation(){
         Path [] pathBoxes = new Path[boxes.length];
         for(int i=0; i<pathBoxes.length; i++){
+            if(boxes[i] == null)
+                continue;
+
             pathBoxes[i] = new Path();
 
             pathBoxes[i].getElements().add(new MoveTo(boxes[i].getLayoutX() + boxWidth/2, boxes[i].getTranslateY()));
@@ -147,9 +148,13 @@ public class Main extends Application{
             Path [] pathBoxesAlternate = new Path[boxesAlternate.length];
 
             for(int i=0; i<pathBoxesAlternate.length; i++){
+
+                if(boxesAlternate[i] == null)
+                    continue;
+
                 pathBoxesAlternate[i] = new Path();
 
-                pathBoxesAlternate[i].getElements().add(new MoveTo(boxesAlternate[i].getLayoutX() + boxWidth/2, boxes[i].getLayoutY() - boxHeight));
+                pathBoxesAlternate[i].getElements().add(new MoveTo(boxesAlternate[i].getLayoutX() + boxWidth/2, boxesAlternate[i].getLayoutY() - boxHeight));
                 pathBoxesAlternate[i].getElements().add(new LineTo(boxesAlternate[i].getLayoutX() + boxWidth/2, gamePaneHeight + boxHeight/2));
                 PathTransition pathTransition = new PathTransition();
                 pathTransition.setDuration(Duration.millis(3000));
