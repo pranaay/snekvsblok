@@ -127,6 +127,7 @@ public class PlayGame extends Application{
 
     private void createAnimation(){
         Path [] pathBoxes = new Path[boxes.length];
+        boolean setNext = false;
         for(int i=0; i<pathBoxes.length; i++){
             if(boxes[i] == null)
                 continue;
@@ -140,9 +141,12 @@ public class PlayGame extends Application{
             pathTransition.setPath(pathBoxes[i]);
             pathTransition.setNode(boxes[i]);
             pathTransition.play();
-            if(i == 5)
+            if(!setNext) {
+                setNext = true;
                 pathTransition.setOnFinished(e -> nextCycle());
+            }
         }
+        
         if(alternateFall){
             alternateFall = false;
             Path [] pathBoxesAlternate = new Path[boxesAlternate.length];
