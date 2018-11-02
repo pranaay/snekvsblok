@@ -10,8 +10,7 @@ public class Ball extends Circle {
 
     public Ball() {
         super();
-        Random rand = new Random();
-        this.Value = 1 + rand.nextInt(10);
+        this.Value = 0;
     }
 
     public Ball(double radius) {
@@ -25,4 +24,5 @@ public class Ball extends Circle {
         Random rand = new Random();
         this.Value = 1 + rand.nextInt(10);
     }
+
 }

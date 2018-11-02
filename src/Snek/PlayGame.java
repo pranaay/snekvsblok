@@ -146,7 +146,7 @@ public class PlayGame extends Application{
                 pathTransition.setOnFinished(e -> nextCycle());
             }
         }
-        
+
         if(alternateFall){
             alternateFall = false;
             Path [] pathBoxesAlternate = new Path[boxesAlternate.length];
@@ -265,11 +265,11 @@ public class PlayGame extends Application{
         gamePaneHeight = windowHeight - 60;
         optionsPaneWidth = 0.4 * windowWidth - 40;
         optionsPaneHeight = windowHeight - 60;
+        double centerOfGamePaneHeight = gamePaneHeight/2;
+        double centerOfGamePaneWidth = gamePaneWidth/2;
 
 //        numberOfBoxes = (int) Math.floor(gamePaneWidth/boxWidth);
         boxWidth = Math.floor(gamePaneWidth/numberOfBoxes);
-
-        System.out.println(gamePaneHeight + " " + gamePaneWidth);
 
         SplitPane gamePane = new SplitPane();
         gamePane.setOrientation(Orientation.VERTICAL);
@@ -285,7 +285,7 @@ public class PlayGame extends Application{
         optionsPane.setPrefSize(optionsPaneWidth, optionsPaneHeight);
         hBox.getChildren().add(optionsPane);
 
-
+        Snake snake = new Snake(10, gridPaneBoard, centerOfGamePaneHeight, centerOfGamePaneWidth);
 
         nextCycle();
     }
