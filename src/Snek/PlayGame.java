@@ -29,11 +29,13 @@ public class PlayGame extends Application{
     private StackPane[] boxes;
     private StackPane[] boxesAlternate;
     private StackPane[] balls;
+    private StackPane[] coins;
 
     private GridPane gridPaneBoard;
 
     private int numberOfBoxes = 8;
     private int numberOfBalls;
+    private int numberOfCoins;
 
     private boolean alternateFall = true;
 
@@ -73,13 +75,9 @@ public class PlayGame extends Application{
 
         if(this.alternateFall){
 
+            int definetlyInactive = rand.nextInt(numberOfBoxes);
             for (int x = 0; x < 2*numberOfBoxes; x++) {
                 DestroyBlock rect = createBlok();
-
-                int inactiveBlock = rand.nextInt(10);
-                if(inactiveBlock == 0){
-                    continue;
-                }
 
                 Text text =  new Text(Integer.toString(rect.getBoxValue()));
                 text.setStyle("-fx-font-size: 18px;style: \"-fx-font-weight: bold\";");
@@ -88,12 +86,20 @@ public class PlayGame extends Application{
                 StackPane stackPane = new StackPane();
                 stackPane.getChildren().addAll(rect, text);
                 if(x < numberOfBoxes){
+                    int inactiveBlock = rand.nextInt(numberOfBoxes);
+                    if(inactiveBlock == x || x == definetlyInactive){
+                        continue;
+                    }
                     boxes[x] = stackPane;
                     boxes[x].setTranslateY(-boxHeight);
 //                    boxes[x].setLayoutY(-boxHeight);
                     gridPaneBoard.add(boxes[x], x, 0);
                 }
                 else{
+                    int inactiveBlock = rand.nextInt(numberOfBoxes);
+                    if(inactiveBlock == x-numberOfBoxes || x-numberOfBoxes == definetlyInactive){
+                        continue;
+                    }
                     boxesAlternate[x-numberOfBoxes] = stackPane;
                     boxesAlternate[x-numberOfBoxes].setTranslateY(-boxHeight);
 //                    boxesAlternate[x-numberOfBoxes].setLayoutY(-boxHeight);
@@ -102,11 +108,12 @@ public class PlayGame extends Application{
             }
         }
         else {
+            int definetlyInactive = rand.nextInt(numberOfBoxes);
             for (int x = 0; x < numberOfBoxes; x++) {
                 DestroyBlock rect = createBlok();
 
-                int inactiveBlock = rand.nextInt(25);
-                if(inactiveBlock == 0){
+                int inactiveBlock = rand.nextInt(numberOfBoxes);
+                if(inactiveBlock == x || x == definetlyInactive){
                     continue;
                 }
 
@@ -215,11 +222,55 @@ public class PlayGame extends Application{
         }
     }
 
+    private void createCoins(){
+        Random rand = new Random();
+
+        for(int i=0; i<numberOfCoins; i++){
+            int x = rand.nextInt(numberOfBoxes);
+            int y = 0;
+            while(y == 0){
+                y = rand.nextInt(10);
+                y *= -1;
+            }
+
+            StackPane coin = new StackPane();
+            Coin rawCoin = new Coin(10);
+            rawCoin.setFill(Color.GOLD);
+            coin.getChildren().add(rawCoin);
+
+            gridPaneBoard.add(coin, x, 0);
+            coins[i] = coin;
+
+            coins[i].setTranslateY(boxHeight * (y - boxHeight));
+        }
+    }
+
+    private void coinsFall(){
+        Path [] pathCoins = new Path[numberOfCoins];
+        Random rand = new Random();
+
+        for(int i=0; i<pathCoins.length; i++){
+
+            pathCoins[i] = new Path();
+
+            pathCoins[i].getElements().add(new MoveTo(coins[i].getLayoutX() + boxWidth/2, coins[i].getLayoutY() - boxHeight));
+            pathCoins[i].getElements().add(new LineTo(coins[i].getLayoutX() + boxWidth/2, gamePaneHeight + boxHeight));
+            PathTransition pathTransition = new PathTransition();
+            pathTransition.setDuration(Duration.millis(3000));
+            pathTransition.setPath(pathCoins[i]);
+            pathTransition.setNode(coins[i]);
+            pathTransition.setDelay(new Duration(900 + rand.nextInt(500)));
+            pathTransition.play();
+        }
+    }
+
     private void nextCycle(){
-        boxes = new StackPane[numberOfBoxes];
-        boxesAlternate = new StackPane[numberOfBoxes];
 
         Random rand = new Random();
+
+        // Boxes
+        boxes = new StackPane[numberOfBoxes];
+        boxesAlternate = new StackPane[numberOfBoxes];
         int alternate = rand.nextInt(5);
         if(alternate == 0){
             this.alternateFall = true;
@@ -227,10 +278,22 @@ public class PlayGame extends Application{
         createBoxes();
         boxesFall();
 
+        // Balls
         numberOfBalls = 1 + rand.nextInt(numberOfBoxes/2);
         balls = new StackPane[numberOfBalls];
         createBalls();
         ballsFall();
+
+        // Coins
+        try {
+            numberOfCoins = 1 + rand.nextInt(numberOfBalls / 2 == 0 ? 1 : numberOfBalls/2);
+        } catch (java.lang.IllegalArgumentException e){
+            System.out.println(numberOfBalls/2);
+            System.out.println(e);
+        }
+        coins = new StackPane[numberOfCoins];
+        createCoins();
+        coinsFall();
     }
 
     @Override
