@@ -125,7 +125,7 @@ public class PlayGame extends Application{
 
     }
 
-    private void createAnimation(){
+    private void boxesFall(){
         Path [] pathBoxes = new Path[boxes.length];
         boolean setNext = false;
         for(int i=0; i<pathBoxes.length; i++){
@@ -168,10 +168,6 @@ public class PlayGame extends Application{
                 pathTransition.play();
             }
         }
-    }
-
-    private void boxesFall(){
-        createAnimation();
     }
 
     private void createBalls(){
