@@ -30,12 +30,16 @@ public class PlayGame extends Application{
     private StackPane[] boxesAlternate;
     private StackPane[] balls;
     private StackPane[] coins;
+    private StackPane[] walls;
 
     private GridPane gridPaneBoard;
 
     private int numberOfBoxes = 8;
     private int numberOfBalls;
     private int numberOfCoins;
+    private int numberOfWalls;
+
+    private int[] heightOfWalls;
 
     private boolean alternateFall = true;
 
@@ -101,7 +105,7 @@ public class PlayGame extends Application{
                         continue;
                     }
                     boxesAlternate[x-numberOfBoxes] = stackPane;
-                    boxesAlternate[x-numberOfBoxes].setTranslateY(-boxHeight);
+                    boxesAlternate[x-numberOfBoxes].setTranslateY(-2*boxHeight);
 //                    boxesAlternate[x-numberOfBoxes].setLayoutY(-boxHeight);
                     gridPaneBoard.add(boxesAlternate[x-numberOfBoxes], x-numberOfBoxes, 0);
                 }
@@ -264,6 +268,47 @@ public class PlayGame extends Application{
         }
     }
 
+    private void createWalls(){
+        Random rand = new Random();
+        for (int x = 0; x < numberOfWalls; x++) {
+            int needAWall = rand.nextInt(10);
+            if(needAWall < 4)
+                continue;
+
+            int height = 40;
+            Wall wall = new Wall(height);
+            heightOfWalls[x] = height;
+            wall.setFill(Color.WHITE);
+
+            StackPane stackPane = new StackPane();
+            stackPane.getChildren().addAll(wall);
+            stackPane.setTranslateY(0);
+            stackPane.setTranslateX(-boxWidth/2);
+            walls[x] = stackPane;
+            gridPaneBoard.add(walls[x], x, 0);
+        }
+    }
+
+    private void wallsFall(){
+        Path [] pathWalls = new Path[walls.length];
+//        boolean setNext = false;
+        for(int i=0; i<pathWalls.length; i++){
+            if(walls[i] == null)
+                continue;
+
+            pathWalls[i] = new Path();
+
+            pathWalls[i].getElements().add(new MoveTo(walls[i].getLayoutX(), walls[i].getTranslateY()));
+            pathWalls[i].getElements().add(new LineTo(walls[i].getLayoutX(), gamePaneHeight + heightOfWalls[i]/2));
+            PathTransition pathTransition = new PathTransition();
+            pathTransition.setDuration(Duration.millis(2850));
+            pathTransition.setPath(pathWalls[i]);
+            pathTransition.setNode(walls[i]);
+//            pathTransition.setDelay(new Duration(150));
+            pathTransition.play();
+        }
+    }
+
     private void nextCycle(){
 
         Random rand = new Random();
@@ -277,6 +322,13 @@ public class PlayGame extends Application{
         }
         createBoxes();
         boxesFall();
+
+        // Walls
+        numberOfWalls = 1 + rand.nextInt(numberOfBoxes);
+        walls = new StackPane[numberOfWalls];
+        heightOfWalls = new int[numberOfWalls];
+        createWalls();
+        wallsFall();
 
         // Balls
         numberOfBalls = 1 + rand.nextInt(numberOfBoxes/2);
