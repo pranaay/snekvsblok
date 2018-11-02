@@ -181,12 +181,12 @@ public class PlayGame extends Application{
             int x = rand.nextInt(numberOfBoxes);
             int y = 0;
             while(y == 0){
-                y = rand.nextInt(10);
+                y = rand.nextInt(20);
                 y *= -1;
             }
 
             StackPane ball = new StackPane();
-            Ball rawBall = new Ball(10);
+            Ball rawBall = new Ball(15);
             rawBall.setFill(Color.PINK);
             Text text = new Text(Integer.toString(rand.nextInt(10)));
             ball.getChildren().addAll(rawBall, text);
@@ -216,7 +216,6 @@ public class PlayGame extends Application{
             pathTransition.setNode(balls[i]);
             pathTransition.setDelay(new Duration(700 + rand.nextInt(500)));
             pathTransition.play();
-//            System.out.println(balls[i].getTranslateY() + "  " + boxes[i].getTranslateY());
         }
     }
 
@@ -229,13 +228,11 @@ public class PlayGame extends Application{
         if(alternate == 0){
             this.alternateFall = true;
         }
-
         createBoxes();
         boxesFall();
 
         numberOfBalls = 1 + rand.nextInt(numberOfBoxes/2);
         balls = new StackPane[numberOfBalls];
-//
         createBalls();
         ballsFall();
     }
@@ -268,7 +265,6 @@ public class PlayGame extends Application{
         double centerOfGamePaneHeight = gamePaneHeight/2;
         double centerOfGamePaneWidth = gamePaneWidth/2;
 
-//        numberOfBoxes = (int) Math.floor(gamePaneWidth/boxWidth);
         boxWidth = Math.floor(gamePaneWidth/numberOfBoxes);
 
         SplitPane gamePane = new SplitPane();
@@ -277,7 +273,6 @@ public class PlayGame extends Application{
         hBox.getChildren().add(gamePane);
         gamePane.getItems().add(gridPaneBoard);
 
-//        gridPaneBoard.setBackground(Background.EMPTY);
         gamePane.setStyle("-fx-background-color: #000000");
 
         SplitPane optionsPane = new SplitPane();
