@@ -212,7 +212,7 @@ public class PlayGame extends Application{
 			else{
 				StackPane ball = new StackPane();
 				Ball rawBall = new Ball(15);
-				rawBall.setFill(Color.BLUE);
+				rawBall.setFill(Color.PINK);
 				Text text = new Text(Integer.toString(rand.nextInt(10)));
 				ball.getChildren().addAll(rawBall, text);
 
@@ -242,7 +242,7 @@ public class PlayGame extends Application{
 			pathTransition.setDuration(Duration.millis(3000));
 			pathTransition.setPath(pathBalls[i]);
 			pathTransition.setNode(balls[i]);
-			pathTransition.setDelay(new Duration(700 + rand.nextInt(500)));
+			pathTransition.setDelay(new Duration(500 + rand.nextInt(500)));
 			pathTransition.play();
 		}
 
@@ -297,10 +297,38 @@ public class PlayGame extends Application{
 			pathTransition.setDuration(Duration.millis(3000));
 			pathTransition.setPath(pathCoins[i]);
 			pathTransition.setNode(coins[i]);
-			pathTransition.setDelay(new Duration(900 + rand.nextInt(500)));
+			pathTransition.setDelay(new Duration(400 + rand.nextInt(500)));
 			pathTransition.play();
 		}
 	}
+
+	private void addShield(){
+	    Random rand = new Random();
+	    shield = new StackPane();
+
+        int x = rand.nextInt(numberOfBoxes);
+
+	    Shield tempShield = new Shield();
+	    tempShield.setFill(Color.SILVER);
+	    shield.getChildren().add(tempShield);
+
+        gridPaneBoard.add(shield, x, 3);
+        shield.setTranslateY(-(wallHeight+boxHeight+boxHeight));
+    }
+
+    private void shieldFall(){
+        Path shieldPath = new Path();
+        Random rand = new Random();
+
+        shieldPath.getElements().add(new MoveTo(shield.getTranslateX() + boxWidth/2, shield.getTranslateY()));
+        shieldPath.getElements().add(new LineTo(shield.getTranslateX() + boxWidth/2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
+        PathTransition pathTransition = new PathTransition();
+        pathTransition.setDuration(Duration.millis(3000));
+        pathTransition.setPath(shieldPath);
+        pathTransition.setNode(shield);
+        pathTransition.setDelay(new Duration(700 + rand.nextInt(600)));
+        pathTransition.play();
+    }
 
 	private void addMagnet(){
 	    Random rand = new Random();
@@ -419,7 +447,11 @@ public class PlayGame extends Application{
         }
 
         // Shields
-        
+        int shieldNow = rand.nextInt(10);
+        if(shieldNow == 0){
+            addShield();
+            shieldFall();
+        }
 	}
 
 	@Override
