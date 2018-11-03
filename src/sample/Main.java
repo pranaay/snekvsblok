@@ -14,6 +14,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
+import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.scene.input.MouseButton;
@@ -51,13 +52,21 @@ public class Main extends Application {
     private StackPane[] boxes;
     private StackPane[] boxesAlternate;
     private StackPane[] balls;
-
+    private StackPane[] ballsAlternate;
+    private StackPane[] coins;
+    private StackPane[] walls;
     private GridPane gridPaneBoard;
-
+    private StackPane magnet;
+    private StackPane shield;
     private int numberOfBoxes = 8;
     private int numberOfBalls;
+    private int numberOfCoins;
+    private int numberOfWalls;
 
-    private boolean alternateFall = true;
+    private double wallHeight = 200;
+
+    private boolean alternateFallBoxes = true;
+
     final String IDLE_BUTTON_STYLE = "-fx-padding: 8 15 15 15;"+
         "-fx-background-insets: 0,0 0 5 0, 0 0 6 0, 0 0 7 0;"+
         "-fx-background-radius: 8;"+
@@ -105,7 +114,9 @@ public class Main extends Application {
             "-fx-font-size: 1.1em;" ;
     Stage window;
     Scene mainScreen , leaderBoards , changeSkin , pause , mainGame ;
-    Button toMainScreen,toLeaderPage,toSkinChangePage, Quit, toStartGame;
+    Button toMainScreen,toLeaderPage,toSkinChangePage, Quit, toStartGame, confirmButton;
+    ChoiceBox<String> Choices ;
+
     private StackPane playButton;
 
     private DestroyBlock createBlok(){
@@ -141,15 +152,11 @@ public class Main extends Application {
     private void createBoxes(){
         Random rand = new Random();
 
-        if(this.alternateFall){
+        if(this.alternateFallBoxes){
 
+            int definetlyInactive = rand.nextInt(numberOfBoxes);
             for (int x = 0; x < 2*numberOfBoxes; x++) {
                 DestroyBlock rect = createBlok();
-
-                int inactiveBlock = rand.nextInt(10);
-                if(inactiveBlock == 0){
-                    continue;
-                }
 
                 Text text =  new Text(Integer.toString(rect.getBoxValue()));
                 text.setStyle("-fx-font-size: 18px;style: \"-fx-font-weight: bold\";");
@@ -158,25 +165,35 @@ public class Main extends Application {
                 StackPane stackPane = new StackPane();
                 stackPane.getChildren().addAll(rect, text);
                 if(x < numberOfBoxes){
+                    int inactiveBlock = rand.nextInt(numberOfBoxes);
+                    if(inactiveBlock == x || x == definetlyInactive){
+                        continue;
+                    }
+                    stackPane.setTranslateY(-(wallHeight+boxHeight+boxHeight));
                     boxes[x] = stackPane;
-                    boxes[x].setTranslateY(-boxHeight);
 //                    boxes[x].setLayoutY(-boxHeight);
                     gridPaneBoard.add(boxes[x], x, 0);
+                    boxes[x].setTranslateY(-(wallHeight+boxHeight+boxHeight));
                 }
                 else{
+                    int inactiveBlock = rand.nextInt(numberOfBoxes);
+                    if(inactiveBlock == x-numberOfBoxes || x-numberOfBoxes == definetlyInactive){
+                        continue;
+                    }
+                    stackPane.setTranslateY(-(wallHeight+boxHeight+boxHeight));
                     boxesAlternate[x-numberOfBoxes] = stackPane;
-                    boxesAlternate[x-numberOfBoxes].setTranslateY(-boxHeight);
-//                    boxesAlternate[x-numberOfBoxes].setLayoutY(-boxHeight);
                     gridPaneBoard.add(boxesAlternate[x-numberOfBoxes], x-numberOfBoxes, 0);
+                    boxesAlternate[x-numberOfBoxes].setTranslateY(-(wallHeight+boxHeight+boxHeight));
                 }
             }
         }
         else {
+            int definetlyInactive = rand.nextInt(numberOfBoxes);
             for (int x = 0; x < numberOfBoxes; x++) {
                 DestroyBlock rect = createBlok();
 
-                int inactiveBlock = rand.nextInt(25);
-                if(inactiveBlock == 0){
+                int inactiveBlock = rand.nextInt(numberOfBoxes);
+                if(inactiveBlock == x || x == definetlyInactive){
                     continue;
                 }
 
@@ -186,15 +203,14 @@ public class Main extends Application {
 
                 StackPane stackPane = new StackPane();
                 stackPane.getChildren().addAll(rect, text);
+                stackPane.setTranslateY(-(wallHeight+boxHeight+boxHeight));
                 boxes[x] = stackPane;
-                boxes[x].setTranslateY(-boxHeight);
-//                boxes[x].setLayoutY(-boxHeight);
+                boxes[x].setTranslateY(-(wallHeight+boxHeight+boxHeight));
                 gridPaneBoard.add(boxes[x], x, 0);
             }
         }
 
     }
-
     private void playgame(){
         gridPaneBoard = new GridPane();
         HBox hBox = new HBox();
@@ -220,7 +236,8 @@ public class Main extends Application {
         gamePaneHeight = windowHeight - 60;
         optionsPaneWidth = 0.4 * windowWidth - 40;
         optionsPaneHeight = windowHeight - 60;
-
+        double centerOfGamePaneHeight = gamePaneHeight/2;
+        double centerOfGamePaneWidth = gamePaneWidth/2;
 //        numberOfBoxes = (int) Math.floor(gamePaneWidth/boxWidth);
         boxWidth = Math.floor(gamePaneWidth/numberOfBoxes);
 
@@ -236,34 +253,89 @@ public class Main extends Application {
         gamePane.setStyle("-fx-background-color: #000000");
 
         SplitPane optionsPane = new SplitPane();
+        Label score = new Label();
+        score.setText("1032");
+        optionsPane.getItems().add(score);
+        optionsPane.getItems().add(Choices);
+        optionsPane.getItems().add(confirmButton);
         optionsPane.setOrientation(Orientation.VERTICAL);
         optionsPane.setPrefSize(optionsPaneWidth, optionsPaneHeight);
         hBox.getChildren().add(optionsPane);
 
+        Snake snake = new Snake(10, gridPaneBoard, centerOfGamePaneHeight, centerOfGamePaneWidth);
 
 
         nextCycle();
     }
-    private void createAnimation(){
+//    private void createAnimation(){
+//        Path [] pathBoxes = new Path[boxes.length];
+//        boolean setNext = false;
+//        for(int i=0; i<pathBoxes.length; i++){
+//            if(boxes[i] == null)
+//                continue;
+//
+//            pathBoxes[i] = new Path();
+//
+//            pathBoxes[i].getElements().add(new MoveTo(boxes[i].getLayoutX() + boxWidth/2, boxes[i].getTranslateY()));
+//            pathBoxes[i].getElements().add(new LineTo(boxes[i].getLayoutX() + boxWidth/2, gamePaneHeight + boxHeight/2));
+//            PathTransition pathTransition = new PathTransition();
+//            pathTransition.setDuration(Duration.millis(3000));
+//            pathTransition.setPath(pathBoxes[i]);
+//            pathTransition.setNode(boxes[i]);
+//            pathTransition.play();
+//           // if(i == 5)
+//                if(!setNext){
+//                    setNext = true;
+//                    pathTransition.setOnFinished(e -> nextCycle());
+//                }
+//        }
+//
+//        if(alternateFall){
+//            alternateFall = false;
+//            Path [] pathBoxesAlternate = new Path[boxesAlternate.length];
+//
+//            for(int i=0; i<pathBoxesAlternate.length; i++){
+//
+//                if(boxesAlternate[i] == null)
+//                    continue;
+//
+//                pathBoxesAlternate[i] = new Path();
+//
+//                pathBoxesAlternate[i].getElements().add(new MoveTo(boxesAlternate[i].getLayoutX() + boxWidth/2, boxesAlternate[i].getLayoutY() - boxHeight));
+//                pathBoxesAlternate[i].getElements().add(new LineTo(boxesAlternate[i].getLayoutX() + boxWidth/2, gamePaneHeight + boxHeight/2));
+//                PathTransition pathTransition = new PathTransition();
+//                pathTransition.setDuration(Duration.millis(3000));
+//                pathTransition.setPath(pathBoxesAlternate[i]);
+//                pathTransition.setNode(boxesAlternate[i]);
+//                pathTransition.setDelay(new Duration(1500));
+//                pathTransition.play();
+//            }
+//        }
+//    }
+    private void boxesFall(){
         Path [] pathBoxes = new Path[boxes.length];
+        boolean setNext = false;
         for(int i=0; i<pathBoxes.length; i++){
             if(boxes[i] == null)
                 continue;
 
             pathBoxes[i] = new Path();
 
-            pathBoxes[i].getElements().add(new MoveTo(boxes[i].getLayoutX() + boxWidth/2, boxes[i].getTranslateY()));
-            pathBoxes[i].getElements().add(new LineTo(boxes[i].getLayoutX() + boxWidth/2, gamePaneHeight + boxHeight/2));
+            pathBoxes[i].getElements().add(new MoveTo(boxes[i].getTranslateX() + boxWidth/2, boxes[i].getTranslateY()));
+            pathBoxes[i].getElements().add(new LineTo(boxes[i].getTranslateX() + boxWidth/2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
             PathTransition pathTransition = new PathTransition();
             pathTransition.setDuration(Duration.millis(3000));
             pathTransition.setPath(pathBoxes[i]);
             pathTransition.setNode(boxes[i]);
             pathTransition.play();
-            if(i == 5)
-                pathTransition.setOnFinished(e -> nextCycle());
+            if(!setNext) {
+                setNext = true;
+//                pathTransition.setOnFinished(e -> nextCycle());
+            }
         }
-        if(alternateFall){
-            alternateFall = false;
+
+        if(alternateFallBoxes){
+            alternateFallBoxes = false;
             Path [] pathBoxesAlternate = new Path[boxesAlternate.length];
 
             for(int i=0; i<pathBoxesAlternate.length; i++){
@@ -273,8 +345,8 @@ public class Main extends Application {
 
                 pathBoxesAlternate[i] = new Path();
 
-                pathBoxesAlternate[i].getElements().add(new MoveTo(boxesAlternate[i].getLayoutX() + boxWidth/2, boxesAlternate[i].getLayoutY() - boxHeight));
-                pathBoxesAlternate[i].getElements().add(new LineTo(boxesAlternate[i].getLayoutX() + boxWidth/2, gamePaneHeight + boxHeight/2));
+                pathBoxesAlternate[i].getElements().add(new MoveTo(boxesAlternate[i].getTranslateX() + boxWidth/2, boxesAlternate[i].getTranslateY()));
+                pathBoxesAlternate[i].getElements().add(new LineTo(boxesAlternate[i].getTranslateX() + boxWidth/2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
                 PathTransition pathTransition = new PathTransition();
                 pathTransition.setDuration(Duration.millis(3000));
                 pathTransition.setPath(pathBoxesAlternate[i]);
@@ -284,77 +356,273 @@ public class Main extends Application {
             }
         }
     }
-    private void boxesFall(){
-        createAnimation();
-    }
-
 
     private void createBalls(){
         Random rand = new Random();
 
-        for(int i=0; i<numberOfBalls; i++){
+        for(int i=0; i<2*numberOfBalls; i++){
             int x = rand.nextInt(numberOfBoxes);
             int y = 0;
             while(y == 0){
-                y = rand.nextInt(10);
+                y = rand.nextInt(20);
                 y *= -1;
             }
 
-            StackPane ball = new StackPane();
-            Ball rawBall = new Ball(10);
-            rawBall.setFill(Color.PINK);
-            Text text = new Text(Integer.toString(rand.nextInt(10)));
-            ball.getChildren().addAll(rawBall, text);
+            if(i < numberOfBalls) {
+                StackPane ball = new StackPane();
+                Ball rawBall = new Ball(15);
+                rawBall.setFill(Color.PINK);
+                Text text = new Text(Integer.toString(rand.nextInt(10)));
+                ball.getChildren().addAll(rawBall, text);
+                gridPaneBoard.add(ball, x, 0);
+                balls[i] = ball;
 
-            gridPaneBoard.add(ball, x, 0);
-            balls[i] = ball;
+                balls[i].setTranslateY((-wallHeight+boxHeight+boxHeight));
+            }
+            else{
+                StackPane ball = new StackPane();
+                Ball rawBall = new Ball(15);
+                rawBall.setFill(Color.PINK);
+                Text text = new Text(Integer.toString(rand.nextInt(10)));
+                ball.getChildren().addAll(rawBall, text);
 
-            balls[i].setTranslateY(boxHeight * (y - boxHeight));
+                gridPaneBoard.add(ball, x, 0);
+                ballsAlternate[i-numberOfBalls] = ball;
+
+                ballsAlternate[i-numberOfBalls].setTranslateY(-(wallHeight+boxHeight+boxHeight));
+            }
         }
     }
 
     private void ballsFall(){
         Path [] pathBalls = new Path[balls.length];
+        Path [] pathBallsAlternate = new Path[balls.length];
+
         Random rand = new Random();
 
-        for(int i=0; i<pathBalls.length; i++){
+        for(int i=0; i<pathBalls.length; i++) {
 
-            if(boxes[i] == null)
+            if (boxes[i] == null)
                 continue;
             pathBalls[i] = new Path();
 
-            pathBalls[i].getElements().add(new MoveTo(balls[i].getLayoutX() + boxWidth/2, balls[i].getLayoutY() - boxHeight));
-            pathBalls[i].getElements().add(new LineTo(balls[i].getLayoutX() + boxWidth/2, gamePaneHeight + boxHeight));
+            pathBalls[i].getElements().add(new MoveTo(balls[i].getTranslateX() + boxWidth / 2, balls[i].getTranslateY()));
+            pathBalls[i].getElements().add(new LineTo(balls[i].getTranslateX() + boxWidth / 2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
             PathTransition pathTransition = new PathTransition();
             pathTransition.setDuration(Duration.millis(3000));
             pathTransition.setPath(pathBalls[i]);
             pathTransition.setNode(balls[i]);
-            pathTransition.setDelay(new Duration(700 + rand.nextInt(500)));
+            pathTransition.setDelay(new Duration(500 + rand.nextInt(500)));
             pathTransition.play();
-//            System.out.println(balls[i].getTranslateY() + "  " + boxes[i].getTranslateY());
+        }
+
+        boolean setOnFinished = false;
+        for(int i=0; i<ballsAlternate.length; i++){
+            pathBallsAlternate[i] = new Path();
+
+            pathBallsAlternate[i].getElements().add(new MoveTo(ballsAlternate[i].getTranslateX() + boxWidth/2, ballsAlternate[i].getTranslateY()));
+            pathBallsAlternate[i].getElements().add(new LineTo(ballsAlternate[i].getTranslateX() + boxWidth/2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
+            PathTransition pathTransition = new PathTransition();
+            pathTransition.setDuration(Duration.millis(3000));
+            pathTransition.setPath(pathBallsAlternate[i]);
+            pathTransition.setNode(ballsAlternate[i]);
+            pathTransition.setDelay(new Duration(2000));
+            if(!setOnFinished) {
+                setOnFinished = true;
+                pathTransition.setOnFinished(event -> nextCycle());
+            }
+            pathTransition.play();
         }
     }
 
 
+    private void createCoins(){
+        Random rand = new Random();
+
+        for(int i=0; i<numberOfCoins; i++){
+            int x = rand.nextInt(numberOfBoxes);
+
+            StackPane coin = new StackPane();
+            Coin rawCoin = new Coin(10);
+            rawCoin.setFill(Color.GOLD);
+            coin.getChildren().add(rawCoin);
+
+            gridPaneBoard.add(coin, x, 0);
+            coins[i] = coin;
+
+            coins[i].setTranslateY(-(wallHeight+boxHeight+boxHeight));
+        }
+    }
+
+    private void coinsFall(){
+        Path [] pathCoins = new Path[numberOfCoins];
+        Random rand = new Random();
+
+        for(int i=0; i<pathCoins.length; i++){
+
+            pathCoins[i] = new Path();
+
+            pathCoins[i].getElements().add(new MoveTo(coins[i].getTranslateX() + boxWidth/2, coins[i].getTranslateY()));
+            pathCoins[i].getElements().add(new LineTo(coins[i].getTranslateX() + boxWidth/2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
+            PathTransition pathTransition = new PathTransition();
+            pathTransition.setDuration(Duration.millis(3000));
+            pathTransition.setPath(pathCoins[i]);
+            pathTransition.setNode(coins[i]);
+            pathTransition.setDelay(new Duration(400 + rand.nextInt(500)));
+            pathTransition.play();
+        }
+    }
+
+    private void addShield(){
+        Random rand = new Random();
+        shield = new StackPane();
+
+        int x = rand.nextInt(numberOfBoxes);
+
+        Shield tempShield = new Shield();
+        tempShield.setFill(Color.SILVER);
+        shield.getChildren().add(tempShield);
+
+        gridPaneBoard.add(shield, x, 3);
+        shield.setTranslateY(-(wallHeight+boxHeight+boxHeight));
+    }
+
+    private void shieldFall(){
+        Path shieldPath = new Path();
+        Random rand = new Random();
+
+        shieldPath.getElements().add(new MoveTo(shield.getTranslateX() + boxWidth/2, shield.getTranslateY()));
+        shieldPath.getElements().add(new LineTo(shield.getTranslateX() + boxWidth/2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
+        PathTransition pathTransition = new PathTransition();
+        pathTransition.setDuration(Duration.millis(3000));
+        pathTransition.setPath(shieldPath);
+        pathTransition.setNode(shield);
+        pathTransition.setDelay(new Duration(700 + rand.nextInt(600)));
+        pathTransition.play();
+    }
     private void nextCycle(){
+
+        Random rand = new Random();
+
+        // Boxes
         boxes = new StackPane[numberOfBoxes];
         boxesAlternate = new StackPane[numberOfBoxes];
 
-        Random rand = new Random();
-        int alternate = rand.nextInt(5);
+        int alternate = rand.nextInt(3);
         if(alternate == 0){
-            this.alternateFall = true;
+            this.alternateFallBoxes = true;
         }
 
         createBoxes();
         boxesFall();
 
+        // Walls
+        numberOfWalls = 1 + rand.nextInt(numberOfBoxes);
+        walls = new StackPane[numberOfWalls];
+        createWalls();
+        wallsFall();
+
+        // Balls
         numberOfBalls = 1 + rand.nextInt(numberOfBoxes/2);
         balls = new StackPane[numberOfBalls];
-//
+        ballsAlternate = new StackPane[numberOfBalls];
+
         createBalls();
         ballsFall();
+
+        // Coins
+        numberOfCoins = 1 + rand.nextInt(numberOfBalls / 2 == 0 ? 1 : numberOfBalls/2);
+        coins = new StackPane[numberOfCoins];
+        createCoins();
+        coinsFall();
+
+        // Magnet
+        int magNow = rand.nextInt(10);
+        if(magNow == 0){
+            magnet = new StackPane();
+            addMagnet();
+            magnetFall();
+        }
+
+        // Shields
+        int shieldNow = rand.nextInt(10);
+        if(shieldNow == 0){
+            addShield();
+            shieldFall();
+        }
     }
+
+    private void addMagnet(){
+        Random rand = new Random();
+
+        int x = rand.nextInt(numberOfBoxes);
+
+        Magnet mag = new Magnet(10);
+        mag.setFill(Color.BLACK);
+        Text text = new Text("U");
+        text.setFont(Font.font ("Verdana", 20));
+        text.setStyle("-fx-font-weight: bold");
+        text.setFill(Color.MAGENTA);
+        magnet.getChildren().addAll(mag, text);
+        gridPaneBoard.add(magnet, x, 2);
+
+        magnet.setTranslateY(-(wallHeight+boxHeight+boxHeight));
+    }
+
+    private void magnetFall(){
+        Path magPath = new Path();
+        Random rand = new Random();
+
+        magPath.getElements().add(new MoveTo(magnet.getTranslateX() + boxWidth/2, magnet.getTranslateY()));
+        magPath.getElements().add(new LineTo(magnet.getTranslateX() + boxWidth/2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
+        PathTransition pathTransition = new PathTransition();
+        pathTransition.setDuration(Duration.millis(3000));
+        pathTransition.setPath(magPath);
+        pathTransition.setNode(magnet);
+        pathTransition.setDelay(new Duration(700 + rand.nextInt(600)));
+        pathTransition.play();
+    }
+    private void createWalls(){
+        Random rand = new Random();
+        for (int x = 0; x < numberOfWalls; x++) {
+            int needAWall = rand.nextInt(10);
+            if(needAWall < 4)
+                continue;
+
+            int height = 100;
+            Wall wall = new Wall(wallHeight);
+            wall.setFill(Color.WHITE);
+
+            StackPane stackPane = new StackPane();
+            stackPane.getChildren().addAll(wall);
+//            stackPane.setTranslateY(-height);
+//            stackPane.setTranslateX(-boxWidth/2);
+            walls[x] = stackPane;
+            gridPaneBoard.add(walls[x], x, 1);
+            walls[x].setTranslateY(-(wallHeight+boxHeight+boxHeight/2));
+        }
+    }
+
+    private void wallsFall(){
+        Path [] pathWalls = new Path[walls.length];
+//        boolean setNext = false;
+        for(int i=0; i<pathWalls.length; i++){
+            if(walls[i] == null)
+                continue;
+
+            pathWalls[i] = new Path();
+
+            pathWalls[i].getElements().add(new MoveTo(walls[i].getTranslateX(), walls[i].getTranslateY()));
+            pathWalls[i].getElements().add(new LineTo(walls[i].getTranslateX(), gamePaneHeight + (wallHeight+boxHeight+3*boxHeight/2)));
+            PathTransition pathTransition = new PathTransition();
+            pathTransition.setDuration(Duration.millis(3000));
+            pathTransition.setPath(pathWalls[i]);
+            pathTransition.setNode(walls[i]);
+//            pathTransition.setDelay(new Duration(150));
+            pathTransition.play();
+        }
+    }
+
     public void renderMainpage(){
 
         VBox mainlayout = new VBox();
@@ -398,28 +666,25 @@ public class Main extends Application {
         toMainScreen.setLayoutY(8);
         ListView<String> board = new ListView<String>();
 
-        String[] str = new String[15];
-        str[0] = "pranaay     420";
-        str[1] = "aniket      69";
-        str[2] = "amoghe      35";
-        str[3] = "pranaay     420";
-        str[4] = "aniket      69";
-        str[5] = "amoghe      35";
-        str[6] = "pranaay     420";
-        str[7] = "aniket      69";
-        str[8] = "amoghe      35";
-        str[9] = "pranaay     420";
-        str[10] = "aniket      69";
-        str[11] = "amoghe      35";
-        str[12] = "pranaay     420";
-        str[13] = "aniket      69";
-        str[14] = "amoghe      35";
-
+        String[] str = new String[11];
+        str[0] = " Name      Score       Date";
+        str[1] = "aniket       69      03/11/2018";
+        str[2] = "amoghe      35      03/11/2018";
+        str[3] = "pranaay     420     03/11/2018";
+        str[4] = "aniket       69      03/11/2018";
+        str[5] = "amoghe      35      03/11/2018";
+        str[6] = "pranaay     420     03/11/2018";
+        str[7] = "aniket       69      03/11/2018";
+        str[8] = "amoghe      35      03/11/2018";
+        str[9] = "pranaay     420     03/11/2018";
+        str[10]= "aniket       69      03/11/2018";
 
         leaderboardlayout.getStylesheets().add(getClass().getResource("lmao.css").toExternalForm());
         board.setLayoutX(510);
         board.setLayoutY(120);
         board.setEditable(false);
+        board.setPrefWidth(335);
+        board.setPrefHeight(500);
        // board.set
         board.getItems().addAll(str);
         //board.
@@ -447,6 +712,7 @@ public class Main extends Application {
         try {
             final Image image = new Image(new FileInputStream(imageFile), 150, 0, true, true);
             imageView = new ImageView(image);
+            imageView.setStyle("-fx-background-color: transparent");
             imageView.setFitWidth(150);
             imageView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
@@ -461,13 +727,13 @@ public class Main extends Application {
                                 ImageView imageView = new ImageView();
                                 Image image = new Image(new FileInputStream(imageFile));
                                 imageView.setImage(image);
-                                imageView.setStyle("-fx-background-color: BLACK");
+                                imageView.setStyle("-fx-background-color: transparent");
                                 imageView.setFitHeight(window.getHeight() - 10);
                                 imageView.setPreserveRatio(true);
                                 imageView.setSmooth(true);
                                 imageView.setCache(true);
                                 borderPane.setCenter(imageView);
-                                borderPane.setStyle("-fx-background-color: BLACK");
+                                borderPane.setStyle("-fx-background-color: transparent");
                                 Stage newStage = new Stage();
                                 newStage.setWidth(window.getWidth());
                                 newStage.setHeight(window.getHeight());
@@ -499,9 +765,10 @@ public class Main extends Application {
 
         BackgroundImage myBI= new BackgroundImage(new Image(getClass().getResourceAsStream("background.png"),1281,720,false,true), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
         tile.getChildren().add(toMainScreen);
-       root.setBackground(new Background(myBI));
-       //tile.setBackground(Background.EMPTY);
-        tile.setStyle("-fx-background-color: transparent;");
+//       tile.setBackground(new Background(myBI));
+//       root.setBackground(new Background(myBI));
+
+        //tile.setStyle("-fx-background-color: transparent;");
         tile.setPadding(new Insets(15, 15, 15, 15));
         tile.setHgap(15);
 
@@ -564,7 +831,7 @@ public class Main extends Application {
 //        window.setResizable(false);
 //        window.setMaximized(true);
         toMainScreen = new Button();
-        toMainScreen.setText("Back to main page");
+        toMainScreen.setText("Back");
 
         ///////////////////////////////////
         toLeaderPage = new Button();
@@ -633,10 +900,29 @@ public class Main extends Application {
         }));
         toStartGame.setOnMouseEntered(e -> toStartGame.setStyle(HOVEROVER_BUTTON_STYLE));
         toStartGame.setOnMouseExited(e -> toStartGame.setStyle(IDLE_BUTTON_STYLE));
+////////////////////////////////////////////////////////////////////////////////////////////
+        confirmButton = new Button();
+        confirmButton.setStyle(IDLE_BUTTON_STYLE);
+        confirmButton.setText("Confirm");
+        confirmButton.setOnAction(e->{
+            if(Choices.getValue().equals("RESTART")){
+                playgame();
+            }
+            if(Choices.getValue().equals("GO Back")){
+                renderMainpage();
+            }
+        });
+        confirmButton.setOnMousePressed(e -> {
+            confirmButton.setStyle(PRESSED_BUTTON_STYLE);
+        });
+        confirmButton.setOnMouseEntered(e -> confirmButton.setStyle(HOVEROVER_BUTTON_STYLE));
+        confirmButton.setOnMouseExited(e -> confirmButton.setStyle(IDLE_BUTTON_STYLE));
 
 
-
-
+//////////////////////////////////////////////////////////////////////////////////////////////////
+        Choices = new ChoiceBox<String>();
+        Choices.getItems().add("RESTART");
+        Choices.getItems().add("GO Back");
 //////////////////////////////////////////////////////////////////////leaderpage button
         toLeaderPage.setOnAction(e -> {
 
