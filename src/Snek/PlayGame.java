@@ -44,13 +44,9 @@ public class PlayGame extends Application{
 	private int numberOfCoins;
 	private int numberOfWalls;
 
-	private int[] heightOfWalls;
-
 	private double wallHeight = 200;
 
 	private boolean alternateFallBoxes = true;
-	private boolean wantMagnet;
-	private boolean wantShield;
 
 	private DestroyBlock createBlok(){
 		DestroyBlock rect = new DestroyBlock(0, -boxHeight, boxWidth, boxHeight);
@@ -346,7 +342,6 @@ public class PlayGame extends Application{
 
 			int height = 100;
 			Wall wall = new Wall(wallHeight);
-			heightOfWalls[x] = height;
 			wall.setFill(Color.WHITE);
 
 			StackPane stackPane = new StackPane();
@@ -398,13 +393,11 @@ public class PlayGame extends Application{
 		// Walls
 		numberOfWalls = 1 + rand.nextInt(numberOfBoxes);
 		walls = new StackPane[numberOfWalls];
-		heightOfWalls = new int[numberOfWalls];
 		createWalls();
 		wallsFall();
 
 		// Balls
 		numberOfBalls = 1 + rand.nextInt(numberOfBoxes/2);
-//        System.out.println(numberOfBalls);
 		balls = new StackPane[numberOfBalls];
 		ballsAlternate = new StackPane[numberOfBalls];
 
@@ -418,14 +411,15 @@ public class PlayGame extends Application{
 		coinsFall();
 
 		// Magnet
-        int mag = rand.nextInt(10);
-        if(mag == 0){
+        int magNow = rand.nextInt(10);
+        if(magNow == 0){
             magnet = new StackPane();
             addMagnet();
             magnetFall();
         }
 
         // Shields
+        
 	}
 
 	@Override
