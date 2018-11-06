@@ -526,7 +526,7 @@ public class PlayGame extends Application{
         boxWidth = Math.floor(gamePaneWidth/numberOfBoxes);
 
         Choices.setItems(FXCollections.observableArrayList(
-                "Restart", "Go Back", "Third"));
+                "Restart", "Go Back"));
         Choices.getSelectionModel().selectFirst();
 
         confirmButton.setStyle(IDLE_BUTTON_STYLE);
