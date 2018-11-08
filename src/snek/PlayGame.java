@@ -2,12 +2,15 @@ package snek;
 
 import javafx.animation.PathTransition;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableListValue;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
+import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
@@ -67,6 +70,8 @@ public class PlayGame extends Application{
     private PlayGame game;
 
     private boolean alternateFallBoxes = true;
+
+    private Snake snake;
 
     final String IDLE_BUTTON_STYLE = "-fx-padding: 8 15 15 15;"+
             "-fx-background-insets: 0,0 0 5 0, 0 0 6 0, 0 0 7 0;"+
@@ -180,6 +185,37 @@ public class PlayGame extends Application{
                 boxes[x].setTranslateY(-(wallHeight+boxHeight+boxHeight));
                 gameGridPane.add(boxes[x], x, 0);
             }
+        }
+
+        for(int x = 0; x<boxes.length; x++){
+            final int index = x;
+
+            if(boxes[x] == null)
+                continue;
+
+            boxes[x].boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
+                @Override
+                public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
+//                            System.out.println(newValue);
+                    Ball ball = (Ball) snake.getFirst().getChildren().get(0);
+                    DestroyBlock blok = (DestroyBlock) boxes[index].getChildren().get(0);
+//                            System.out.println(ball + " " + blok);
+                    Shape intersect = Shape.intersect(ball, blok);
+                    if (intersect.getBoundsInLocal().getWidth() != -1) {
+                        if(blok.hit()){
+                            System.out.println("LALAL");
+                            boxes[index].getChildren().removeAll();
+                        }
+                        else{
+                            Text text = (Text) boxes[index].getChildren().get(1);
+                            text.setText(Integer.toString(Integer.parseInt(text.getText()) - 1));
+                            boxes[index].getChildren().remove(0);
+                            boxes[index].getChildren().remove(1);
+                            boxes[index].getChildren().addAll(blok, text);
+                        }
+                    }
+                }
+            });
         }
 
     }
@@ -568,7 +604,7 @@ public class PlayGame extends Application{
 
         gamePane.setStyle("-fx-background-color: #000000");
 
-        Snake snake = new Snake(10, gameGridPane, centerOfGamePaneHeight, centerOfGamePaneWidth);
+        snake = new Snake(10, gameGridPane, centerOfGamePaneHeight, centerOfGamePaneWidth);
 
         Label score = new Label();
         score.setText("1032");
