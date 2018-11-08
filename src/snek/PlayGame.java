@@ -5,6 +5,9 @@ import javafx.application.Application;
 import javafx.beans.value.ObservableListValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.geometry.Orientation;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
@@ -14,6 +17,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
@@ -564,19 +568,31 @@ public class PlayGame extends Application{
 
         gamePane.setStyle("-fx-background-color: #000000");
 
+        Snake snake = new Snake(10, gameGridPane, centerOfGamePaneHeight, centerOfGamePaneWidth);
+
+        Label score = new Label();
+        score.setText("1032");
+
+        gameGridPane.setOnMouseMoved(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+//                System.out.println(event.getX() + " " + event.toString());
+                score.setText(Double.toString(event.getX()) + " :: " + Double.toString(event.getSceneX()));
+                snake.moveSnek(event.getSceneX() - 20);
+            }
+        });
+
         SplitPane optionsPane = new SplitPane();
         optionsPane.setOrientation(Orientation.VERTICAL);
         optionsPane.setPrefSize(optionsPaneWidth, optionsPaneHeight);
         hBox.getChildren().add(optionsPane);
         optionsPane.getItems().add(optionsGridPane);
 
-        Label score = new Label();
-        score.setText("1032");
+//        Label score = new Label();
+//        score.setText("1032");
         optionsGridPane.add(score, 1, 1);
         optionsGridPane.add(Choices, 1, 2);
         optionsGridPane.add(confirmButton, 1, 3);
-
-        Snake snake = new Snake(10, gameGridPane, centerOfGamePaneHeight, centerOfGamePaneWidth);
 
         nextCycle();
 
