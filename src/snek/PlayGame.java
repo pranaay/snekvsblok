@@ -308,10 +308,11 @@ public class PlayGame extends Application{
             }
 
             if(i < numberOfBalls) {
+                int temp  = 1+ rand.nextInt(10);
                 StackPane ball = new StackPane();
-                Ball rawBall = new Ball(15);
+                Ball rawBall = new Ball(15,temp);
                 rawBall.setFill(Color.PINK);
-                Text text = new Text(Integer.toString(rand.nextInt(10)));
+                Text text = new Text(Integer.toString(temp));
                 ball.getChildren().addAll(rawBall, text);
                 gameGridPane.add(ball, x, 0);
                 balls[i] = ball;
@@ -319,10 +320,11 @@ public class PlayGame extends Application{
                 balls[i].setTranslateY((-wallHeight+boxHeight+boxHeight));
             }
             else{
+                int temp  = 1+ rand.nextInt(10);
                 StackPane ball = new StackPane();
-                Ball rawBall = new Ball(15);
+                Ball rawBall = new Ball(15,temp);
                 rawBall.setFill(Color.PINK);
-                Text text = new Text(Integer.toString(rand.nextInt(10)));
+                Text text = new Text(Integer.toString(temp));
                 ball.getChildren().addAll(rawBall, text);
 
                 gameGridPane.add(ball, x, 0);
@@ -347,10 +349,11 @@ public class PlayGame extends Application{
 //                            System.out.println(ball + " " + blok);
                     Shape intersect = Shape.intersect(ball, boll);
                     if (intersect.getBoundsInLocal().getWidth() != -1) {
+                        snake.addBalls(boll.getValue(),gameGridPane);
                         //if(boll.hit()){
-                            System.out.println("LALAL");
-                            score.setText("lalalalalalalala");
-                           // boll.setFill(Color.TRANSPARENT);
+                        System.out.println("LALAL");
+                        score.setText( Integer.toString(snake.getLength()));
+                        // boll.setFill(Color.TRANSPARENT);
                         balls[index].getChildren().remove(0);
                         balls[index].getChildren().remove(1);
                         //}
@@ -382,11 +385,13 @@ public class PlayGame extends Application{
                     if (intersect.getBoundsInLocal().getWidth() != -1) {
                         //if(boll.hit()){
                         System.out.println("LALAL");
-                        score.setText("lalalalalalalala");
+                        score.setText( Integer.toString(snake.getLength()));
 
                         //ballsAlternate[index].setStyle("-fx-background-color: #000000");
                         ballsAlternate[index].getChildren().remove(0);
                         ballsAlternate[index].getChildren().remove(1);
+                        snake.addBalls(((Ball) ballsAlternate[index].getChildren().get(0)).getValue(),gameGridPane);
+
                         //}
 //                        else{
 //                            Text text = (Text) boxes[index].getChildren().get(1);

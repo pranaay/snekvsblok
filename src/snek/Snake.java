@@ -11,6 +11,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
+import sun.security.util.Length;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -20,7 +21,20 @@ public class Snake extends Region {
     private ArrayList<StackPane> snek;
     private ArrayList<Double> Xs, Ys;
 
-    int length;
+   private int length;
+
+    public int getLength() {
+
+        return length;
+    }
+
+    public ArrayList<Double> getXs(){
+        return Xs;
+    }
+
+    public ArrayList<Double> getYs(){
+        return Ys;
+    }
 
     public Snake(){
         this.snek = new ArrayList<StackPane>();
@@ -67,6 +81,7 @@ public class Snake extends Region {
         return color;
     }
 
+
     public Snake(int n, GridPane gridPane, double centerX, double centerY){
         this.snek = new ArrayList<StackPane>();
         this.Xs = new ArrayList<Double>(n);
@@ -110,7 +125,31 @@ public class Snake extends Region {
             gridPane.getChildren().add(ball);
         }
     }
+    public void addBalls(int n,GridPane gridPane){
+        //this guys got some balls
+        double radius = 10;
 
+        Double X = Xs.get(this.length-1);
+        Double Y = Ys.get(this.length-1);
+        this.length += n;
+        Y += 2*radius;
+
+        for(int i=0; i<n; i++){
+            Ball otherBalls = new Ball(radius);
+            otherBalls.setFill(getColor());
+            StackPane ball = new StackPane();
+            ball.getChildren().add(otherBalls);
+
+            Xs.add(X);
+            Ys.add(Y);
+            Y += 2*radius;
+
+            snek.add(ball);
+            gridPane.getChildren().add(ball);
+            ball.setTranslateX(X);
+            ball.setTranslateY(Y);
+        }
+    }
     public void moveSnek(double x){
 
         Path[] snekPath = new Path[length];
