@@ -32,6 +32,7 @@ import javafx.util.Duration;
 import java.util.Random;
 
 public class PlayGame extends Application{
+    private Label score;
 
     private double windowWidth;
     private double windowHeight;
@@ -329,6 +330,74 @@ public class PlayGame extends Application{
 
                 ballsAlternate[i-numberOfBalls].setTranslateY(-(wallHeight+boxHeight+boxHeight));
             }
+        }
+
+        for(int x = 0; x<balls.length; x++){
+            final int index = x;
+
+            if(balls[x] == null)
+                continue;
+
+            balls[x].boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
+                @Override
+                public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
+//                            System.out.println(newValue);
+                    Ball ball = (Ball) snake.getFirst().getChildren().get(0);
+                    Ball boll = (Ball) balls[index].getChildren().get(0);
+//                            System.out.println(ball + " " + blok);
+                    Shape intersect = Shape.intersect(ball, boll);
+                    if (intersect.getBoundsInLocal().getWidth() != -1) {
+                        //if(boll.hit()){
+                            System.out.println("LALAL");
+                            score.setText("lalalalalalalala");
+                           // boll.setFill(Color.TRANSPARENT);
+                        balls[index].getChildren().remove(0);
+                        balls[index].getChildren().remove(1);
+                        //}
+//                        else{
+//                            Text text = (Text) boxes[index].getChildren().get(1);
+//                            text.setText(Integer.toString(Integer.parseInt(text.getText()) - 1));
+//                            boxes[index].getChildren().remove(0);
+//                            boxes[index].getChildren().remove(1);
+//                            boxes[index].getChildren().addAll(blok, text);
+//                        }
+                    }
+                }
+            });
+        }
+        for(int x = 0; x<ballsAlternate.length; x++){
+            final int index = x;
+
+            if(ballsAlternate[x] == null)
+                continue;
+
+            ballsAlternate[x].boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
+                @Override
+                public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
+//                            System.out.println(newValue);
+                    Ball ball = (Ball) snake.getFirst().getChildren().get(0);
+                    Ball boll = (Ball) ballsAlternate[index].getChildren().get(0);
+//                            System.out.println(ball + " " + blok);
+                    Shape intersect = Shape.intersect(ball, boll);
+                    if (intersect.getBoundsInLocal().getWidth() != -1) {
+                        //if(boll.hit()){
+                        System.out.println("LALAL");
+                        score.setText("lalalalalalalala");
+
+                        //ballsAlternate[index].setStyle("-fx-background-color: #000000");
+                        ballsAlternate[index].getChildren().remove(0);
+                        ballsAlternate[index].getChildren().remove(1);
+                        //}
+//                        else{
+//                            Text text = (Text) boxes[index].getChildren().get(1);
+//                            text.setText(Integer.toString(Integer.parseInt(text.getText()) - 1));
+//                            boxes[index].getChildren().remove(0);
+//                            boxes[index].getChildren().remove(1);
+//                            boxes[index].getChildren().addAll(blok, text);
+//                        }
+                    }
+                }
+            });
         }
     }
 
@@ -636,14 +705,14 @@ public class PlayGame extends Application{
 
         snake = new Snake(10, gameGridPane, centerOfGamePaneHeight, centerOfGamePaneWidth);
 
-        Label score = new Label();
-        score.setText("1032");
+        score = new Label();
+      //  score.setText("1032");
 
         gameGridPane.setOnMouseMoved(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
 //                System.out.println(event.getX() + " " + event.toString());
-                score.setText(Double.toString(event.getX()) + " :: " + Double.toString(event.getSceneX()));
+               // score.setText(Double.toString(event.getX()) + " :: " + Double.toString(event.getSceneX()));
                 snake.moveSnek(event.getSceneX() - 20);
             }
         });

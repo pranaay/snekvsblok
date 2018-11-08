@@ -116,6 +116,10 @@ public class Snake extends Region {
         Path[] snekPath = new Path[length];
 
         for(int i=0; i<length; i++){
+
+            if(x == Xs.get(i))
+                continue;
+
             snekPath[i] = new Path();
 
             snekPath[i].getElements().add(new MoveTo(Xs.get(i), Ys.get(i)));
