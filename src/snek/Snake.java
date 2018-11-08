@@ -131,4 +131,8 @@ public class Snake extends Region {
         }
     }
 
+    public StackPane getFirst(){
+        return this.snek.get(0);
+    }
+
 }
