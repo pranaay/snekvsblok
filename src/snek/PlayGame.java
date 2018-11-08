@@ -217,6 +217,36 @@ public class PlayGame extends Application{
                 }
             });
         }
+        for(int x = 0; x<boxesAlternate.length; x++){
+            final int index = x;
+
+            if(boxesAlternate[x] == null)
+                continue;
+
+            boxesAlternate[x].boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
+                @Override
+                public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
+//                            System.out.println(newValue);
+                    Ball ball = (Ball) snake.getFirst().getChildren().get(0);
+                    DestroyBlock blok = (DestroyBlock) boxesAlternate[index].getChildren().get(0);
+//                            System.out.println(ball + " " + blok);
+                    Shape intersect = Shape.intersect(ball, blok);
+                    if (intersect.getBoundsInLocal().getWidth() != -1) {
+                        if(blok.hit()){
+                            System.out.println("LALAL");
+                            boxesAlternate[index].getChildren().removeAll();
+                        }
+                        else{
+                            Text text = (Text) boxesAlternate[index].getChildren().get(1);
+                            text.setText(Integer.toString(Integer.parseInt(text.getText()) - 1));
+                            boxesAlternate[index].getChildren().remove(0);
+                            boxesAlternate[index].getChildren().remove(1);
+                            boxesAlternate[index].getChildren().addAll(blok, text);
+                        }
+                    }
+                }
+            });
+        }
 
     }
 
