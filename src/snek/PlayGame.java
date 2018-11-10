@@ -30,6 +30,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.util.Random;
+import java.util.Stack;
 
 public class PlayGame extends Application{
     private Label score;
@@ -610,16 +611,58 @@ public class PlayGame extends Application{
 
         int x = rand.nextInt(numberOfBoxes);
 
-        Magnet mag = new Magnet(10);
-        mag.setFill(Color.BLACK);
+//        Magnet mag = new Magnet(10);
+//        mag.setFill(Color.BLACK);
         Text text = new Text("U");
         text.setFont(Font.font ("Verdana", 20));
         text.setStyle("-fx-font-weight: bold");
         text.setFill(Color.MAGENTA);
-        magnet.getChildren().addAll(mag, text);
+        magnet.getChildren().addAll(text);
         gameGridPane.add(magnet, x, 2);
 
         magnet.setTranslateY(-(wallHeight+boxHeight+boxHeight));
+
+        magnet.boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
+            @Override
+            public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
+                Ball ball = (Ball) snake.getFirst().getChildren().get(0);
+                Text newMag = (Text) magnet.getChildren().get(0);
+
+                Shape intersect = Shape.intersect(ball, newMag);
+                if (intersect.getBoundsInLocal().getWidth() != -1) {
+                    magnet.getChildren().remove(0);
+
+                    Bounds[] coinBounds = new Bounds[numberOfCoins];
+                    double[] distances = new double[numberOfCoins];
+
+                    for(int i=0; i<numberOfCoins; i++){
+                        if(coins[i] == null){
+                            coinBounds[i] = null;
+                            distances[i] = 9999;
+                        }
+                        else{
+                            coinBounds[i] = coins[i].getBoundsInParent();
+                            double X = oldValue.getMinX() - coinBounds[i].getMinX();
+                            double Y = oldValue.getMinY() - coinBounds[i].getMinY();
+                            double dist = Math.sqrt(Math.pow(X, 2) + Math.pow(Y, 2));
+                            distances[i] = dist;
+                        }
+                    }
+
+                    for(int i=0; i<numberOfCoins; i++){
+                        if(distances[i] == 9999)
+                            continue;
+                        if(distances[i] < 500){
+                            // Add the coin to score. :#
+
+                            // take the coins.
+                            StackPane theCoin = coins[i];
+                            theCoin.getChildren().remove(0);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     private void magnetFall(){
@@ -714,7 +757,7 @@ public class PlayGame extends Application{
         coinsFall();
 
         // Magnet
-        int magNow = rand.nextInt(10);
+        int magNow = rand.nextInt(1);
         if(magNow == 0){
             magnet = new StackPane();
             addMagnet();
@@ -722,7 +765,7 @@ public class PlayGame extends Application{
         }
 
         // Shields
-        int shieldNow = rand.nextInt(1);
+        int shieldNow = rand.nextInt(10);
         if(shieldNow == 0){
             addShield();
             shieldFall();
