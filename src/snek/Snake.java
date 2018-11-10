@@ -120,7 +120,7 @@ public class Snake extends Region {
             Xs.add(X);
             Ys.add(Y);
             Y += 2*radius;
-
+            ball.setId(Integer.toString(i));
             snek.add(ball);
             gridPane.getChildren().add(ball);
         }
@@ -143,12 +143,28 @@ public class Snake extends Region {
             Xs.add(X);
             Ys.add(Y);
             Y += 2*radius;
-
+            ball.setId(Integer.toString(length+n));
             snek.add(ball);
             gridPane.getChildren().add(ball);
             ball.setTranslateX(X);
             ball.setTranslateY(Y);
         }
+
+    }
+
+    public void removeBalls(int n,GridPane gridPane){
+        for(int i=length-1;i>=length-n;i--){
+            //gridPane.getChildren().indexOf(snek);
+            StackPane ball = snek.get(i);
+            ball.getChildren().remove(0);
+
+            gridPane.getChildren().remove(ball);
+            Xs.remove(i);
+            Ys.remove(i);
+            snek.remove(i);
+        }
+
+        length -= n;
     }
     public void moveSnek(double x){
 
