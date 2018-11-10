@@ -2,36 +2,21 @@ package snek;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
-import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
-import javafx.animation.PathTransition;
-import javafx.application.Application;
-import javafx.geometry.Orientation;
 import javafx.scene.Scene;
-import javafx.scene.control.SplitPane;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.*;
-import javafx.scene.text.Text;
-import javafx.stage.Stage;
-import javafx.util.Duration;
-import java.util.Random;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -167,7 +152,7 @@ public class Main extends Application {
         mainlayout.getChildren().add(Quit);
         mainlayout.setSpacing(75);
 
-        BackgroundImage myBI= new BackgroundImage(new Image(getClass().getResourceAsStream("background.png"),1281,720,false,true), BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
+        BackgroundImage myBI= new BackgroundImage(new Image(getClass().getResource("background.png").toExternalForm(),1281,720,false,true), BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
 
         mainlayout.setBackground(new Background(myBI));
 
@@ -194,7 +179,7 @@ public class Main extends Application {
 
     public void renderLeaderboard(){
         Pane leaderboardlayout = new Pane();
-        BackgroundImage myBI= new BackgroundImage(new Image(getClass().getResourceAsStream("background.png"),1281,720,false,true), BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
+        BackgroundImage myBI= new BackgroundImage(new Image(getClass().getResource("background.png").toExternalForm(),1281,720,false,true), BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
 
         leaderboardlayout.setBackground(new Background(myBI));
         leaderboardlayout.setTranslateX(0);
@@ -309,9 +294,10 @@ public class Main extends Application {
         tile.setPadding(new Insets(15, 15, 15, 15));
         tile.setHgap(15);
 
-        String path = "/home/pranaaysaini/Desktop/creepy_pictures";
+        String path = "CreepyPictures";
 
         File folder = new File(path);
+        System.out.println(folder.getAbsolutePath());
         File[] listOfFiles = folder.listFiles();
 
         for (final File file : listOfFiles) {
