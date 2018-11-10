@@ -32,6 +32,7 @@ import javafx.util.Duration;
 import java.util.Random;
 
 public class PlayGame extends Application{
+    private Label score;
 
     private double windowWidth;
     private double windowHeight;
@@ -65,7 +66,7 @@ public class PlayGame extends Application{
 
     private ChoiceBox<String> Choices ;
     private Button confirmButton;
-
+    private Stage window;
     private Main main;
     private PlayGame game;
 
@@ -202,21 +203,129 @@ public class PlayGame extends Application{
 //                            System.out.println(ball + " " + blok);
                     Shape intersect = Shape.intersect(ball, blok);
                     if (intersect.getBoundsInLocal().getWidth() != -1) {
-                        if(blok.hit()){
-                            System.out.println("LALAL");
-                            boxes[index].getChildren().removeAll();
-                        }
-                        else{
-                            Text text = (Text) boxes[index].getChildren().get(1);
-                            text.setText(Integer.toString(Integer.parseInt(text.getText()) - 1));
+                        if(blok.hit(snake.getLength())){
+
+                            snake.removeBalls(blok.getBoxValue(),gameGridPane);
+                            score.setText(Integer.toString(snake.getLength()));
+//                            System.out.println("LALAL");
                             boxes[index].getChildren().remove(0);
                             boxes[index].getChildren().remove(1);
-                            boxes[index].getChildren().addAll(blok, text);
+//                            try {
+//                                Thread.sleep(2000);
+//                            } catch (InterruptedException e) {
+//                                e.printStackTrace();
+//                            }
+//                            //  boxes[index].getChildren().addAll(blok, text);
+//                            //
+                        }
+                        else{
+                            score.setText("game over bithc");
+
+                            try {
+                                main.start(window);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+//                            snake.removeBalls(blok.getBoxValue(),gameGridPane);
+//                            score.setText(Integer.toString(snake.getLength()));
+
+//                            Text text = (Text) boxes[index].getChildren().get(1);
+//                            text.setText(Integer.toString(Integer.parseInt(text.getText()) - 1));
+//                            boxes[index].getChildren().remove(0);
+//                            boxes[index].getChildren().remove(1);
+//                            boxes[index].getChildren().addAll(blok, text);
                         }
                     }
                 }
             });
         }
+        for(int x = 0; x<boxesAlternate.length; x++){
+            final int index = x;
+
+            if(boxesAlternate[x] == null)
+                continue;
+
+            boxesAlternate[x].boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
+                @Override
+                public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
+//                            System.out.println(newValue);
+                    Ball ball = (Ball) snake.getFirst().getChildren().get(0);
+                    DestroyBlock blok = (DestroyBlock) boxesAlternate[index].getChildren().get(0);
+//                            System.out.println(ball + " " + blok);
+                    Shape intersect = Shape.intersect(ball, blok);
+                    if (intersect.getBoundsInLocal().getWidth() != -1) {
+                        if(blok.hit(snake.getLength())){
+
+                            snake.removeBalls(blok.getBoxValue(),gameGridPane);
+                            score.setText(Integer.toString(snake.getLength()));
+//                            System.out.println("LALAL");
+                            boxesAlternate[index].getChildren().remove(0);
+                            boxesAlternate[index].getChildren().remove(1);
+//                            try {
+//                                Thread.sleep(2000);
+//                            } catch (InterruptedException e) {
+//                                e.printStackTrace();
+//                            }
+//                            //  boxes[index].getChildren().addAll(blok, text);
+//                            //
+                        }
+                        else{
+                            score.setText("game over bithc");
+
+                            try {
+                                main.start(window);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+//                            snake.removeBalls(blok.getBoxValue(),gameGridPane);
+//                            score.setText(Integer.toString(snake.getLength()));
+
+//                            Text text = (Text) boxes[index].getChildren().get(1);
+//                            text.setText(Integer.toString(Integer.parseInt(text.getText()) - 1));
+//                            boxes[index].getChildren().remove(0);
+//                            boxes[index].getChildren().remove(1);
+//                            boxes[index].getChildren().addAll(blok, text);
+                        }
+                    }
+                }
+            });
+        }
+//        for(int x = 0; x<boxesAlternate.length; x++){
+//            final int index = x;
+//
+//            if(boxesAlternate[x] == null)
+//                continue;
+//
+//            boxesAlternate[x].boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
+//                @Override
+//                public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
+////                            System.out.println(newValue);
+//                    Ball ball = (Ball) snake.getFirst().getChildren().get(0);
+//                    DestroyBlock blok = (DestroyBlock) boxesAlternate[index].getChildren().get(0);
+////                            System.out.println(ball + " " + blok);
+//                    Shape intersect = Shape.intersect(ball, blok);
+//                    if (intersect.getBoundsInLocal().getWidth() != -1) {
+//                        if(blok.hit(snake.getLength())){
+//                            snake.removeBalls(blok.getBoxValue(),gameGridPane);
+//                            score.setText(Integer.toString(snake.getLength()));
+//                            System.out.println("LALAL");
+//                            boxesAlternate[index].getChildren().remove(0);
+//                            boxesAlternate[index].getChildren().remove(1);
+//                           // boxesAlternate[index].getChildren().addAll(blok, text);
+//                        }
+//                        else{
+////                            snake.removeBalls(blok.getBoxValue(),gameGridPane);
+////                            score.setText(Integer.toString(snake.getLength()));
+//                            Text text = (Text) boxesAlternate[index].getChildren().get(1);
+//                            text.setText(Integer.toString(Integer.parseInt(text.getText()) - 1));
+//                            boxesAlternate[index].getChildren().remove(0);
+//                            boxesAlternate[index].getChildren().remove(1);
+//                            boxesAlternate[index].getChildren().addAll(blok, text);
+//                        }
+//                    }
+//                }
+//            });
+//        }
 
     }
 
@@ -277,10 +386,11 @@ public class PlayGame extends Application{
             }
 
             if(i < numberOfBalls) {
+                int temp  = 1+ rand.nextInt(10);
                 StackPane ball = new StackPane();
-                Ball rawBall = new Ball(15);
+                Ball rawBall = new Ball(15,temp);
                 rawBall.setFill(Color.PINK);
-                Text text = new Text(Integer.toString(rand.nextInt(10)));
+                Text text = new Text(Integer.toString(temp));
                 ball.getChildren().addAll(rawBall, text);
                 gameGridPane.add(ball, x, 0);
                 balls[i] = ball;
@@ -288,10 +398,11 @@ public class PlayGame extends Application{
                 balls[i].setTranslateY((-wallHeight+boxHeight+boxHeight));
             }
             else{
+                int temp  = 1+ rand.nextInt(10);
                 StackPane ball = new StackPane();
-                Ball rawBall = new Ball(15);
+                Ball rawBall = new Ball(15,temp);
                 rawBall.setFill(Color.PINK);
-                Text text = new Text(Integer.toString(rand.nextInt(10)));
+                Text text = new Text(Integer.toString(temp));
                 ball.getChildren().addAll(rawBall, text);
 
                 gameGridPane.add(ball, x, 0);
@@ -299,6 +410,78 @@ public class PlayGame extends Application{
 
                 ballsAlternate[i-numberOfBalls].setTranslateY(-(wallHeight+boxHeight+boxHeight));
             }
+        }
+
+        for(int x = 0; x<balls.length; x++){
+            final int index = x;
+
+            if(balls[x] == null)
+                continue;
+
+            balls[x].boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
+                @Override
+                public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
+//                            System.out.println(newValue);
+                    Ball ball = (Ball) snake.getFirst().getChildren().get(0);
+                    Ball boll = (Ball) balls[index].getChildren().get(0);
+//                            System.out.println(ball + " " + blok);
+                    Shape intersect = Shape.intersect(ball, boll);
+                    if (intersect.getBoundsInLocal().getWidth() != -1) {
+                        snake.addBalls(boll.getValue(),gameGridPane);
+                        //if(boll.hit()){
+                        System.out.println("LALAL");
+                        score.setText( Integer.toString(snake.getLength()));
+                        // boll.setFill(Color.TRANSPARENT);
+                        balls[index].getChildren().remove(0);
+                        balls[index].getChildren().remove(1);
+                        //}
+//                        else{
+//                            Text text = (Text) boxes[index].getChildren().get(1);
+//                            text.setText(Integer.toString(Integer.parseInt(text.getText()) - 1));
+//                            boxes[index].getChildren().remove(0);
+//                            boxes[index].getChildren().remove(1);
+//                            boxes[index].getChildren().addAll(blok, text);
+//                        }
+                    }
+                }
+            });
+        }
+        for(int x = 0; x<ballsAlternate.length; x++){
+            final int index = x;
+
+            if(ballsAlternate[x] == null)
+                continue;
+
+            ballsAlternate[x].boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
+                @Override
+                public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
+//                            System.out.println(newValue);
+                    Ball ball = (Ball) snake.getFirst().getChildren().get(0);
+                    Ball boll = (Ball) ballsAlternate[index].getChildren().get(0);
+//                            System.out.println(ball + " " + blok);
+                    Shape intersect = Shape.intersect(ball, boll);
+                    if (intersect.getBoundsInLocal().getWidth() != -1) {
+                        //if(boll.hit()){
+                        snake.addBalls(boll.getValue(),gameGridPane);
+
+                        System.out.println("LALAL");
+                        score.setText( Integer.toString(snake.getLength()));
+
+                        //ballsAlternate[index].setStyle("-fx-background-color: #000000");
+                        ballsAlternate[index].getChildren().remove(0);
+                        ballsAlternate[index].getChildren().remove(1);
+
+                        //}
+//                        else{
+//                            Text text = (Text) boxes[index].getChildren().get(1);
+//                            text.setText(Integer.toString(Integer.parseInt(text.getText()) - 1));
+//                            boxes[index].getChildren().remove(0);
+//                            boxes[index].getChildren().remove(1);
+//                            boxes[index].getChildren().addAll(blok, text);
+//                        }
+                    }
+                }
+            });
         }
     }
 
@@ -537,7 +720,7 @@ public class PlayGame extends Application{
 
         main = new Main();
         game = new PlayGame();
-
+        window = primaryStage;
         Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 
         gameGridPane = new GridPane();
@@ -606,14 +789,14 @@ public class PlayGame extends Application{
 
         snake = new Snake(10, gameGridPane, centerOfGamePaneHeight, centerOfGamePaneWidth);
 
-        Label score = new Label();
-        score.setText("1032");
+        score = new Label();
+      //  score.setText("1032");
 
         gameGridPane.setOnMouseMoved(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
 //                System.out.println(event.getX() + " " + event.toString());
-                score.setText(Double.toString(event.getX()) + " :: " + Double.toString(event.getSceneX()));
+               // score.setText(Double.toString(event.getX()) + " :: " + Double.toString(event.getSceneX()));
                 snake.moveSnek(event.getSceneX() - 20);
             }
         });
