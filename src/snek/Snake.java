@@ -131,8 +131,12 @@ public class Snake extends Region {
 
         Double X = Xs.get(this.length-1);
         Double Y = Ys.get(this.length-1);
-        this.length += n;
         Y += 2*radius;
+
+        this.length += n;
+        StackPane first = getFirst();
+        Text text = (Text) first.getChildren().get(1);
+        text.setText(String.valueOf(length));
 
         for(int i=0; i<n; i++){
             Ball otherBalls = new Ball(radius);
@@ -165,6 +169,10 @@ public class Snake extends Region {
         }
 
         length -= n;
+
+        StackPane first = getFirst();
+        Text text = (Text) first.getChildren().get(1);
+        text.setText(String.valueOf(length));
     }
     public void moveSnek(double x){
 
