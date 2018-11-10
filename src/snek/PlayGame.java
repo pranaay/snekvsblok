@@ -575,6 +575,20 @@ public class PlayGame extends Application{
 
         gameGridPane.add(shield, x, 3);
         shield.setTranslateY(-(wallHeight+boxHeight+boxHeight));
+
+        shield.boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
+            @Override
+            public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
+                Ball ball = (Ball) snake.getFirst().getChildren().get(0);
+                Polygon poly = (Polygon) shield.getChildren().get(0);
+                Shape intersect = Shape.intersect(ball, poly);
+                if (intersect.getBoundsInLocal().getWidth() != -1) {
+                    System.out.println("LALAL");
+                    snake.getShield();
+                    shield.getChildren().remove(0);
+                }
+            }
+        });
     }
 
     private void shieldFall(){
@@ -708,7 +722,7 @@ public class PlayGame extends Application{
         }
 
         // Shields
-        int shieldNow = rand.nextInt(10);
+        int shieldNow = rand.nextInt(1);
         if(shieldNow == 0){
             addShield();
             shieldFall();

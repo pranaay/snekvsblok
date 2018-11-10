@@ -15,13 +15,17 @@ import sun.security.util.Length;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Snake extends Region {
 
     private ArrayList<StackPane> snek;
     private ArrayList<Double> Xs, Ys;
 
-   private int length;
+    private int length;
+
+    private boolean hasShield = false;
 
     public int getLength() {
 
@@ -79,6 +83,22 @@ public class Snake extends Region {
         }
 
         return color;
+    }
+
+    public void getShield(){
+        Timer timer = new Timer();
+        this.hasShield = true;
+
+        TimerTask task = new TimerTask()
+        {
+            public void run()
+            {
+                hasShield = false;
+            }
+
+        };
+
+        timer.schedule(task, 5000);
     }
 
 
@@ -157,22 +177,24 @@ public class Snake extends Region {
     }
 
     public void removeBalls(int n,GridPane gridPane){
-        for(int i=length-1;i>=length-n;i--){
-            //gridPane.getChildren().indexOf(snek);
-            StackPane ball = snek.get(i);
-            ball.getChildren().remove(0);
+        if(!hasShield) {
+            for (int i = length - 1; i >= length - n; i--) {
+                //gridPane.getChildren().indexOf(snek);
+                StackPane ball = snek.get(i);
+                ball.getChildren().remove(0);
 
-            gridPane.getChildren().remove(ball);
-            Xs.remove(i);
-            Ys.remove(i);
-            snek.remove(i);
+                gridPane.getChildren().remove(ball);
+                Xs.remove(i);
+                Ys.remove(i);
+                snek.remove(i);
+            }
+
+            length -= n;
+
+            StackPane first = getFirst();
+            Text text = (Text) first.getChildren().get(1);
+            text.setText(String.valueOf(length));
         }
-
-        length -= n;
-
-        StackPane first = getFirst();
-        Text text = (Text) first.getChildren().get(1);
-        text.setText(String.valueOf(length));
     }
     public void moveSnek(double x){
 
