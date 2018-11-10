@@ -39,7 +39,6 @@ public class PlayGame extends Application{
     private double windowHeight;
     private double boxWidth = 80;
     private double boxHeight = 50;
-
     private double gamePaneWidth;
     private double gamePaneHeight;
     private double optionsPaneWidth;
@@ -62,6 +61,7 @@ public class PlayGame extends Application{
     private int numberOfBalls;
     private int numberOfCoins;
     private int numberOfWalls;
+    private int PlayerScore = 0;
 
     private double wallHeight = 200;
 
@@ -207,7 +207,6 @@ public class PlayGame extends Application{
                         if(blok.hit(snake.getLength())){
 
                             snake.removeBalls(blok.getBoxValue(),gameGridPane);
-                            score.setText(Integer.toString(snake.getLength()));
 //                            System.out.println("LALAL");
                             boxes[index].getChildren().remove(0);
                             boxes[index].getChildren().remove(1);
@@ -258,7 +257,6 @@ public class PlayGame extends Application{
                         if(blok.hit(snake.getLength())){
 
                             snake.removeBalls(blok.getBoxValue(),gameGridPane);
-                            score.setText(Integer.toString(snake.getLength()));
 //                            System.out.println("LALAL");
                             boxesAlternate[index].getChildren().remove(0);
                             boxesAlternate[index].getChildren().remove(1);
@@ -430,8 +428,6 @@ public class PlayGame extends Application{
                     if (intersect.getBoundsInLocal().getWidth() != -1) {
                         snake.addBalls(boll.getValue(),gameGridPane);
                         //if(boll.hit()){
-                        System.out.println("LALAL");
-                        score.setText( Integer.toString(snake.getLength()));
                         // boll.setFill(Color.TRANSPARENT);
                         balls[index].getChildren().remove(0);
                         balls[index].getChildren().remove(1);
@@ -464,9 +460,6 @@ public class PlayGame extends Application{
                     if (intersect.getBoundsInLocal().getWidth() != -1) {
                         //if(boll.hit()){
                         snake.addBalls(boll.getValue(),gameGridPane);
-
-                        System.out.println("LALAL");
-                        score.setText( Integer.toString(snake.getLength()));
 
                         //ballsAlternate[index].setStyle("-fx-background-color: #000000");
                         ballsAlternate[index].getChildren().remove(0);
@@ -542,6 +535,29 @@ public class PlayGame extends Application{
             coins[i] = coin;
 
             coins[i].setTranslateY(-(wallHeight+boxHeight+boxHeight));
+        }
+
+        for(int i=0; i<numberOfCoins; i++){
+            final int index = i;
+
+            if(coins[i] == null){
+                continue;
+            }
+
+            coins[i].boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
+                @Override
+                public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
+                    Ball ball = (Ball) snake.getFirst().getChildren().get(0);
+                    Coin boll = (Coin) coins[index].getChildren().get(0);
+                    Shape intersect = Shape.intersect(ball, boll);
+
+                    if (intersect.getBoundsInLocal().getWidth() != -1) {
+                        PlayerScore += 1;
+                        score.setText(String.valueOf(PlayerScore));
+                        coins[index].getChildren().remove(0);
+                    }
+                }
+            });
         }
     }
 
@@ -654,6 +670,8 @@ public class PlayGame extends Application{
                             continue;
                         if(distances[i] < 500){
                             // Add the coin to score. :#
+                            PlayerScore++;
+                            score.setText(String.valueOf(PlayerScore));
 
                             // take the coins.
                             StackPane theCoin = coins[i];
@@ -757,7 +775,7 @@ public class PlayGame extends Application{
         coinsFall();
 
         // Magnet
-        int magNow = rand.nextInt(1);
+        int magNow = rand.nextInt(10);
         if(magNow == 0){
             magnet = new StackPane();
             addMagnet();
@@ -847,7 +865,7 @@ public class PlayGame extends Application{
         snake = new Snake(10, gameGridPane, centerOfGamePaneHeight, centerOfGamePaneWidth);
 
         score = new Label();
-      //  score.setText("1032");
+        score.setText(String.valueOf(0));
 
         gameGridPane.setOnMouseMoved(new EventHandler<MouseEvent>() {
             @Override
