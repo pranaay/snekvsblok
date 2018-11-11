@@ -2,6 +2,7 @@ package snek;
 
 import javafx.animation.PathTransition;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableListValue;
 import javafx.beans.value.ObservableValue;
@@ -11,6 +12,7 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
@@ -20,15 +22,21 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import sun.security.krb5.internal.crypto.Des;
+
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Random;
 import java.util.Stack;
 import java.util.Timer;
@@ -213,16 +221,32 @@ public class PlayGame extends Application{
             boxes[x].boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
                 @Override
                 public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
-                    Ball ball = (Ball) snake.getFirst().getChildren().get(0);
-                    DestroyBlock blok = (DestroyBlock) boxes[index].getChildren().get(0);
+                    Ball ball;
+                    DestroyBlock blok;
+
+                    try{
+                        ball = (Ball) snake.getFirst().getChildren().get(0);
+                        blok = (DestroyBlock) boxes[index].getChildren().get(0);
+                    } catch (Exception e){
+                        ball = null;
+                        blok = null;
+                    }
+
+                    if(ball == null || blok == null)
+                        return;
 
                     Shape intersect = Shape.intersect(ball, blok);
                     if (intersect.getBoundsInLocal().getWidth() != -1) {
-                        boolean hit = blok.hit(snake.getLength(), snake.isHasShield());
+                        boolean hit = blok.hit(snake.getLength());
 
-                        if(hit && blok.getBoxValue() <= 5){
+                        if(snake.isHasShield()){
                             snake.removeBalls(blok.getBoxValue(),gameGridPane);
                             boxes[index].getChildren().remove(0, 1);
+                        }
+                        else if(hit && blok.getBoxValue() <= 5){
+                            snake.removeBalls(blok.getBoxValue(),gameGridPane);
+//                            boxes[index].getChildren().remove(0, 1);
+                            addFire(index, blok);
                         }
                         else if(blok.getBoxValue() > 5 && !snake.isHasShield() && hit){
                             pauseBoxes();
@@ -252,16 +276,33 @@ public class PlayGame extends Application{
             boxesAlternate[x].boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
                 @Override
                 public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
-                    Ball ball = (Ball) snake.getFirst().getChildren().get(0);
-                    DestroyBlock blok = (DestroyBlock) boxesAlternate[index].getChildren().get(0);
+                    Ball ball;
+                    DestroyBlock blok;
+
+                    try{
+                        ball = (Ball) snake.getFirst().getChildren().get(0);
+                        blok = (DestroyBlock) boxesAlternate[index].getChildren().get(0);
+                    } catch (Exception e){
+                        ball = null;
+                        blok = null;
+                    }
+
+                    if(ball == null || blok == null)
+                        return;
+
                     Shape intersect = Shape.intersect(ball, blok);
                     if (intersect.getBoundsInLocal().getWidth() != -1) {
-                        boolean hit = blok.hit(snake.getLength(), snake.isHasShield());
-                        if(hit && blok.getBoxValue() <= 5){
+                        boolean hit = blok.hit(snake.getLength());
+
+                        if(snake.isHasShield()){
                             snake.removeBalls(blok.getBoxValue(),gameGridPane);
                             boxesAlternate[index].getChildren().remove(0, 1);
                         }
-                        else if(blok.getBoxValue() > 5 && !snake.isHasShield() && hit){
+                        else if(hit && blok.getBoxValue() <= 5){
+                            snake.removeBalls(blok.getBoxValue(),gameGridPane);
+                            boxesAlternate[index].getChildren().remove(0, 1);
+                        }
+                        else if(blok.getBoxValue() > 5 && hit){
                             pauseBoxes();
                             snake.removeBalls(blok.getBoxValue(), gameGridPane);
                             Text text = (Text) boxesAlternate[index].getChildren().get(1);
@@ -279,6 +320,31 @@ public class PlayGame extends Application{
                 }
             });
         }
+    }
+
+    private void addFire(int index, DestroyBlock blok){
+        Timer timer = new Timer();
+
+        boxes[index].getChildren().remove(0);
+        boxes[index].getChildren().remove(0);
+        DestroyBlock rect = createBlok();
+        boxes[index].setBackground(new Background(new BackgroundFill(new ImagePattern(new Image(getClass().getClassLoader().getResource("littt.jpg").toString())), CornerRadii.EMPTY, Insets.EMPTY)));
+        rect.setFill(Color.TRANSPARENT);
+//        rect.setStyle("-fx-background-image: url(littt.png)");
+
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        boxes[index].setBackground(Background.EMPTY);
+                    }
+                });
+            }
+        };
+
+        timer.schedule(timerTask, 500);
     }
 
     private void boxesFall(){
@@ -456,8 +522,19 @@ public class PlayGame extends Application{
                 @Override
                 public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
 //                            System.out.println(newValue);
-                    Ball ball = (Ball) snake.getFirst().getChildren().get(0);
-                    Ball boll = (Ball) balls[index].getChildren().get(0);
+                    Ball ball;
+                    Ball boll;
+                    try{
+                        ball = (Ball) snake.getFirst().getChildren().get(0);
+                        boll = (Ball) balls[index].getChildren().get(0);
+                    } catch (Exception e){
+                        ball = null;
+                        boll = null;
+                    }
+
+                    if(ball == null || boll == null)
+                        return;
+
                     Shape intersect = Shape.intersect(ball, boll);
 
                     if (intersect.getBoundsInLocal().getWidth() != -1) {
@@ -477,8 +554,19 @@ public class PlayGame extends Application{
                 @Override
                 public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
 //                            System.out.println(newValue);
-                    Ball ball = (Ball) snake.getFirst().getChildren().get(0);
-                    Ball boll = (Ball) ballsAlternate[index].getChildren().get(0);
+                    Ball ball;
+                    Ball boll;
+
+                    try{
+                        ball = (Ball) snake.getFirst().getChildren().get(0);
+                        boll = (Ball) ballsAlternate[index].getChildren().get(0);
+                    } catch (Exception e){
+                        ball = null;
+                        boll = null;
+                    }
+
+                    if(boll == null || ball == null)
+                        return;
 //                            System.out.println(ball + " " + blok);
                     Shape intersect = Shape.intersect(ball, boll);
                     if (intersect.getBoundsInLocal().getWidth() != -1) {
@@ -564,8 +652,20 @@ public class PlayGame extends Application{
             coins[i].boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
                 @Override
                 public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
-                    Ball ball = (Ball) snake.getFirst().getChildren().get(0);
-                    Coin boll = (Coin) coins[index].getChildren().get(0);
+                    Ball ball;
+                    Coin boll;
+
+                    try{
+                        ball = (Ball) snake.getFirst().getChildren().get(0);
+                        boll = (Coin) coins[index].getChildren().get(0);
+                    } catch (Exception e){
+                        ball = null;
+                        boll = null;
+                    }
+
+                    if(ball == null || boll == null)
+                        return;
+
                     Shape intersect = Shape.intersect(ball, boll);
 
                     if (intersect.getBoundsInLocal().getWidth() != -1) {
@@ -614,8 +714,19 @@ public class PlayGame extends Application{
         shield.boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
             @Override
             public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
-                Ball ball = (Ball) snake.getFirst().getChildren().get(0);
-                Polygon poly = (Polygon) shield.getChildren().get(0);
+                Polygon poly;
+                Ball ball;
+                try{
+                    ball = (Ball) snake.getFirst().getChildren().get(0);
+                    poly = (Polygon) shield.getChildren().get(0);
+                } catch (Exception e){
+                    ball = null;
+                    poly = null;
+                }
+
+                if(ball == null || poly == null)
+                    return;
+
                 Shape intersect = Shape.intersect(ball, poly);
                 if (intersect.getBoundsInLocal().getWidth() != -1) {
                     System.out.println("LALAL");
@@ -660,8 +771,18 @@ public class PlayGame extends Application{
         magnet.boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
             @Override
             public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
-                Ball ball = (Ball) snake.getFirst().getChildren().get(0);
-                Text newMag = (Text) magnet.getChildren().get(0);
+                Ball ball;
+                Text newMag;
+                try{
+                    ball = (Ball) snake.getFirst().getChildren().get(0);
+                    newMag = (Text) magnet.getChildren().get(0);
+                } catch (Exception e){
+                    ball = null;
+                    newMag = null;
+                }
+
+                if(ball == null || newMag == null)
+                    return;
 
                 Shape intersect = Shape.intersect(ball, newMag);
                 if (intersect.getBoundsInLocal().getWidth() != -1) {
