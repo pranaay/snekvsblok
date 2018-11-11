@@ -34,12 +34,14 @@ public class DestroyBlock extends Rectangle {
     }
 
     public boolean hit(int sneklen){
-        //this.boxValue--;
-
         if(this.boxValue < sneklen)
             return true;
         else
             return false;
+    }
+
+    public void reduceValue(int n){
+        this.boxValue -= n;
     }
 
 }

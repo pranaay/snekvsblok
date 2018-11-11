@@ -224,4 +224,7 @@ public class Snake extends Region {
         return this.snek.get(0);
     }
 
+    public boolean isHasShield() {
+        return hasShield;
+    }
 }
