@@ -242,6 +242,7 @@ public class PlayGame extends Application{
                         if(snake.isHasShield()){
                             snake.removeBalls(blok.getBoxValue(),gameGridPane);
                             boxes[index].getChildren().remove(0, 1);
+                            addFire(index, blok);
                         }
                         else if(hit && blok.getBoxValue() <= 5){
                             snake.removeBalls(blok.getBoxValue(),gameGridPane);
@@ -297,10 +298,12 @@ public class PlayGame extends Application{
                         if(snake.isHasShield()){
                             snake.removeBalls(blok.getBoxValue(),gameGridPane);
                             boxesAlternate[index].getChildren().remove(0, 1);
+                            addFireAlternate(index, blok);
                         }
                         else if(hit && blok.getBoxValue() <= 5){
                             snake.removeBalls(blok.getBoxValue(),gameGridPane);
                             boxesAlternate[index].getChildren().remove(0, 1);
+                            addFireAlternate(index, blok);
                         }
                         else if(blok.getBoxValue() > 5 && hit){
                             pauseBoxes();
@@ -322,11 +325,46 @@ public class PlayGame extends Application{
         }
     }
 
+    private void addFireAlternate(int index, DestroyBlock blok){
+        Timer timer = new Timer();
+
+        try{
+            boxesAlternate[index].getChildren().remove(1);
+            boxesAlternate[index].getChildren().remove(0);
+        } catch (Exception e){
+
+        }
+
+        DestroyBlock rect = createBlok();
+        boxesAlternate[index].setBackground(new Background(new BackgroundFill(new ImagePattern(new Image(getClass().getClassLoader().getResource("littt.jpg").toString())), CornerRadii.EMPTY, Insets.EMPTY)));
+        rect.setFill(Color.TRANSPARENT);
+//        rect.setStyle("-fx-background-image: url(littt.png)");
+
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        boxesAlternate[index].setBackground(Background.EMPTY);
+                    }
+                });
+            }
+        };
+
+        timer.schedule(timerTask, 500);
+    }
+
     private void addFire(int index, DestroyBlock blok){
         Timer timer = new Timer();
 
-        boxes[index].getChildren().remove(0);
-        boxes[index].getChildren().remove(0);
+        try{
+            boxes[index].getChildren().remove(1);
+            boxes[index].getChildren().remove(0);
+        } catch (Exception e){
+
+        }
+
         DestroyBlock rect = createBlok();
         boxes[index].setBackground(new Background(new BackgroundFill(new ImagePattern(new Image(getClass().getClassLoader().getResource("littt.jpg").toString())), CornerRadii.EMPTY, Insets.EMPTY)));
         rect.setFill(Color.TRANSPARENT);
