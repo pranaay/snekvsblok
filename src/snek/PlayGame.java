@@ -31,6 +31,8 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.util.Random;
 import java.util.Stack;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class PlayGame extends Application{
     private Label score;
@@ -74,6 +76,19 @@ public class PlayGame extends Application{
     private boolean alternateFallBoxes = true;
 
     private Snake snake;
+
+    private Path[] pathBoxes;
+    private Path[] alternatePathBoxes;
+
+    private PathTransition[] pathTransitionBoxes;
+    private PathTransition[] pathTransitionBoxesAlternate;
+    private PathTransition[] pathTransitionBalls;
+    private PathTransition[] pathTransitionBallsAlternate;
+    private PathTransition[] pathTransitionCoins;
+    private PathTransition[] pathTransitionWalls;
+
+    private PathTransition pathTransitionShield;
+    private PathTransition pathTransitionMagnet;
 
     final String IDLE_BUTTON_STYLE = "-fx-padding: 8 15 15 15;"+
             "-fx-background-insets: 0,0 0 5 0, 0 0 6 0, 0 0 7 0;"+
@@ -198,42 +213,31 @@ public class PlayGame extends Application{
             boxes[x].boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
                 @Override
                 public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
-//                            System.out.println(newValue);
                     Ball ball = (Ball) snake.getFirst().getChildren().get(0);
                     DestroyBlock blok = (DestroyBlock) boxes[index].getChildren().get(0);
-//                            System.out.println(ball + " " + blok);
+
                     Shape intersect = Shape.intersect(ball, blok);
                     if (intersect.getBoundsInLocal().getWidth() != -1) {
-                        if(blok.hit(snake.getLength())){
+                        boolean hit = blok.hit(snake.getLength(), snake.isHasShield());
 
+                        if(hit && blok.getBoxValue() <= 5){
                             snake.removeBalls(blok.getBoxValue(),gameGridPane);
-//                            System.out.println("LALAL");
-                            boxes[index].getChildren().remove(0);
-                            boxes[index].getChildren().remove(1);
-//                            try {
-//                                Thread.sleep(2000);
-//                            } catch (InterruptedException e) {
-//                                e.printStackTrace();
-//                            }
-//                            //  boxes[index].getChildren().addAll(blok, text);
-//                            //
+                            boxes[index].getChildren().remove(0, 1);
+                        }
+                        else if(blok.getBoxValue() > 5 && !snake.isHasShield() && hit){
+                            pauseBoxes();
+
+                            snake.removeBalls(blok.getBoxValue(), gameGridPane);
+                            Text text = (Text) boxes[index].getChildren().get(1);
+                            text.setText(String.valueOf(blok.getBoxValue() - 5));
+                            blok.reduceValue(5);
                         }
                         else{
-                            score.setText("game over bithc");
-
                             try {
                                 main.start(window);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
-//                            snake.removeBalls(blok.getBoxValue(),gameGridPane);
-//                            score.setText(Integer.toString(snake.getLength()));
-
-//                            Text text = (Text) boxes[index].getChildren().get(1);
-//                            text.setText(Integer.toString(Integer.parseInt(text.getText()) - 1));
-//                            boxes[index].getChildren().remove(0);
-//                            boxes[index].getChildren().remove(1);
-//                            boxes[index].getChildren().addAll(blok, text);
                         }
                     }
                 }
@@ -248,88 +252,39 @@ public class PlayGame extends Application{
             boxesAlternate[x].boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
                 @Override
                 public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
-//                            System.out.println(newValue);
                     Ball ball = (Ball) snake.getFirst().getChildren().get(0);
                     DestroyBlock blok = (DestroyBlock) boxesAlternate[index].getChildren().get(0);
-//                            System.out.println(ball + " " + blok);
                     Shape intersect = Shape.intersect(ball, blok);
                     if (intersect.getBoundsInLocal().getWidth() != -1) {
-                        if(blok.hit(snake.getLength())){
-
+                        boolean hit = blok.hit(snake.getLength(), snake.isHasShield());
+                        if(hit && blok.getBoxValue() <= 5){
                             snake.removeBalls(blok.getBoxValue(),gameGridPane);
-//                            System.out.println("LALAL");
-                            boxesAlternate[index].getChildren().remove(0);
-                            boxesAlternate[index].getChildren().remove(1);
-//                            try {
-//                                Thread.sleep(2000);
-//                            } catch (InterruptedException e) {
-//                                e.printStackTrace();
-//                            }
-//                            //  boxes[index].getChildren().addAll(blok, text);
-//                            //
+                            boxesAlternate[index].getChildren().remove(0, 1);
+                        }
+                        else if(blok.getBoxValue() > 5 && !snake.isHasShield() && hit){
+                            pauseBoxes();
+                            snake.removeBalls(blok.getBoxValue(), gameGridPane);
+                            Text text = (Text) boxesAlternate[index].getChildren().get(1);
+                            text.setText(String.valueOf(blok.getBoxValue() - 5));
+                            blok.reduceValue(5);
                         }
                         else{
-                            score.setText("game over bithc");
-
                             try {
                                 main.start(window);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
-//                            snake.removeBalls(blok.getBoxValue(),gameGridPane);
-//                            score.setText(Integer.toString(snake.getLength()));
-
-//                            Text text = (Text) boxes[index].getChildren().get(1);
-//                            text.setText(Integer.toString(Integer.parseInt(text.getText()) - 1));
-//                            boxes[index].getChildren().remove(0);
-//                            boxes[index].getChildren().remove(1);
-//                            boxes[index].getChildren().addAll(blok, text);
                         }
                     }
                 }
             });
         }
-//        for(int x = 0; x<boxesAlternate.length; x++){
-//            final int index = x;
-//
-//            if(boxesAlternate[x] == null)
-//                continue;
-//
-//            boxesAlternate[x].boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
-//                @Override
-//                public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
-////                            System.out.println(newValue);
-//                    Ball ball = (Ball) snake.getFirst().getChildren().get(0);
-//                    DestroyBlock blok = (DestroyBlock) boxesAlternate[index].getChildren().get(0);
-////                            System.out.println(ball + " " + blok);
-//                    Shape intersect = Shape.intersect(ball, blok);
-//                    if (intersect.getBoundsInLocal().getWidth() != -1) {
-//                        if(blok.hit(snake.getLength())){
-//                            snake.removeBalls(blok.getBoxValue(),gameGridPane);
-//                            score.setText(Integer.toString(snake.getLength()));
-//                            System.out.println("LALAL");
-//                            boxesAlternate[index].getChildren().remove(0);
-//                            boxesAlternate[index].getChildren().remove(1);
-//                           // boxesAlternate[index].getChildren().addAll(blok, text);
-//                        }
-//                        else{
-////                            snake.removeBalls(blok.getBoxValue(),gameGridPane);
-////                            score.setText(Integer.toString(snake.getLength()));
-//                            Text text = (Text) boxesAlternate[index].getChildren().get(1);
-//                            text.setText(Integer.toString(Integer.parseInt(text.getText()) - 1));
-//                            boxesAlternate[index].getChildren().remove(0);
-//                            boxesAlternate[index].getChildren().remove(1);
-//                            boxesAlternate[index].getChildren().addAll(blok, text);
-//                        }
-//                    }
-//                }
-//            });
-//        }
-
     }
 
     private void boxesFall(){
-        Path [] pathBoxes = new Path[boxes.length];
+        pathBoxes = new Path[boxes.length];
+        pathTransitionBoxes = new PathTransition[boxes.length];
+
         boolean setNext = false;
         for(int i=0; i<pathBoxes.length; i++){
             if(boxes[i] == null)
@@ -339,11 +294,11 @@ public class PlayGame extends Application{
 
             pathBoxes[i].getElements().add(new MoveTo(boxes[i].getTranslateX() + boxWidth/2, boxes[i].getTranslateY()));
             pathBoxes[i].getElements().add(new LineTo(boxes[i].getTranslateX() + boxWidth/2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
-            PathTransition pathTransition = new PathTransition();
-            pathTransition.setDuration(Duration.millis(3000));
-            pathTransition.setPath(pathBoxes[i]);
-            pathTransition.setNode(boxes[i]);
-            pathTransition.play();
+            pathTransitionBoxes[i] = new PathTransition();
+            pathTransitionBoxes[i].setDuration(Duration.millis(3000));
+            pathTransitionBoxes[i].setPath(pathBoxes[i]);
+            pathTransitionBoxes[i].setNode(boxes[i]);
+            pathTransitionBoxes[i].play();
             if(!setNext) {
                 setNext = true;
 //                pathTransition.setOnFinished(e -> nextCycle());
@@ -352,25 +307,105 @@ public class PlayGame extends Application{
 
         if(alternateFallBoxes){
             alternateFallBoxes = false;
-            Path [] pathBoxesAlternate = new Path[boxesAlternate.length];
+            alternatePathBoxes = new Path[boxesAlternate.length];
+            pathTransitionBoxesAlternate = new PathTransition[boxesAlternate.length];
 
-            for(int i=0; i<pathBoxesAlternate.length; i++){
+            for(int i=0; i<alternatePathBoxes.length; i++){
 
                 if(boxesAlternate[i] == null)
                     continue;
 
-                pathBoxesAlternate[i] = new Path();
+                alternatePathBoxes[i] = new Path();
 
-                pathBoxesAlternate[i].getElements().add(new MoveTo(boxesAlternate[i].getTranslateX() + boxWidth/2, boxesAlternate[i].getTranslateY()));
-                pathBoxesAlternate[i].getElements().add(new LineTo(boxesAlternate[i].getTranslateX() + boxWidth/2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
-                PathTransition pathTransition = new PathTransition();
-                pathTransition.setDuration(Duration.millis(3000));
-                pathTransition.setPath(pathBoxesAlternate[i]);
-                pathTransition.setNode(boxesAlternate[i]);
-                pathTransition.setDelay(new Duration(1500));
-                pathTransition.play();
+                alternatePathBoxes[i].getElements().add(new MoveTo(boxesAlternate[i].getTranslateX() + boxWidth/2, boxesAlternate[i].getTranslateY()));
+                alternatePathBoxes[i].getElements().add(new LineTo(boxesAlternate[i].getTranslateX() + boxWidth/2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
+                pathTransitionBoxesAlternate[i] = new PathTransition();
+                pathTransitionBoxesAlternate[i].setDuration(Duration.millis(3000));
+                pathTransitionBoxesAlternate[i].setPath(alternatePathBoxes[i]);
+                pathTransitionBoxesAlternate[i].setNode(boxesAlternate[i]);
+                pathTransitionBoxesAlternate[i].setDelay(new Duration(1500));
+                pathTransitionBoxesAlternate[i].play();
             }
         }
+    }
+
+    private void pauseBoxes(){
+        Timer timer = new Timer();
+
+        for(int i=0; i<pathBoxes.length; i++){
+            if(pathTransitionBoxes[i] != null)
+                pathTransitionBoxes[i].pause();
+
+            if(pathTransitionBoxesAlternate[i] != null)
+                pathTransitionBoxesAlternate[i].pause();
+        }
+
+        for(int i=0; i<coins.length; i++){
+            if(pathTransitionCoins[i] != null)
+                pathTransitionCoins[i].pause();
+        }
+
+        for(int i=0; i<balls.length; i++){
+            if(pathTransitionBalls[i] != null)
+                pathTransitionBalls[i].pause();
+        }
+
+        for(int i=0; i<ballsAlternate.length; i++){
+            if(pathTransitionBallsAlternate[i] != null)
+                pathTransitionBallsAlternate[i].pause();
+        }
+
+        for(int i=0; i<walls.length; i++){
+            if(pathTransitionWalls[i] != null)
+                pathTransitionWalls[i].pause();
+        }
+
+        if(pathTransitionMagnet != null)
+            pathTransitionMagnet.pause();
+
+        if(pathTransitionShield != null)
+            pathTransitionShield.pause();
+
+        TimerTask task = new TimerTask()
+        {
+            public void run()
+            {
+                for(int i=0; i<pathBoxes.length; i++){
+                    if(pathTransitionBoxes[i] != null)
+                        pathTransitionBoxes[i].play();
+
+                    if(pathTransitionBoxesAlternate[i] != null)
+                        pathTransitionBoxesAlternate[i].play();
+                }
+
+                for(int i=0; i<coins.length; i++){
+                    if(pathTransitionCoins[i] != null)
+                        pathTransitionCoins[i].play();
+                }
+
+                for(int i=0; i<balls.length; i++){
+                    if(pathTransitionBalls[i] != null)
+                        pathTransitionBalls[i].play();
+                }
+
+                for(int i=0; i<ballsAlternate.length; i++){
+                    if(pathTransitionBallsAlternate[i] != null)
+                        pathTransitionBallsAlternate[i].play();
+                }
+
+                for(int i=0; i<walls.length; i++){
+                    if(pathTransitionWalls[i] != null)
+                        pathTransitionWalls[i].play();
+                }
+
+                if(pathTransitionMagnet != null)
+                    pathTransitionMagnet.play();
+
+                if(pathTransitionShield != null)
+                    pathTransitionShield.play();
+            }
+        };
+        timer.schedule(task, 1000);
     }
 
     private void createBalls(){
@@ -423,22 +458,11 @@ public class PlayGame extends Application{
 //                            System.out.println(newValue);
                     Ball ball = (Ball) snake.getFirst().getChildren().get(0);
                     Ball boll = (Ball) balls[index].getChildren().get(0);
-//                            System.out.println(ball + " " + blok);
                     Shape intersect = Shape.intersect(ball, boll);
+
                     if (intersect.getBoundsInLocal().getWidth() != -1) {
                         snake.addBalls(boll.getValue(),gameGridPane);
-                        //if(boll.hit()){
-                        // boll.setFill(Color.TRANSPARENT);
-                        balls[index].getChildren().remove(0);
-                        balls[index].getChildren().remove(1);
-                        //}
-//                        else{
-//                            Text text = (Text) boxes[index].getChildren().get(1);
-//                            text.setText(Integer.toString(Integer.parseInt(text.getText()) - 1));
-//                            boxes[index].getChildren().remove(0);
-//                            boxes[index].getChildren().remove(1);
-//                            boxes[index].getChildren().addAll(blok, text);
-//                        }
+                        balls[index].getChildren().remove(0, 1);
                     }
                 }
             });
@@ -462,17 +486,8 @@ public class PlayGame extends Application{
                         snake.addBalls(boll.getValue(),gameGridPane);
 
                         //ballsAlternate[index].setStyle("-fx-background-color: #000000");
-                        ballsAlternate[index].getChildren().remove(0);
-                        ballsAlternate[index].getChildren().remove(1);
+                        ballsAlternate[index].getChildren().remove(0, 1);
 
-                        //}
-//                        else{
-//                            Text text = (Text) boxes[index].getChildren().get(1);
-//                            text.setText(Integer.toString(Integer.parseInt(text.getText()) - 1));
-//                            boxes[index].getChildren().remove(0);
-//                            boxes[index].getChildren().remove(1);
-//                            boxes[index].getChildren().addAll(blok, text);
-//                        }
                     }
                 }
             });
@@ -482,6 +497,7 @@ public class PlayGame extends Application{
     private void ballsFall(){
         Path [] pathBalls = new Path[balls.length];
         Path [] pathBallsAlternate = new Path[balls.length];
+        pathTransitionBalls = new PathTransition[balls.length];
 
         Random rand = new Random();
 
@@ -493,30 +509,31 @@ public class PlayGame extends Application{
 
             pathBalls[i].getElements().add(new MoveTo(balls[i].getTranslateX() + boxWidth / 2, balls[i].getTranslateY()));
             pathBalls[i].getElements().add(new LineTo(balls[i].getTranslateX() + boxWidth / 2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
-            PathTransition pathTransition = new PathTransition();
-            pathTransition.setDuration(Duration.millis(3000));
-            pathTransition.setPath(pathBalls[i]);
-            pathTransition.setNode(balls[i]);
-            pathTransition.setDelay(new Duration(500 + rand.nextInt(500)));
-            pathTransition.play();
+            pathTransitionBalls[i] = new PathTransition();
+            pathTransitionBalls[i].setDuration(Duration.millis(3000));
+            pathTransitionBalls[i].setPath(pathBalls[i]);
+            pathTransitionBalls[i].setNode(balls[i]);
+            pathTransitionBalls[i].setDelay(new Duration(500 + rand.nextInt(500)));
+            pathTransitionBalls[i].play();
         }
 
         boolean setOnFinished = false;
         for(int i=0; i<ballsAlternate.length; i++){
             pathBallsAlternate[i] = new Path();
+            pathTransitionBallsAlternate = new PathTransition[ballsAlternate.length];
 
             pathBallsAlternate[i].getElements().add(new MoveTo(ballsAlternate[i].getTranslateX() + boxWidth/2, ballsAlternate[i].getTranslateY()));
             pathBallsAlternate[i].getElements().add(new LineTo(ballsAlternate[i].getTranslateX() + boxWidth/2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
-            PathTransition pathTransition = new PathTransition();
-            pathTransition.setDuration(Duration.millis(3000));
-            pathTransition.setPath(pathBallsAlternate[i]);
-            pathTransition.setNode(ballsAlternate[i]);
-            pathTransition.setDelay(new Duration(2000));
+            pathTransitionBallsAlternate[i] = new PathTransition();
+            pathTransitionBallsAlternate[i].setDuration(Duration.millis(3000));
+            pathTransitionBallsAlternate[i].setPath(pathBallsAlternate[i]);
+            pathTransitionBallsAlternate[i].setNode(ballsAlternate[i]);
+            pathTransitionBallsAlternate[i].setDelay(new Duration(2000));
             if(!setOnFinished) {
                 setOnFinished = true;
-                pathTransition.setOnFinished(event -> nextCycle());
+                pathTransitionBallsAlternate[i].setOnFinished(event -> nextCycle());
             }
-            pathTransition.play();
+            pathTransitionBallsAlternate[i].play();
         }
     }
 
@@ -563,6 +580,7 @@ public class PlayGame extends Application{
 
     private void coinsFall(){
         Path [] pathCoins = new Path[numberOfCoins];
+        pathTransitionCoins = new PathTransition[numberOfCoins];
         Random rand = new Random();
 
         for(int i=0; i<pathCoins.length; i++){
@@ -571,12 +589,12 @@ public class PlayGame extends Application{
 
             pathCoins[i].getElements().add(new MoveTo(coins[i].getTranslateX() + boxWidth/2, coins[i].getTranslateY()));
             pathCoins[i].getElements().add(new LineTo(coins[i].getTranslateX() + boxWidth/2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
-            PathTransition pathTransition = new PathTransition();
-            pathTransition.setDuration(Duration.millis(3000));
-            pathTransition.setPath(pathCoins[i]);
-            pathTransition.setNode(coins[i]);
-            pathTransition.setDelay(new Duration(400 + rand.nextInt(500)));
-            pathTransition.play();
+            pathTransitionCoins[i] = new PathTransition();
+            pathTransitionCoins[i].setDuration(Duration.millis(3000));
+            pathTransitionCoins[i].setPath(pathCoins[i]);
+            pathTransitionCoins[i].setNode(coins[i]);
+            pathTransitionCoins[i].setDelay(new Duration(200 + rand.nextInt(500)));
+            pathTransitionCoins[i].play();
         }
     }
 
@@ -610,16 +628,17 @@ public class PlayGame extends Application{
 
     private void shieldFall(){
         Path shieldPath = new Path();
+        pathTransitionShield = new PathTransition();
         Random rand = new Random();
 
         shieldPath.getElements().add(new MoveTo(shield.getTranslateX() + boxWidth/2, shield.getTranslateY()));
         shieldPath.getElements().add(new LineTo(shield.getTranslateX() + boxWidth/2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
-        PathTransition pathTransition = new PathTransition();
-        pathTransition.setDuration(Duration.millis(3000));
-        pathTransition.setPath(shieldPath);
-        pathTransition.setNode(shield);
-        pathTransition.setDelay(new Duration(700 + rand.nextInt(600)));
-        pathTransition.play();
+
+        pathTransitionShield.setDuration(Duration.millis(3000));
+        pathTransitionShield.setPath(shieldPath);
+        pathTransitionShield.setNode(shield);
+        pathTransitionShield.setDelay(new Duration(700 + rand.nextInt(600)));
+        pathTransitionShield.play();
     }
 
     private void addMagnet(){
@@ -685,16 +704,17 @@ public class PlayGame extends Application{
 
     private void magnetFall(){
         Path magPath = new Path();
+        pathTransitionMagnet = new PathTransition();
         Random rand = new Random();
 
         magPath.getElements().add(new MoveTo(magnet.getTranslateX() + boxWidth/2, magnet.getTranslateY()));
         magPath.getElements().add(new LineTo(magnet.getTranslateX() + boxWidth/2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
-        PathTransition pathTransition = new PathTransition();
-        pathTransition.setDuration(Duration.millis(3000));
-        pathTransition.setPath(magPath);
-        pathTransition.setNode(magnet);
-        pathTransition.setDelay(new Duration(700 + rand.nextInt(600)));
-        pathTransition.play();
+
+        pathTransitionMagnet.setDuration(Duration.millis(3000));
+        pathTransitionMagnet.setPath(magPath);
+        pathTransitionMagnet.setNode(magnet);
+        pathTransitionMagnet.setDelay(new Duration(700 + rand.nextInt(600)));
+        pathTransitionMagnet.play();
     }
 
     private void createWalls(){
@@ -720,7 +740,8 @@ public class PlayGame extends Application{
 
     private void wallsFall(){
         Path [] pathWalls = new Path[walls.length];
-//        boolean setNext = false;
+        pathTransitionWalls = new PathTransition[walls.length];
+
         for(int i=0; i<pathWalls.length; i++){
             if(walls[i] == null)
                 continue;
@@ -729,12 +750,11 @@ public class PlayGame extends Application{
 
             pathWalls[i].getElements().add(new MoveTo(walls[i].getTranslateX(), walls[i].getTranslateY()));
             pathWalls[i].getElements().add(new LineTo(walls[i].getTranslateX(), gamePaneHeight + (wallHeight+boxHeight+3*boxHeight/2)));
-            PathTransition pathTransition = new PathTransition();
-            pathTransition.setDuration(Duration.millis(3000));
-            pathTransition.setPath(pathWalls[i]);
-            pathTransition.setNode(walls[i]);
-//            pathTransition.setDelay(new Duration(150));
-            pathTransition.play();
+            pathTransitionWalls[i] = new PathTransition();
+            pathTransitionWalls[i].setDuration(Duration.millis(3000));
+            pathTransitionWalls[i].setPath(pathWalls[i]);
+            pathTransitionWalls[i].setNode(walls[i]);
+            pathTransitionWalls[i].play();
         }
     }
 
