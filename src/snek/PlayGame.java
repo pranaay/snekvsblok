@@ -12,6 +12,7 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.geometry.*;
+import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -25,6 +26,8 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.*;
+import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
@@ -32,6 +35,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import sun.security.krb5.internal.crypto.Des;
 
+import java.awt.*;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Random;
@@ -259,7 +263,7 @@ public class PlayGame extends Application{
                             try {
                                 stopAllAnim();
                                 window.close();
-                                resultWindow.setScore(Integer.parseInt("4"));
+                                resultWindow.setScore(Integer.parseInt(score.getText()));
                                 resultWindow.start(window);
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -893,7 +897,11 @@ public class PlayGame extends Application{
 
                             // take the coins.
                             StackPane theCoin = coins[i];
-                            theCoin.getChildren().remove(0);
+                            try{
+                                theCoin.getChildren().remove(0);
+                            } catch (Exception e){
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }
@@ -935,6 +943,47 @@ public class PlayGame extends Application{
             gameGridPane.add(walls[x], x, 1);
             walls[x].setTranslateY(-(wallHeight+boxHeight+boxHeight/2));
         }
+
+        for(int i=0; i<numberOfWalls; i++){
+            if(walls[i] == null)
+                continue;
+
+            final int index = i;
+
+            walls[i].boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
+                @Override
+                public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
+                    Ball ball;
+                    Wall wall;
+                    try{
+                        ball = (Ball) snake.getFirst().getChildren().get(0);
+                        wall = (Wall) walls[index].getChildren().get(0);
+                    } catch (Exception e){
+                        ball = null;
+                        wall = null;
+                    }
+
+                    if(ball == null || wall == null)
+                        return;
+
+                    Shape intersect = Shape.intersect(ball, wall);
+                    if (intersect.getBoundsInLocal().getWidth() != -1) {
+                        int Xlast = (int) snake.getXLast();
+                        int X = (int) snake.getXFirst();
+                        int Y = (int) snake.getYFirst();
+
+                        if(oldValue.getMinX() < Xlast){
+                            X -= 40;
+                        }
+                        else{
+                            X += 100;
+                        }
+                        moveCursor(X, Y);
+                    }
+
+                }
+            });
+        }
     }
 
     private void wallsFall(){
@@ -955,6 +1004,18 @@ public class PlayGame extends Application{
             pathTransitionWalls[i].setNode(walls[i]);
             pathTransitionWalls[i].play();
         }
+    }
+
+    public void moveCursor(int screenX, int screenY) {
+        Platform.runLater(() -> {
+            try {
+                Robot robot = new Robot();
+                robot.mouseMove(screenX, screenY);
+            } catch (AWTException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        });
     }
 
     private void nextCycle(){

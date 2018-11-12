@@ -14,6 +14,8 @@ import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+import java.awt.*;
+
 public class ResultWindow extends Application {
 
     final String IDLE_BUTTON_STYLE = "-fx-padding: 8 15 15 15;"+

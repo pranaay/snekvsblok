@@ -227,4 +227,16 @@ public class Snake extends Region {
     public boolean isHasShield() {
         return hasShield;
     }
+
+    public double getXFirst(){
+        return Xs.get(0);
+    }
+
+    public double getXLast(){
+        return Xs.get(Xs.size()-1);
+    }
+
+    public double getYFirst(){
+        return Ys.get(0);
+    }
 }
