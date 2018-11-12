@@ -76,6 +76,7 @@ public class PlayGame extends Application{
     private Button confirmButton;
     private Stage window;
     private Main main;
+    private ResultWindow resultWindow;
     private PlayGame game;
 
     private boolean alternateFallBoxes = true;
@@ -256,7 +257,10 @@ public class PlayGame extends Application{
                         }
                         else{
                             try {
-                                main.start(window);
+                                stopAllAnim();
+                                window.close();
+                                resultWindow.setScore(Integer.parseInt("4"));
+                                resultWindow.start(window);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -311,7 +315,10 @@ public class PlayGame extends Application{
                         }
                         else{
                             try {
-                                main.start(window);
+                                stopAllAnim();
+                                window.close();
+                                resultWindow.setScore(Integer.parseInt(score.getText()));
+                                resultWindow.start(window);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -320,6 +327,42 @@ public class PlayGame extends Application{
                 }
             });
         }
+    }
+
+    private void stopAllAnim(){
+        for(int i=0; i<pathBoxes.length; i++){
+            if(pathTransitionBoxes[i] != null)
+                pathTransitionBoxes[i].stop();
+
+            if(pathTransitionBoxesAlternate[i] != null)
+                pathTransitionBoxesAlternate[i].stop();
+        }
+
+        for(int i=0; i<coins.length; i++){
+            if(pathTransitionCoins[i] != null)
+                pathTransitionCoins[i].stop();
+        }
+
+        for(int i=0; i<balls.length; i++){
+            if(pathTransitionBalls[i] != null)
+                pathTransitionBalls[i].stop();
+        }
+
+        for(int i=0; i<ballsAlternate.length; i++){
+            if(pathTransitionBallsAlternate[i] != null)
+                pathTransitionBallsAlternate[i].stop();
+        }
+
+        for(int i=0; i<walls.length; i++){
+            if(pathTransitionWalls[i] != null)
+                pathTransitionWalls[i].stop();
+        }
+
+        if(pathTransitionMagnet != null)
+            pathTransitionMagnet.stop();
+
+        if(pathTransitionShield != null)
+            pathTransitionShield.stop();
     }
 
     private void addFireAlternate(int index, DestroyBlock blok){
@@ -971,6 +1014,7 @@ public class PlayGame extends Application{
 
         main = new Main();
         game = new PlayGame();
+        resultWindow = new ResultWindow();
         window = primaryStage;
         Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 
