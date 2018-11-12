@@ -11,10 +11,7 @@ import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
-import javafx.geometry.Bounds;
-import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
-import javafx.geometry.Rectangle2D;
+import javafx.geometry.*;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -336,7 +333,7 @@ public class PlayGame extends Application{
         }
 
         DestroyBlock rect = createBlok();
-        boxesAlternate[index].setBackground(new Background(new BackgroundFill(new ImagePattern(new Image(getClass().getClassLoader().getResource("littt.jpg").toString())), CornerRadii.EMPTY, Insets.EMPTY)));
+        boxesAlternate[index].setBackground(new Background(new BackgroundFill(new ImagePattern(new Image(getClass().getClassLoader().getResource("littt.png").toString())), CornerRadii.EMPTY, Insets.EMPTY)));
         rect.setFill(Color.TRANSPARENT);
 //        rect.setStyle("-fx-background-image: url(littt.png)");
 
@@ -366,7 +363,7 @@ public class PlayGame extends Application{
         }
 
         DestroyBlock rect = createBlok();
-        boxes[index].setBackground(new Background(new BackgroundFill(new ImagePattern(new Image(getClass().getClassLoader().getResource("littt.jpg").toString())), CornerRadii.EMPTY, Insets.EMPTY)));
+        boxes[index].setBackground(new Background(new BackgroundFill(new ImagePattern(new Image(getClass().getClassLoader().getResource("littt.png").toString())), CornerRadii.EMPTY, Insets.EMPTY)));
         rect.setFill(Color.TRANSPARENT);
 //        rect.setStyle("-fx-background-image: url(littt.png)");
 
@@ -1005,9 +1002,13 @@ public class PlayGame extends Application{
         Choices.setItems(FXCollections.observableArrayList(
                 "Restart", "Go Back"));
         Choices.getSelectionModel().selectFirst();
+        Choices.setPrefHeight(30);
+        Choices.setPrefWidth(200);
 
         confirmButton.setStyle(IDLE_BUTTON_STYLE);
         confirmButton.setText("Confirm");
+        confirmButton.setPrefHeight(30);
+        confirmButton.setPrefWidth(200);
         confirmButton.setOnAction(e->{
             if(Choices.getValue().equalsIgnoreCase("RESTART")){
                 try {
@@ -1024,9 +1025,9 @@ public class PlayGame extends Application{
                 } catch (Exception e1) {
                     e1.printStackTrace();
                 }
-                //renderMainpage();
             }
         });
+
         confirmButton.setOnMousePressed(e -> {
             confirmButton.setStyle(PRESSED_BUTTON_STYLE);
         });
@@ -1043,14 +1044,9 @@ public class PlayGame extends Application{
 
         snake = new Snake(10, gameGridPane, centerOfGamePaneHeight, centerOfGamePaneWidth);
 
-        score = new Label();
-        score.setText(String.valueOf(0));
-
         gameGridPane.setOnMouseMoved(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-//                System.out.println(event.getX() + " " + event.toString());
-               // score.setText(Double.toString(event.getX()) + " :: " + Double.toString(event.getSceneX()));
                 snake.moveSnek(event.getSceneX() - 20);
             }
         });
@@ -1061,11 +1057,26 @@ public class PlayGame extends Application{
         hBox.getChildren().add(optionsPane);
         optionsPane.getItems().add(optionsGridPane);
 
-//        Label score = new Label();
-//        score.setText("1032");
-        optionsGridPane.add(score, 1, 1);
-        optionsGridPane.add(Choices, 1, 2);
-        optionsGridPane.add(confirmButton, 1, 3);
+        score = new Label();
+        score.setText(String.valueOf(0));
+        score.setAlignment(Pos.CENTER);
+
+        Label scoreLabel = new Label();
+        scoreLabel.setText("SCORE");
+        scoreLabel.setFont(Font.font("Roboto", 32));
+
+        optionsGridPane.setVgap(10);
+        optionsGridPane.setPadding(new Insets(10, 10, 10, 10));
+        optionsGridPane.add(scoreLabel, 3, 0);
+        optionsGridPane.add(score, 3, 1);
+        optionsGridPane.add(Choices, 3, 3);
+        optionsGridPane.add(confirmButton, 3, 5);
+        optionsGridPane.setAlignment(Pos.CENTER);
+        optionsGridPane.setHalignment(score, HPos.CENTER);
+        optionsGridPane.setHalignment(scoreLabel, HPos.CENTER);
+        optionsGridPane.setHalignment(Choices, HPos.CENTER);
+        optionsGridPane.setHalignment(confirmButton, HPos.CENTER);
+
 
         nextCycle();
 
