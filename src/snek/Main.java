@@ -1,37 +1,23 @@
 package snek;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
-import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
-import javafx.animation.PathTransition;
-import javafx.application.Application;
-import javafx.geometry.Orientation;
 import javafx.scene.Scene;
-import javafx.scene.control.SplitPane;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.*;
-import javafx.scene.text.Text;
-import javafx.stage.Stage;
-import javafx.util.Duration;
-import java.util.Random;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -94,63 +80,6 @@ public class Main extends Application {
 
     private StackPane playButton;
 
-
-
-
-//    private void createAnimation(){
-//        Path [] pathBoxes = new Path[boxes.length];
-//        boolean setNext = false;
-//        for(int i=0; i<pathBoxes.length; i++){
-//            if(boxes[i] == null)
-//                continue;
-//
-//            pathBoxes[i] = new Path();
-//
-//            pathBoxes[i].getElements().add(new MoveTo(boxes[i].getLayoutX() + boxWidth/2, boxes[i].getTranslateY()));
-//            pathBoxes[i].getElements().add(new LineTo(boxes[i].getLayoutX() + boxWidth/2, gamePaneHeight + boxHeight/2));
-//            PathTransition pathTransition = new PathTransition();
-//            pathTransition.setDuration(Duration.millis(3000));
-//            pathTransition.setPath(pathBoxes[i]);
-//            pathTransition.setNode(boxes[i]);
-//            pathTransition.play();
-//           // if(i == 5)
-//                if(!setNext){
-//                    setNext = true;
-//                    pathTransition.setOnFinished(e -> nextCycle());
-//                }
-//        }
-//
-//        if(alternateFall){
-//            alternateFall = false;
-//            Path [] pathBoxesAlternate = new Path[boxesAlternate.length];
-//
-//            for(int i=0; i<pathBoxesAlternate.length; i++){
-//
-//                if(boxesAlternate[i] == null)
-//                    continue;
-//
-//                pathBoxesAlternate[i] = new Path();
-//
-//                pathBoxesAlternate[i].getElements().add(new MoveTo(boxesAlternate[i].getLayoutX() + boxWidth/2, boxesAlternate[i].getLayoutY() - boxHeight));
-//                pathBoxesAlternate[i].getElements().add(new LineTo(boxesAlternate[i].getLayoutX() + boxWidth/2, gamePaneHeight + boxHeight/2));
-//                PathTransition pathTransition = new PathTransition();
-//                pathTransition.setDuration(Duration.millis(3000));
-//                pathTransition.setPath(pathBoxesAlternate[i]);
-//                pathTransition.setNode(boxesAlternate[i]);
-//                pathTransition.setDelay(new Duration(1500));
-//                pathTransition.play();
-//            }
-//        }
-//    }
-
-
-
-
-
-
-
-
-
     public void renderMainpage(){
         VBox mainlayout = new VBox();
 
@@ -167,7 +96,7 @@ public class Main extends Application {
         mainlayout.getChildren().add(Quit);
         mainlayout.setSpacing(75);
 
-        BackgroundImage myBI= new BackgroundImage(new Image(getClass().getResourceAsStream("background.png"),1281,720,false,true), BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
+        BackgroundImage myBI= new BackgroundImage(new Image(getClass().getResource("background.png").toExternalForm(),1281,720,false,true), BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
 
         mainlayout.setBackground(new Background(myBI));
 
@@ -189,12 +118,13 @@ public class Main extends Application {
     }
 
     public void exiting(){
+        Platform.exit();
         window.close();
     }
 
     public void renderLeaderboard(){
         Pane leaderboardlayout = new Pane();
-        BackgroundImage myBI= new BackgroundImage(new Image(getClass().getResourceAsStream("background.png"),1281,720,false,true), BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
+        BackgroundImage myBI= new BackgroundImage(new Image(getClass().getResource("background.png").toExternalForm(),1281,720,false,true), BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
 
         leaderboardlayout.setBackground(new Background(myBI));
         leaderboardlayout.setTranslateX(0);
@@ -236,9 +166,6 @@ public class Main extends Application {
         window.setScene(leaderBoards);
         window.show();
     }
-
-
-
 
     private ImageView createImageView(final File imageFile)throws Exception {
         // DEFAULT_THUMBNAIL_WIDTH is a constant you need to define
@@ -302,16 +229,14 @@ public class Main extends Application {
 
         BackgroundImage myBI= new BackgroundImage(new Image(getClass().getResourceAsStream("background.png"),1281,720,false,true), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
         tile.getChildren().add(toMainScreen);
-//       tile.setBackground(new Background(myBI));
-//       root.setBackground(new Background(myBI));
 
-        //tile.setStyle("-fx-background-color: transparent;");
         tile.setPadding(new Insets(15, 15, 15, 15));
         tile.setHgap(15);
 
-        String path = "/home/pranaaysaini/Desktop/creepy_pictures";
+        String path = "CreepyPictures";
 
         File folder = new File(path);
+        System.out.println(folder.getAbsolutePath());
         File[] listOfFiles = folder.listFiles();
 
         for (final File file : listOfFiles) {
@@ -320,40 +245,14 @@ public class Main extends Application {
             tile.getChildren().addAll(imageView);
         }
 
-
         root.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER); // Horizontal
         root.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED); // Vertical scroll bar
         root.setFitToWidth(true);
         root.setContent(tile);
 
-//        window.setWidth(Screen.getPrimary().getVisualBounds().getWidth());
-//        window.setHeight(Screen.getPrimary().getVisualBounds()
-//                .getHeight());
         Scene scene = new Scene(root,1280,720);
         window.setScene(scene);
         window.show();
-//        Pane changeskinlayout = new Pane();
-//
-//        //changeskinlayout.setAlignment(Pos.CENTER);
-//        toMainScreen.setTranslateX(8.0);
-//        toMainScreen.setTranslateY(8.0);
-//
-//        changeskinlayout.getChildren().add(toMainScreen);
-//        changeSkin = new Scene(changeskinlayout ,1280,720);
-//
-//        window.setTitle("Change Skin");
-//        BackgroundImage myBI= new BackgroundImage(new Image(getClass().getResourceAsStream("background.png"),1281,720,false,true), BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
-//
-//        changeskinlayout.setBackground(new Background(myBI));
-//
-//
-//
-//
-//
-//
-//
-//        window.setScene(changeSkin);
-//        window.show();
     }
 
 
@@ -436,31 +335,13 @@ public class Main extends Application {
 
         toStartGame.setOnMouseEntered(e -> toStartGame.setStyle(HOVEROVER_BUTTON_STYLE));
         toStartGame.setOnMouseExited(e -> toStartGame.setStyle(IDLE_BUTTON_STYLE));
-////////////////////////////////////////////////////////////////////////////////////////////
-//        confirmButton = new Button();
-//        confirmButton.setStyle(IDLE_BUTTON_STYLE);
-//        confirmButton.setText("Confirm");
-//        confirmButton.setOnAction(e->{
-//            if(Choices.getValue().equals("RESTART")){
-//                PlayGame obj = new PlayGame();
-//                obj.start(window);
-//            }
-//            if(Choices.getValue().equals("GO Back")){
-//                renderMainpage();
-//            }
-//        });
-//        confirmButton.setOnMousePressed(e -> {
-//            confirmButton.setStyle(PRESSED_BUTTON_STYLE);
-//        });
-//        confirmButton.setOnMouseEntered(e -> confirmButton.setStyle(HOVEROVER_BUTTON_STYLE));
-//        confirmButton.setOnMouseExited(e -> confirmButton.setStyle(IDLE_BUTTON_STYLE));
-//
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////////////////////////
         Choices = new ChoiceBox<String>();
         Choices.getItems().add("RESTART");
         Choices.getItems().add("GO Back");
-//////////////////////////////////////////////////////////////////////leaderpage button
+
+        //////////////////////////////////////////////////////////////////////leaderpage button
         toLeaderPage.setOnAction(e -> {
             this.renderLeaderboard();
         });
@@ -470,8 +351,8 @@ public class Main extends Application {
 
         toLeaderPage.setOnMouseEntered(e -> toLeaderPage.setStyle(HOVEROVER_BUTTON_STYLE));
         toLeaderPage.setOnMouseExited(e -> toLeaderPage.setStyle(IDLE_BUTTON_STYLE));
-/////////////////////////////////////////////////////////////////////////////quit button
 
+        /////////////////////////////////////////////////////////////////////////////quit button
         Quit.setOnAction(e -> {
             this.exiting();
         });
@@ -483,7 +364,7 @@ public class Main extends Application {
         Quit.setOnMouseEntered(e -> Quit.setStyle(HOVEROVER_BUTTON_STYLE_QUIT));
         Quit.setOnMouseExited(e -> Quit.setStyle(IDLE_BUTTON_STYLE_QUIT));
 
-//////////////////////////////////////////////////////////////////////change skin button
+        //////////////////////////////////////////////////////////////////////change skin button
         toSkinChangePage.setOnAction(event -> {
             try {
                 this.renderChangeSkin();

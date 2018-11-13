@@ -15,13 +15,17 @@ import sun.security.util.Length;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Snake extends Region {
 
     private ArrayList<StackPane> snek;
     private ArrayList<Double> Xs, Ys;
 
-   private int length;
+    private int length;
+
+    private boolean hasShield = false;
 
     public int getLength() {
 
@@ -81,6 +85,22 @@ public class Snake extends Region {
         return color;
     }
 
+    public void getShield(){
+        Timer timer = new Timer();
+        this.hasShield = true;
+
+        TimerTask task = new TimerTask()
+        {
+            public void run()
+            {
+                hasShield = false;
+            }
+
+        };
+
+        timer.schedule(task, 5000);
+    }
+
 
     public Snake(int n, GridPane gridPane, double centerX, double centerY){
         this.snek = new ArrayList<StackPane>();
@@ -131,8 +151,12 @@ public class Snake extends Region {
 
         Double X = Xs.get(this.length-1);
         Double Y = Ys.get(this.length-1);
-        this.length += n;
         Y += 2*radius;
+
+        this.length += n;
+        StackPane first = getFirst();
+        Text text = (Text) first.getChildren().get(1);
+        text.setText(String.valueOf(length));
 
         for(int i=0; i<n; i++){
             Ball otherBalls = new Ball(radius);
@@ -153,18 +177,24 @@ public class Snake extends Region {
     }
 
     public void removeBalls(int n,GridPane gridPane){
-        for(int i=length-1;i>=length-n;i--){
-            //gridPane.getChildren().indexOf(snek);
-            StackPane ball = snek.get(i);
-            ball.getChildren().remove(0);
+        if(!hasShield) {
+            for (int i = length - 1; i >= length - n; i--) {
+                //gridPane.getChildren().indexOf(snek);
+                StackPane ball = snek.get(i);
+                ball.getChildren().remove(0);
 
-            gridPane.getChildren().remove(ball);
-            Xs.remove(i);
-            Ys.remove(i);
-            snek.remove(i);
+                gridPane.getChildren().remove(ball);
+                Xs.remove(i);
+                Ys.remove(i);
+                snek.remove(i);
+            }
+
+            length -= n;
+
+            StackPane first = getFirst();
+            Text text = (Text) first.getChildren().get(1);
+            text.setText(String.valueOf(length));
         }
-
-        length -= n;
     }
     public void moveSnek(double x){
 
@@ -194,4 +224,19 @@ public class Snake extends Region {
         return this.snek.get(0);
     }
 
+    public boolean isHasShield() {
+        return hasShield;
+    }
+
+    public double getXFirst(){
+        return Xs.get(0);
+    }
+
+    public double getXLast(){
+        return Xs.get(Xs.size()-1);
+    }
+
+    public double getYFirst(){
+        return Ys.get(0);
+    }
 }
