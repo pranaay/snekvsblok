@@ -67,6 +67,7 @@ public class PlayGame extends Application{
 
     private StackPane magnet;
     private StackPane shield;
+    private StackPane destroyAllShiz;
 
     private GridPane gameGridPane;
     private GridPane optionsGridPane;
@@ -102,6 +103,7 @@ public class PlayGame extends Application{
 
     private PathTransition pathTransitionShield;
     private PathTransition pathTransitionMagnet;
+    private PathTransition pathTransitionDestroyAll;
 
     final String IDLE_BUTTON_STYLE = "-fx-padding: 8 15 15 15;"+
             "-fx-background-insets: 0,0 0 5 0, 0 0 6 0, 0 0 7 0;"+
@@ -245,18 +247,32 @@ public class PlayGame extends Application{
 
                         boolean hit = blok.hit(snake.getLength());
 
+                        int tempScore = 0;
+
                         if(snake.isHasShield()){
                             snake.removeBalls(blok.getBoxValue(),gameGridPane);
-                            boxes[index].getChildren().remove(0, 1);
+//                            boxes[index].getChildren().remove(0, 1);
+                            tempScore += blok.getBoxValue();
+                            tempScore += Integer.parseInt(score.getText());
+                            score.setText(String.valueOf(tempScore));
+
                             addFire(index, blok);
                         }
                         else if(hit && blok.getBoxValue() <= 5){
                             snake.removeBalls(blok.getBoxValue(),gameGridPane);
 //                            boxes[index].getChildren().remove(0, 1);
+                            tempScore += blok.getBoxValue();
+                            tempScore += Integer.parseInt(score.getText());
+                            score.setText(String.valueOf(tempScore));
+
                             addFire(index, blok);
                         }
                         else if(blok.getBoxValue() > 5 && !snake.isHasShield() && hit){
                             pauseBoxes();
+
+                            tempScore += 5;
+                            tempScore += Integer.parseInt(score.getText());
+                            score.setText(String.valueOf(tempScore));
 
                             snake.removeBalls(blok.getBoxValue(), gameGridPane);
                             Text text = (Text) boxes[index].getChildren().get(1);
@@ -265,12 +281,11 @@ public class PlayGame extends Application{
                         }
                         else{
                             try {
-
                                 String musicFile = "roblox.mp3";     // For example
 
                                 Media sound = new Media(new File(musicFile).toURI().toString());
                                 MediaPlayer mediaPlayer = new MediaPlayer(sound);
-                                mediaPlayer.seek(Duration.millis(500));
+                                mediaPlayer.seek(Duration.millis(1000));
                                 mediaPlayer.play();
 
                                 stopAllAnim();
@@ -313,18 +328,33 @@ public class PlayGame extends Application{
 
                         boolean hit = blok.hit(snake.getLength());
 
+                        int tempScore = 0;
+
                         if(snake.isHasShield()){
                             snake.removeBalls(blok.getBoxValue(),gameGridPane);
-                            boxesAlternate[index].getChildren().remove(0, 1);
+//                            boxesAlternate[index].getChildren().remove(0, 1);
+                            tempScore += blok.getBoxValue();
+                            tempScore += Integer.parseInt(score.getText());
+                            score.setText(String.valueOf(tempScore));
+
                             addFireAlternate(index, blok);
                         }
                         else if(hit && blok.getBoxValue() <= 5){
                             snake.removeBalls(blok.getBoxValue(),gameGridPane);
-                            boxesAlternate[index].getChildren().remove(0, 1);
+//                            boxesAlternate[index].getChildren().remove(0, 1);
+                            tempScore += blok.getBoxValue();
+                            tempScore += Integer.parseInt(score.getText());
+                            score.setText(String.valueOf(tempScore));
+
                             addFireAlternate(index, blok);
                         }
                         else if(blok.getBoxValue() > 5 && hit){
                             pauseBoxes();
+
+                            tempScore += 5;
+                            tempScore += Integer.parseInt(score.getText());
+                            score.setText(String.valueOf(tempScore));
+
                             snake.removeBalls(blok.getBoxValue(), gameGridPane);
                             Text text = (Text) boxesAlternate[index].getChildren().get(1);
                             text.setText(String.valueOf(blok.getBoxValue() - 5));
@@ -337,7 +367,7 @@ public class PlayGame extends Application{
 
                                 Media sound = new Media(new File(musicFile).toURI().toString());
                                 MediaPlayer mediaPlayer = new MediaPlayer(sound);
-                                mediaPlayer.seek(Duration.millis(500));
+                                mediaPlayer.seek(Duration.millis(1000));
                                 mediaPlayer.play();
 
                                 stopAllAnim();
@@ -426,9 +456,7 @@ public class PlayGame extends Application{
         try{
             boxes[index].getChildren().remove(1);
             boxes[index].getChildren().remove(0);
-        } catch (Exception e){
-
-        }
+        } catch (Exception e){}
 
         DestroyBlock rect = createBlok();
         boxes[index].setBackground(new Background(new BackgroundFill(new ImagePattern(new Image(getClass().getClassLoader().getResource("littt.png").toString())), CornerRadii.EMPTY, Insets.EMPTY)));
@@ -535,6 +563,9 @@ public class PlayGame extends Application{
         if(pathTransitionShield != null)
             pathTransitionShield.pause();
 
+        if(pathTransitionDestroyAll != null)
+            pathTransitionDestroyAll.pause();
+
         TimerTask task = new TimerTask()
         {
             public void run()
@@ -572,6 +603,9 @@ public class PlayGame extends Application{
 
                 if(pathTransitionShield != null)
                     pathTransitionShield.play();
+
+                if(pathTransitionDestroyAll != null)
+                    pathTransitionDestroyAll.play();
             }
         };
         timer.schedule(task, 1000);
@@ -855,6 +889,102 @@ public class PlayGame extends Application{
         pathTransitionShield.play();
     }
 
+    private void addDestroyAll(){
+        Random rand = new Random();
+        destroyAllShiz = new StackPane();
+
+        int x = rand.nextInt(numberOfBoxes);
+
+        Image back = new Image(getClass().getClassLoader().getResource("destroyAll.png").toString());
+
+        DestroyAll tempDestroy = new DestroyAll(back);
+        destroyAllShiz.getChildren().add(tempDestroy);
+
+        gameGridPane.add(destroyAllShiz, x, 3);
+        destroyAllShiz.setTranslateY(-(wallHeight+boxHeight+boxHeight));
+
+        destroyAllShiz.boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
+            @Override
+            public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
+                DestroyAll poly;
+                Ball ball;
+                try{
+                    ball = (Ball) snake.getFirst().getChildren().get(0);
+                    poly = (DestroyAll) destroyAllShiz.getChildren().get(0);
+                } catch (Exception e){
+                    ball = null;
+                    poly = null;
+                }
+
+                if(ball == null || poly == null)
+                    return;
+
+                Shape intersect = Shape.intersect(ball, poly);
+                if (intersect.getBoundsInLocal().getWidth() != -1) {
+                    // Destroy all
+                    int tempScore = 0;
+
+                    ((DestroyAll) destroyAllShiz.getChildren().get(0)).setFill(Color.TRANSPARENT);
+                    destroyAllShiz.getChildren().remove(0);
+
+                    for(int i=0; i<boxes.length; i++){
+                        DestroyBlock blok;
+
+                        if(boxes[i] == null)
+                            continue;
+
+                        try {
+                            blok = (DestroyBlock) boxes[i].getChildren().get(0);
+                        } catch (Exception e){
+                            blok = null;
+                        }
+
+                        if(blok == null)
+                            continue;
+
+                        tempScore += blok.getBoxValue();
+                        addFire(i, blok);
+                    }
+                    for(int i=0; i<boxesAlternate.length; i++){
+                        DestroyBlock blok;
+
+                        if(boxesAlternate[i] == null)
+                            continue;
+
+                        try {
+                            blok = (DestroyBlock) boxesAlternate[i].getChildren().get(0);
+                        } catch (Exception e){
+                            blok = null;
+                        }
+
+                        if(blok == null)
+                            continue;
+
+                        tempScore += blok.getBoxValue();
+                        addFireAlternate(i, blok);
+                    }
+                    tempScore += Integer.parseInt(score.getText());
+                    score.setText(String.valueOf(tempScore));
+                }
+            }
+        });
+    }
+
+    private void destroyAllFall(){
+        Path destroyPath = new Path();
+        pathTransitionDestroyAll = new PathTransition();
+        Random rand = new Random();
+
+        destroyPath.getElements().add(new MoveTo(destroyAllShiz.getTranslateX() + boxWidth/2, destroyAllShiz.getTranslateY()));
+        destroyPath.getElements().add(new LineTo(destroyAllShiz.getTranslateX() + boxWidth/2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
+
+        pathTransitionDestroyAll.setDuration(Duration.millis(3000));
+        pathTransitionDestroyAll.setPath(destroyPath);
+        pathTransitionDestroyAll.setNode(destroyAllShiz);
+        pathTransitionDestroyAll.setDelay(new Duration(700 + rand.nextInt(600)));
+        pathTransitionDestroyAll.play();
+    }
+
     private void addMagnet(){
         Random rand = new Random();
 
@@ -1088,6 +1218,12 @@ public class PlayGame extends Application{
         if(shieldNow == 0){
             addShield();
             shieldFall();
+        }
+
+        int destroyAllNow = rand.nextInt(10);
+        if(destroyAllNow == 0){
+            addDestroyAll();
+            destroyAllFall();
         }
     }
 
