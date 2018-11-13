@@ -75,7 +75,7 @@ public class Main extends Application {
             "-fx-font-size: 1.1em;" ;
     Stage window;
     Scene mainScreen , leaderBoards , changeSkin , pause , mainGame ;
-    Button toMainScreen,toLeaderPage,toSkinChangePage, Quit, toStartGame, confirmButton;
+    Button toMainScreen,toLeaderPage,toSkinChangePage, Quit, toStartGame, confirmButton, resumeButton;
     ChoiceBox<String> Choices ;
 
     private StackPane playButton;
@@ -93,8 +93,9 @@ public class Main extends Application {
         mainlayout.getChildren().add(playButton);
         mainlayout.getChildren().add(toLeaderPage);
         mainlayout.getChildren().add(toSkinChangePage);
+        mainlayout.getChildren().add(resumeButton);
         mainlayout.getChildren().add(Quit);
-        mainlayout.setSpacing(75);
+        mainlayout.setSpacing(30);
 
         BackgroundImage myBI= new BackgroundImage(new Image(getClass().getResource("background.png").toExternalForm(),1281,720,false,true), BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
 
@@ -275,6 +276,11 @@ public class Main extends Application {
         toLeaderPage.setStyle(IDLE_BUTTON_STYLE);
 
         ///////////////////////////////////
+        resumeButton = new Button();
+        resumeButton.setText("Resume");
+        resumeButton.setStyle(IDLE_BUTTON_STYLE);
+
+        ///////////////////////////////////
         toSkinChangePage = new Button();
         toSkinChangePage.setText("Change Skin");
         toSkinChangePage.setStyle(IDLE_BUTTON_STYLE);
@@ -351,6 +357,17 @@ public class Main extends Application {
 
         toLeaderPage.setOnMouseEntered(e -> toLeaderPage.setStyle(HOVEROVER_BUTTON_STYLE));
         toLeaderPage.setOnMouseExited(e -> toLeaderPage.setStyle(IDLE_BUTTON_STYLE));
+
+        //////////////////////////////////////////////////////////////////////
+        resumeButton.setOnAction(e -> {
+            //TODO
+        });
+        resumeButton.setOnMousePressed(e -> {
+            resumeButton.setStyle(PRESSED_BUTTON_STYLE);
+        });
+
+        resumeButton.setOnMouseEntered(e -> resumeButton.setStyle(HOVEROVER_BUTTON_STYLE));
+        resumeButton.setOnMouseExited(e -> resumeButton.setStyle(IDLE_BUTTON_STYLE));
 
         /////////////////////////////////////////////////////////////////////////////quit button
         Quit.setOnAction(e -> {
