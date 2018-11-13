@@ -23,6 +23,8 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.*;
@@ -36,6 +38,7 @@ import javafx.util.Duration;
 import sun.security.krb5.internal.crypto.Des;
 
 import java.awt.*;
+import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Random;
@@ -239,6 +242,7 @@ public class PlayGame extends Application{
 
                     Shape intersect = Shape.intersect(ball, blok);
                     if (intersect.getBoundsInLocal().getWidth() != -1) {
+
                         boolean hit = blok.hit(snake.getLength());
 
                         if(snake.isHasShield()){
@@ -261,6 +265,14 @@ public class PlayGame extends Application{
                         }
                         else{
                             try {
+
+                                String musicFile = "roblox.mp3";     // For example
+
+                                Media sound = new Media(new File(musicFile).toURI().toString());
+                                MediaPlayer mediaPlayer = new MediaPlayer(sound);
+                                mediaPlayer.seek(Duration.millis(500));
+                                mediaPlayer.play();
+
                                 stopAllAnim();
                                 window.close();
                                 resultWindow.setScore(Integer.parseInt(score.getText()));
@@ -298,6 +310,7 @@ public class PlayGame extends Application{
 
                     Shape intersect = Shape.intersect(ball, blok);
                     if (intersect.getBoundsInLocal().getWidth() != -1) {
+
                         boolean hit = blok.hit(snake.getLength());
 
                         if(snake.isHasShield()){
@@ -319,6 +332,14 @@ public class PlayGame extends Application{
                         }
                         else{
                             try {
+
+                                String musicFile = "roblox.mp3";     // For example
+
+                                Media sound = new Media(new File(musicFile).toURI().toString());
+                                MediaPlayer mediaPlayer = new MediaPlayer(sound);
+                                mediaPlayer.seek(Duration.millis(500));
+                                mediaPlayer.play();
+
                                 stopAllAnim();
                                 window.close();
                                 resultWindow.setScore(Integer.parseInt(score.getText()));
