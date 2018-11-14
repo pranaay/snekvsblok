@@ -49,7 +49,9 @@ import java.util.TimerTask;
 
 public class PlayGame extends Application{
     private Label score;
+
     private Image snekmage;
+
     private double windowWidth;
     private double windowHeight;
     private double boxWidth = 80;
@@ -58,6 +60,8 @@ public class PlayGame extends Application{
     private double gamePaneHeight;
     private double optionsPaneWidth;
     private double optionsPaneHeight;
+    private double wallHeight = 200;
+    private double snakeOldX = 0;
 
     private StackPane[] boxes;
     private StackPane[] boxesAlternate;
@@ -79,8 +83,6 @@ public class PlayGame extends Application{
     private int numberOfWalls;
     private int PlayerScore = 0;
 
-    private double wallHeight = 200;
-
     private ChoiceBox<String> Choices ;
     private Button confirmButton;
     private Stage window;
@@ -89,6 +91,8 @@ public class PlayGame extends Application{
     private PlayGame game;
 
     private boolean alternateFallBoxes = true;
+    private boolean nextMouseMove = true;
+    private boolean touchingWalls = false;
 
     private Snake snake;
 
@@ -285,7 +289,8 @@ public class PlayGame extends Application{
                             tempScore += Integer.parseInt(score.getText());
                             score.setText(String.valueOf(tempScore));
 
-                            snake.removeBalls(blok.getBoxValue(), gameGridPane);
+                            snake.removeBalls(5, gameGridPane);
+
                             Text text = (Text) boxes[index].getChildren().get(1);
                             text.setText(String.valueOf(blok.getBoxValue() - 5));
                             blok.reduceValue(5);
@@ -366,7 +371,8 @@ public class PlayGame extends Application{
                             tempScore += Integer.parseInt(score.getText());
                             score.setText(String.valueOf(tempScore));
 
-                            snake.removeBalls(blok.getBoxValue(), gameGridPane);
+                            snake.removeBalls(5, gameGridPane);
+
                             Text text = (Text) boxesAlternate[index].getChildren().get(1);
                             text.setText(String.valueOf(blok.getBoxValue() - 5));
                             blok.reduceValue(5);
@@ -1100,11 +1106,11 @@ public class PlayGame extends Application{
 
             StackPane stackPane = new StackPane();
             stackPane.getChildren().addAll(wall);
-//            stackPane.setTranslateY(-height);
-//            stackPane.setTranslateX(-boxWidth/2);
+
             walls[x] = stackPane;
             gameGridPane.add(walls[x], x, 1);
             walls[x].setTranslateY(-(wallHeight+boxHeight+boxHeight/2));
+//            walls[x].setStyle("-fx-background-color: #FFFF00");
         }
 
         for(int i=0; i<numberOfWalls; i++){
@@ -1131,19 +1137,13 @@ public class PlayGame extends Application{
 
                     Shape intersect = Shape.intersect(ball, wall);
                     if (intersect.getBoundsInLocal().getWidth() != -1) {
-                        int Xlast = (int) snake.getXLast();
-                        int X = (int) snake.getXFirst();
-                        int Y = (int) snake.getYFirst();
-
-                        if(oldValue.getMinX() < Xlast){
-                            X -= 40;
-                        }
-                        else{
-                            X += 100;
-                        }
-                        moveCursor(X, Y);
+                        // Please help. I cant think of some approch
+                        // I might kermit suicide...
+                        touchingWalls = true;
                     }
-
+                    else{
+                        touchingWalls = false;
+                    }
                 }
             });
         }
@@ -1316,19 +1316,33 @@ public class PlayGame extends Application{
 
         gamePane.setStyle("-fx-background-color: #000000");
         if(snekmage == null){
-            System.out.println("jaspreet sucks");
             snake = new Snake(10, gameGridPane, centerOfGamePaneHeight, centerOfGamePaneWidth);
-
         }
         else{
-            System.out.println("aniket sucks");
             snake =  new Snake(10, gameGridPane, centerOfGamePaneHeight, centerOfGamePaneWidth,snekmage);
         }
 
         gameGridPane.setOnMouseMoved(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                snake.moveSnek(event.getSceneX() - 20);
+                snakeOldX = snake.getXFirst();
+                double moveSnek = event.getSceneX()-20;
+
+                if(!touchingWalls)
+                    snake.moveSnek(moveSnek);
+                else{
+                    if(snakeOldX < moveSnek) {
+                        snake.moveSnek(moveSnek - 20);
+                        System.out.println("jaspreet sucks");
+                        moveCursor((int) moveSnek-30, (int) snake.getYFirst());
+                    }
+                    else {
+                        snake.moveSnek(moveSnek + 20);
+                        System.out.println("aniket sucks");
+                        moveCursor((int) moveSnek+100, (int) snake.getYFirst());
+                    }
+                }
+                nextMouseMove = true;
             }
         });
 

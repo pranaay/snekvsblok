@@ -212,7 +212,7 @@ public class Snake extends Region {
     }
     public void addBalls(int n,GridPane gridPane){
         //this guys got some balls
-        double radius = 20;
+        double radius = 15;
 
         Double X = Xs.get(this.length-1);
         Double Y = Ys.get(this.length-1);
