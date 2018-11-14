@@ -117,7 +117,7 @@ public class Snake extends Region {
 
         this.length = n;
 
-        double radius = 15;
+        double radius = 20;
 
         Ball tempBall = new Ball(radius);
         tempBall.setFill(getColor());
