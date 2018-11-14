@@ -1315,7 +1315,7 @@ public class PlayGame extends Application{
         gamePane.getItems().add(gameGridPane);
 
         gamePane.setStyle("-fx-background-color: #000000");
-        if(snekmage == null){
+        if(this.snekmage == null){
             System.out.println("jaspreet sucks");
             snake = new Snake(10, gameGridPane, centerOfGamePaneHeight, centerOfGamePaneWidth);
 

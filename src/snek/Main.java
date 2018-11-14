@@ -188,8 +188,14 @@ public class Main extends Application {
 
                         if(mouseEvent.getClickCount() == 2){
                             try {
+
                                 game.setSnekmage(new Image(new FileInputStream(imageFile)));
-                                game.start(window);
+                               // System.out.println(imageFile.getName());
+                                if(imageFile.getName().equals("A.png")){
+
+                                    game.setSnekmage(null);
+                                }
+                                //game.start(window);
                                 ///game.getSnake().setSnakeSkin(new Image(new FileInputStream(imageFile)));
 //                                BorderPane borderPane = new BorderPane();
 //                                ImageView imageView = new ImageView();
@@ -333,7 +339,7 @@ public class Main extends Application {
         });
 
         toStartGame.setOnAction((e->{
-            game = new PlayGame();
+         //   game = new PlayGame();
             try {
 //                ((Node)(e.getSource())).getScene().getWindow().hide();
                 game.start(window);
