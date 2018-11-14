@@ -165,7 +165,7 @@ public class Snake extends Region {
 
         this.length = n;
 
-        double radius = 20;
+        double radius = 15;
         snakeSkin = ii;
         Ball tempBall = new Ball(radius);
 
