@@ -2,7 +2,9 @@ package snek;
 
 
 import javafx.animation.PathTransition;
+import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
@@ -22,11 +24,17 @@ public class Snake extends Region {
 
     private ArrayList<StackPane> snek;
     private ArrayList<Double> Xs, Ys;
-
+    private Image snakeSkin;
     private int length;
+    private String imageName ;
 
     private boolean hasShield = false;
-
+    public Image getSnakeSkin(){
+        return snakeSkin;
+    }
+    public void setSnakeSkin(Image i){
+        this.snakeSkin = i ;
+    }
     public int getLength() {
 
         return length;
@@ -109,10 +117,12 @@ public class Snake extends Region {
 
         this.length = n;
 
-        double radius = 10;
+        double radius = 15;
 
         Ball tempBall = new Ball(radius);
         tempBall.setFill(getColor());
+
+
         Text text = new Text();
         text.setText(Integer.toString(n));
         StackPane firstBall = new StackPane();
@@ -131,7 +141,62 @@ public class Snake extends Region {
 
         for(int i=1; i<n; i++){
             Ball otherBalls = new Ball(radius);
+
             otherBalls.setFill(getColor());
+
+            //otherBalls.setFill(getColor());
+            StackPane ball = new StackPane();
+            ball.getChildren().add(otherBalls);
+            ball.setTranslateX(X);
+            ball.setTranslateY(Y);
+
+            Xs.add(X);
+            Ys.add(Y);
+            Y += 2*radius;
+            ball.setId(Integer.toString(i));
+            snek.add(ball);
+            gridPane.getChildren().add(ball);
+        }
+    }
+    public Snake(int n, GridPane gridPane, double centerX, double centerY,Image ii){
+        this.snek = new ArrayList<StackPane>();
+        this.Xs = new ArrayList<Double>(n);
+        this.Ys = new ArrayList<Double>(n);
+
+        this.length = n;
+
+        double radius = 20;
+        snakeSkin = ii;
+        Ball tempBall = new Ball(radius);
+
+        tempBall.setFill(new ImagePattern(ii));
+
+            //tempBall.setStyle("-fx-background-image: " + this.imageName);
+
+        Text text = new Text();
+        text.setText(Integer.toString(n));
+        StackPane firstBall = new StackPane();
+        firstBall.getChildren().addAll(tempBall, text);
+        firstBall.setTranslateX(centerX);
+        firstBall.setTranslateY(centerY);
+
+        snek.add(firstBall);
+        gridPane.getChildren().add(firstBall);
+
+        Xs.add(centerX);
+        Ys.add(centerY);
+
+        double X = centerX;
+        double Y = centerY + 2*radius;
+
+        for(int i=1; i<n; i++){
+            Ball otherBalls = new Ball(radius);
+
+                otherBalls.setFill(new ImagePattern(ii));
+
+                //tempBall.setStyle("-fx-background-image: " + this.imageName);
+
+            //otherBalls.setFill(getColor());
             StackPane ball = new StackPane();
             ball.getChildren().add(otherBalls);
             ball.setTranslateX(X);
@@ -147,7 +212,7 @@ public class Snake extends Region {
     }
     public void addBalls(int n,GridPane gridPane){
         //this guys got some balls
-        double radius = 10;
+        double radius = 20;
 
         Double X = Xs.get(this.length-1);
         Double Y = Ys.get(this.length-1);
@@ -160,7 +225,14 @@ public class Snake extends Region {
 
         for(int i=0; i<n; i++){
             Ball otherBalls = new Ball(radius);
-            otherBalls.setFill(getColor());
+            if(snakeSkin == null){
+                otherBalls.setFill(getColor());
+            }
+            else{
+                otherBalls.setFill(new ImagePattern(snakeSkin));
+
+                //tempBall.setStyle("-fx-background-image: " + this.imageName);
+            }
             StackPane ball = new StackPane();
             ball.getChildren().add(otherBalls);
 
@@ -213,7 +285,7 @@ public class Snake extends Region {
             pathTransition.setDuration(Duration.millis(10));
             pathTransition.setPath(snekPath[i]);
             pathTransition.setNode(snek.get(i));
-            pathTransition.setDelay(new Duration(50*i));
+            pathTransition.setDelay(new Duration(25*i));
             pathTransition.play();
 
             Xs.set(i, x);

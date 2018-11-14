@@ -188,25 +188,28 @@ public class Main extends Application {
 
                         if(mouseEvent.getClickCount() == 2){
                             try {
-                                BorderPane borderPane = new BorderPane();
-                                ImageView imageView = new ImageView();
-                                Image image = new Image(new FileInputStream(imageFile));
-                                imageView.setImage(image);
-                                imageView.setStyle("-fx-background-color: transparent");
-                                imageView.setFitHeight(window.getHeight() - 10);
-                                imageView.setPreserveRatio(true);
-                                imageView.setSmooth(true);
-                                imageView.setCache(true);
-                                borderPane.setCenter(imageView);
-                                borderPane.setStyle("-fx-background-color: transparent");
-                                Stage newStage = new Stage();
-                                newStage.setWidth(window.getWidth());
-                                newStage.setHeight(window.getHeight());
-                                newStage.setTitle(imageFile.getName());
-                                Scene scene = new Scene(borderPane,Color.BLACK);
-                                newStage.setScene(scene);
-                                newStage.show();
-                            } catch (FileNotFoundException e) {
+                                game.setSnekmage(new Image(new FileInputStream(imageFile)));
+                                game.start(window);
+                                ///game.getSnake().setSnakeSkin(new Image(new FileInputStream(imageFile)));
+//                                BorderPane borderPane = new BorderPane();
+//                                ImageView imageView = new ImageView();
+//                                Image image = new Image(new FileInputStream(imageFile));
+//                                imageView.setImage(image);
+//                                imageView.setStyle("-fx-background-color: transparent");
+//                                imageView.setFitHeight(window.getHeight() - 10);
+//                                imageView.setPreserveRatio(true);
+//                                imageView.setSmooth(true);
+//                                imageView.setCache(true);
+//                                borderPane.setCenter(imageView);
+//                                borderPane.setStyle("-fx-background-color: transparent");
+//                                Stage newStage = new Stage();
+//                                newStage.setWidth(window.getWidth());
+//                                newStage.setHeight(window.getHeight());
+//                                newStage.setTitle(imageFile.getName());
+//                                Scene scene = new Scene(borderPane,Color.BLACK);
+//                                newStage.setScene(scene);
+//                                newStage.show();
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
 

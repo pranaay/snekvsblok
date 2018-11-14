@@ -38,6 +38,7 @@ import javafx.util.Duration;
 import sun.security.krb5.internal.crypto.Des;
 
 import java.awt.*;
+import java.awt.font.ImageGraphicAttribute;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -48,7 +49,7 @@ import java.util.TimerTask;
 
 public class PlayGame extends Application{
     private Label score;
-
+    private Image snekmage;
     private double windowWidth;
     private double windowHeight;
     private double boxWidth = 80;
@@ -127,6 +128,16 @@ public class PlayGame extends Application{
             "-fx-effect: dropshadow( gaussian , rgba(0,0,0,0.75) , 4,0,0,1 );"+
             "-fx-font-weight: bold;"+
             "-fx-font-size: 1.1em;" ;
+    public void setSnekmage(Image i){
+        this.snekmage = i ;
+    }
+
+    public Snake getSnake(){
+        return this.snake;
+    }
+    public void setSnake(Snake i){
+        this.snake = i ;
+    }
     private DestroyBlock createBlok(){
         DestroyBlock rect = new DestroyBlock(0, -boxHeight, boxWidth, boxHeight);
 
@@ -806,7 +817,8 @@ public class PlayGame extends Application{
                     Shape intersect = Shape.intersect(ball, boll);
 
                     if (intersect.getBoundsInLocal().getWidth() != -1) {
-                        PlayerScore += 1;
+                        PlayerScore = Integer.parseInt(score.getText());
+                        PlayerScore++;
                         score.setText(String.valueOf(PlayerScore));
                         coins[index].getChildren().remove(0);
                     }
@@ -1303,8 +1315,15 @@ public class PlayGame extends Application{
         gamePane.getItems().add(gameGridPane);
 
         gamePane.setStyle("-fx-background-color: #000000");
+        if(snekmage == null){
+            System.out.println("jaspreet sucks");
+            snake = new Snake(10, gameGridPane, centerOfGamePaneHeight, centerOfGamePaneWidth);
 
-        snake = new Snake(10, gameGridPane, centerOfGamePaneHeight, centerOfGamePaneWidth);
+        }
+        else{
+            System.out.println("aniket sucks");
+            snake =  new Snake(10, gameGridPane, centerOfGamePaneHeight, centerOfGamePaneWidth,snekmage);
+        }
 
         gameGridPane.setOnMouseMoved(new EventHandler<MouseEvent>() {
             @Override
