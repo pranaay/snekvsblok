@@ -49,7 +49,9 @@ import java.util.TimerTask;
 
 public class PlayGame extends Application{
     private Label score;
+
     private Image snekmage;
+
     private double windowWidth;
     private double windowHeight;
     private double boxWidth = 80;
@@ -58,13 +60,16 @@ public class PlayGame extends Application{
     private double gamePaneHeight;
     private double optionsPaneWidth;
     private double optionsPaneHeight;
+    private double wallHeight = 200;
+    private double snakeOldX = 0;
 
     private StackPane[] boxes;
     private StackPane[] boxesAlternate;
     private StackPane[] balls;
     private StackPane[] ballsAlternate;
     private StackPane[] coins;
-    private StackPane[] walls;
+//    private StackPane[] walls;
+    private Wall[] walls;
 
     private StackPane magnet;
     private StackPane shield;
@@ -79,8 +84,6 @@ public class PlayGame extends Application{
     private int numberOfWalls;
     private int PlayerScore = 0;
 
-    private double wallHeight = 200;
-
     private ChoiceBox<String> Choices ;
     private Button confirmButton;
     private Stage window;
@@ -89,6 +92,8 @@ public class PlayGame extends Application{
     private PlayGame game;
 
     private boolean alternateFallBoxes = true;
+    private boolean nextMouseMove = true;
+    private boolean touchingWalls = false;
 
     private Snake snake;
 
@@ -243,7 +248,7 @@ public class PlayGame extends Application{
                     DestroyBlock blok;
 
                     try{
-                        ball = (Ball) snake.getFirst().getChildren().get(0);
+                        ball = (Ball) snake.getFirst();
                         blok = (DestroyBlock) boxes[index].getChildren().get(0);
                     } catch (Exception e){
                         ball = null;
@@ -285,19 +290,15 @@ public class PlayGame extends Application{
                             tempScore += Integer.parseInt(score.getText());
                             score.setText(String.valueOf(tempScore));
 
-                            snake.removeBalls(blok.getBoxValue(), gameGridPane);
+                            snake.removeBalls(5, gameGridPane);
+
                             Text text = (Text) boxes[index].getChildren().get(1);
                             text.setText(String.valueOf(blok.getBoxValue() - 5));
                             blok.reduceValue(5);
                         }
                         else{
                             try {
-                                String musicFile = "roblox.mp3";     // For example
-
-                                Media sound = new Media(new File(musicFile).toURI().toString());
-                                MediaPlayer mediaPlayer = new MediaPlayer(sound);
-                                mediaPlayer.seek(Duration.millis(1000));
-                                mediaPlayer.play();
+                                PlayGame.super.stop();
 
                                 stopAllAnim();
                                 window.close();
@@ -324,7 +325,7 @@ public class PlayGame extends Application{
                     DestroyBlock blok;
 
                     try{
-                        ball = (Ball) snake.getFirst().getChildren().get(0);
+                        ball = (Ball) snake.getFirst();
                         blok = (DestroyBlock) boxesAlternate[index].getChildren().get(0);
                     } catch (Exception e){
                         ball = null;
@@ -366,21 +367,15 @@ public class PlayGame extends Application{
                             tempScore += Integer.parseInt(score.getText());
                             score.setText(String.valueOf(tempScore));
 
-                            snake.removeBalls(blok.getBoxValue(), gameGridPane);
+                            snake.removeBalls(5, gameGridPane);
+
                             Text text = (Text) boxesAlternate[index].getChildren().get(1);
                             text.setText(String.valueOf(blok.getBoxValue() - 5));
                             blok.reduceValue(5);
                         }
                         else{
                             try {
-
-                                String musicFile = "roblox.mp3";     // For example
-
-                                Media sound = new Media(new File(musicFile).toURI().toString());
-                                MediaPlayer mediaPlayer = new MediaPlayer(sound);
-                                mediaPlayer.seek(Duration.millis(1000));
-                                mediaPlayer.play();
-
+                                PlayGame.super.stop();
                                 stopAllAnim();
                                 window.close();
                                 resultWindow.setScore(Integer.parseInt(score.getText()));
@@ -470,9 +465,11 @@ public class PlayGame extends Application{
         } catch (Exception e){}
 
         DestroyBlock rect = createBlok();
+        if(boxes[index] == null)
+            return;
+
         boxes[index].setBackground(new Background(new BackgroundFill(new ImagePattern(new Image(getClass().getClassLoader().getResource("littt.png").toString())), CornerRadii.EMPTY, Insets.EMPTY)));
         rect.setFill(Color.TRANSPARENT);
-//        rect.setStyle("-fx-background-image: url(littt.png)");
 
         TimerTask timerTask = new TimerTask() {
             @Override
@@ -480,7 +477,8 @@ public class PlayGame extends Application{
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        boxes[index].setBackground(Background.EMPTY);
+                        if(boxes[index] != null)
+                            boxes[index].setBackground(Background.EMPTY);
                     }
                 });
             }
@@ -619,7 +617,7 @@ public class PlayGame extends Application{
                     pathTransitionDestroyAll.play();
             }
         };
-        timer.schedule(task, 1000);
+        timer.schedule(task, 250);
     }
 
     private void createBalls(){
@@ -673,7 +671,7 @@ public class PlayGame extends Application{
                     Ball ball;
                     Ball boll;
                     try{
-                        ball = (Ball) snake.getFirst().getChildren().get(0);
+                        ball = (Ball) snake.getFirst();
                         boll = (Ball) balls[index].getChildren().get(0);
                     } catch (Exception e){
                         ball = null;
@@ -706,7 +704,7 @@ public class PlayGame extends Application{
                     Ball boll;
 
                     try{
-                        ball = (Ball) snake.getFirst().getChildren().get(0);
+                        ball = (Ball) snake.getFirst();
                         boll = (Ball) ballsAlternate[index].getChildren().get(0);
                     } catch (Exception e){
                         ball = null;
@@ -804,7 +802,7 @@ public class PlayGame extends Application{
                     Coin boll;
 
                     try{
-                        ball = (Ball) snake.getFirst().getChildren().get(0);
+                        ball = (Ball) snake.getFirst();
                         boll = (Coin) coins[index].getChildren().get(0);
                     } catch (Exception e){
                         ball = null;
@@ -866,7 +864,7 @@ public class PlayGame extends Application{
                 Polygon poly;
                 Ball ball;
                 try{
-                    ball = (Ball) snake.getFirst().getChildren().get(0);
+                    ball = (Ball) snake.getFirst();
                     poly = (Polygon) shield.getChildren().get(0);
                 } catch (Exception e){
                     ball = null;
@@ -921,7 +919,7 @@ public class PlayGame extends Application{
                 DestroyAll poly;
                 Ball ball;
                 try{
-                    ball = (Ball) snake.getFirst().getChildren().get(0);
+                    ball = (Ball) snake.getFirst();
                     poly = (DestroyAll) destroyAllShiz.getChildren().get(0);
                 } catch (Exception e){
                     ball = null;
@@ -1019,7 +1017,7 @@ public class PlayGame extends Application{
                 Ball ball;
                 Text newMag;
                 try{
-                    ball = (Ball) snake.getFirst().getChildren().get(0);
+                    ball = (Ball) snake.getFirst();
                     newMag = (Text) magnet.getChildren().get(0);
                 } catch (Exception e){
                     ball = null;
@@ -1094,59 +1092,54 @@ public class PlayGame extends Application{
             if(needAWall < 4)
                 continue;
 
-            int height = 100;
             Wall wall = new Wall(wallHeight);
             wall.setFill(Color.WHITE);
 
-            StackPane stackPane = new StackPane();
-            stackPane.getChildren().addAll(wall);
-//            stackPane.setTranslateY(-height);
-//            stackPane.setTranslateX(-boxWidth/2);
-            walls[x] = stackPane;
+            walls[x] = wall;
+            walls[x].setArcHeight(10);
+            walls[x].setArcWidth(10);
+
             gameGridPane.add(walls[x], x, 1);
             walls[x].setTranslateY(-(wallHeight+boxHeight+boxHeight/2));
         }
 
-        for(int i=0; i<numberOfWalls; i++){
-            if(walls[i] == null)
-                continue;
-
-            final int index = i;
-
-            walls[i].boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
-                @Override
-                public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
-                    Ball ball;
-                    Wall wall;
-                    try{
-                        ball = (Ball) snake.getFirst().getChildren().get(0);
-                        wall = (Wall) walls[index].getChildren().get(0);
-                    } catch (Exception e){
-                        ball = null;
-                        wall = null;
-                    }
-
-                    if(ball == null || wall == null)
-                        return;
-
-                    Shape intersect = Shape.intersect(ball, wall);
-                    if (intersect.getBoundsInLocal().getWidth() != -1) {
-                        int Xlast = (int) snake.getXLast();
-                        int X = (int) snake.getXFirst();
-                        int Y = (int) snake.getYFirst();
-
-                        if(oldValue.getMinX() < Xlast){
-                            X -= 40;
-                        }
-                        else{
-                            X += 100;
-                        }
-                        moveCursor(X, Y);
-                    }
-
-                }
-            });
-        }
+//        for(int i=0; i<numberOfWalls; i++){
+//            if(walls[i] == null)
+//                continue;
+//
+//            final int index = i;
+//
+//            walls[i].boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
+//                @Override
+//                public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
+//                    StackPane ball;
+//                    Wall wall;
+//                    try{
+//                        ball = snake.getFirst();
+//                        wall = (Wall) walls[index];
+//                    } catch (Exception e){
+//                        ball = null;
+//                        wall = null;
+//                    }
+//
+//                    if(ball == null || wall == null)
+//                        return;
+//
+////                    Shape intersect = Shape.intersect(ball, wall);
+////                    if (intersect.getBoundsInLocal().getWidth() != -1) {
+////                        // Please help. I cant think of some approch
+////                        // I might kermit suicide...
+////                        touchingWalls = true;
+////                    }
+//                    if(wall.getBoundsInParent().intersects(ball.getBoundsInParent())){
+//                        touchingWalls = true;
+//                    }
+//                    else{
+//                        touchingWalls = false;
+//                    }
+//                }
+//            });
+//        }
     }
 
     private void wallsFall(){
@@ -1169,18 +1162,6 @@ public class PlayGame extends Application{
         }
     }
 
-    public void moveCursor(int screenX, int screenY) {
-        Platform.runLater(() -> {
-            try {
-                Robot robot = new Robot();
-                robot.mouseMove(screenX, screenY);
-            } catch (AWTException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        });
-    }
-
     private void nextCycle(){
 
         Random rand = new Random();
@@ -1199,7 +1180,7 @@ public class PlayGame extends Application{
 
         // Walls
         numberOfWalls = 1 + rand.nextInt(numberOfBoxes);
-        walls = new StackPane[numberOfWalls];
+        walls = new Wall[numberOfWalls];
         createWalls();
         wallsFall();
 
@@ -1315,20 +1296,34 @@ public class PlayGame extends Application{
         gamePane.getItems().add(gameGridPane);
 
         gamePane.setStyle("-fx-background-color: #000000");
-        if(this.snekmage == null){
-            System.out.println("jaspreet sucks");
+        if(snekmage == null){
             snake = new Snake(10, gameGridPane, centerOfGamePaneHeight, centerOfGamePaneWidth);
-
         }
         else{
-            System.out.println("aniket sucks");
             snake =  new Snake(10, gameGridPane, centerOfGamePaneHeight, centerOfGamePaneWidth,snekmage);
         }
 
         gameGridPane.setOnMouseMoved(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                snake.moveSnek(event.getSceneX() - 20);
+                snakeOldX = snake.getXFirst();
+                double moveSnek = event.getSceneX()-20;
+
+                Ball ball = (Ball) snake.getFirst();
+                touchingWalls = false;
+
+                for(int i=0; i<walls.length; i++){
+                    if(walls[i] == null)
+                        continue;
+
+                    if(walls[i].getBoundsInParent().intersects(ball.getBoundsInParent()))
+                        touchingWalls = true;
+                }
+
+                if(!touchingWalls)
+                    snake.moveSnek(moveSnek);
+
+                touchingWalls = false;
             }
         });
 
