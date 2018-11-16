@@ -465,9 +465,11 @@ public class PlayGame extends Application{
         } catch (Exception e){}
 
         DestroyBlock rect = createBlok();
+        if(boxes[index] == null)
+            return;
+
         boxes[index].setBackground(new Background(new BackgroundFill(new ImagePattern(new Image(getClass().getClassLoader().getResource("littt.png").toString())), CornerRadii.EMPTY, Insets.EMPTY)));
         rect.setFill(Color.TRANSPARENT);
-//        rect.setStyle("-fx-background-image: url(littt.png)");
 
         TimerTask timerTask = new TimerTask() {
             @Override

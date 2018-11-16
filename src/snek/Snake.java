@@ -158,12 +158,9 @@ public class Snake extends Region {
 
         double radius = 15;
         snakeSkin = ii;
-        Ball tempBall = new Ball(radius);
-
-        tempBall.setFill(new ImagePattern(ii));
 
         Ball firstBall = new Ball(radius);
-        firstBall.setFill(getColor());
+        firstBall.setFill(new ImagePattern(ii));
         firstBall.setTranslateX(centerX);
         firstBall.setTranslateY(centerY);
 
