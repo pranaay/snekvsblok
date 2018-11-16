@@ -27,10 +27,4 @@ public class Ball extends Circle {
         super(radius);
         this.Value = vv;
     }
-
-    public Ball(double X, double Y, double Radius) {
-        super(X, Y, Radius);
-        //Random rand = new Random();
-        //this.Value = 1 + rand.nextInt(10);
-    }
 }

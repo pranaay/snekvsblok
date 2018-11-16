@@ -10,11 +10,15 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.awt.*;
+import java.io.File;
 
 public class ResultWindow extends Application {
 
@@ -84,6 +88,14 @@ public class ResultWindow extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+
+        String musicFile = "roblox.mp3";     // For example
+
+        Media sound = new Media(new File(musicFile).toURI().toString());
+        MediaPlayer mediaPlayer = new MediaPlayer(sound);
+        mediaPlayer.seek(Duration.millis(1000));
+        mediaPlayer.play();
+
         window = primaryStage;
         game = new PlayGame();
 

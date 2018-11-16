@@ -68,7 +68,8 @@ public class PlayGame extends Application{
     private StackPane[] balls;
     private StackPane[] ballsAlternate;
     private StackPane[] coins;
-    private StackPane[] walls;
+//    private StackPane[] walls;
+    private Wall[] walls;
 
     private StackPane magnet;
     private StackPane shield;
@@ -247,7 +248,7 @@ public class PlayGame extends Application{
                     DestroyBlock blok;
 
                     try{
-                        ball = (Ball) snake.getFirst().getChildren().get(0);
+                        ball = (Ball) snake.getFirst();
                         blok = (DestroyBlock) boxes[index].getChildren().get(0);
                     } catch (Exception e){
                         ball = null;
@@ -297,12 +298,7 @@ public class PlayGame extends Application{
                         }
                         else{
                             try {
-                                String musicFile = "roblox.mp3";     // For example
-
-                                Media sound = new Media(new File(musicFile).toURI().toString());
-                                MediaPlayer mediaPlayer = new MediaPlayer(sound);
-                                mediaPlayer.seek(Duration.millis(1000));
-                                mediaPlayer.play();
+                                PlayGame.super.stop();
 
                                 stopAllAnim();
                                 window.close();
@@ -329,7 +325,7 @@ public class PlayGame extends Application{
                     DestroyBlock blok;
 
                     try{
-                        ball = (Ball) snake.getFirst().getChildren().get(0);
+                        ball = (Ball) snake.getFirst();
                         blok = (DestroyBlock) boxesAlternate[index].getChildren().get(0);
                     } catch (Exception e){
                         ball = null;
@@ -379,14 +375,7 @@ public class PlayGame extends Application{
                         }
                         else{
                             try {
-
-                                String musicFile = "roblox.mp3";     // For example
-
-                                Media sound = new Media(new File(musicFile).toURI().toString());
-                                MediaPlayer mediaPlayer = new MediaPlayer(sound);
-                                mediaPlayer.seek(Duration.millis(1000));
-                                mediaPlayer.play();
-
+                                PlayGame.super.stop();
                                 stopAllAnim();
                                 window.close();
                                 resultWindow.setScore(Integer.parseInt(score.getText()));
@@ -486,7 +475,8 @@ public class PlayGame extends Application{
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        boxes[index].setBackground(Background.EMPTY);
+                        if(boxes[index] != null)
+                            boxes[index].setBackground(Background.EMPTY);
                     }
                 });
             }
@@ -625,7 +615,7 @@ public class PlayGame extends Application{
                     pathTransitionDestroyAll.play();
             }
         };
-        timer.schedule(task, 1000);
+        timer.schedule(task, 250);
     }
 
     private void createBalls(){
@@ -679,7 +669,7 @@ public class PlayGame extends Application{
                     Ball ball;
                     Ball boll;
                     try{
-                        ball = (Ball) snake.getFirst().getChildren().get(0);
+                        ball = (Ball) snake.getFirst();
                         boll = (Ball) balls[index].getChildren().get(0);
                     } catch (Exception e){
                         ball = null;
@@ -712,7 +702,7 @@ public class PlayGame extends Application{
                     Ball boll;
 
                     try{
-                        ball = (Ball) snake.getFirst().getChildren().get(0);
+                        ball = (Ball) snake.getFirst();
                         boll = (Ball) ballsAlternate[index].getChildren().get(0);
                     } catch (Exception e){
                         ball = null;
@@ -810,7 +800,7 @@ public class PlayGame extends Application{
                     Coin boll;
 
                     try{
-                        ball = (Ball) snake.getFirst().getChildren().get(0);
+                        ball = (Ball) snake.getFirst();
                         boll = (Coin) coins[index].getChildren().get(0);
                     } catch (Exception e){
                         ball = null;
@@ -872,7 +862,7 @@ public class PlayGame extends Application{
                 Polygon poly;
                 Ball ball;
                 try{
-                    ball = (Ball) snake.getFirst().getChildren().get(0);
+                    ball = (Ball) snake.getFirst();
                     poly = (Polygon) shield.getChildren().get(0);
                 } catch (Exception e){
                     ball = null;
@@ -927,7 +917,7 @@ public class PlayGame extends Application{
                 DestroyAll poly;
                 Ball ball;
                 try{
-                    ball = (Ball) snake.getFirst().getChildren().get(0);
+                    ball = (Ball) snake.getFirst();
                     poly = (DestroyAll) destroyAllShiz.getChildren().get(0);
                 } catch (Exception e){
                     ball = null;
@@ -1025,7 +1015,7 @@ public class PlayGame extends Application{
                 Ball ball;
                 Text newMag;
                 try{
-                    ball = (Ball) snake.getFirst().getChildren().get(0);
+                    ball = (Ball) snake.getFirst();
                     newMag = (Text) magnet.getChildren().get(0);
                 } catch (Exception e){
                     ball = null;
@@ -1100,53 +1090,54 @@ public class PlayGame extends Application{
             if(needAWall < 4)
                 continue;
 
-            int height = 100;
             Wall wall = new Wall(wallHeight);
             wall.setFill(Color.WHITE);
 
-            StackPane stackPane = new StackPane();
-            stackPane.getChildren().addAll(wall);
+            walls[x] = wall;
+            walls[x].setArcHeight(10);
+            walls[x].setArcWidth(10);
 
-            walls[x] = stackPane;
             gameGridPane.add(walls[x], x, 1);
             walls[x].setTranslateY(-(wallHeight+boxHeight+boxHeight/2));
-//            walls[x].setStyle("-fx-background-color: #FFFF00");
         }
 
-        for(int i=0; i<numberOfWalls; i++){
-            if(walls[i] == null)
-                continue;
-
-            final int index = i;
-
-            walls[i].boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
-                @Override
-                public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
-                    Ball ball;
-                    Wall wall;
-                    try{
-                        ball = (Ball) snake.getFirst().getChildren().get(0);
-                        wall = (Wall) walls[index].getChildren().get(0);
-                    } catch (Exception e){
-                        ball = null;
-                        wall = null;
-                    }
-
-                    if(ball == null || wall == null)
-                        return;
-
-                    Shape intersect = Shape.intersect(ball, wall);
-                    if (intersect.getBoundsInLocal().getWidth() != -1) {
-                        // Please help. I cant think of some approch
-                        // I might kermit suicide...
-                        touchingWalls = true;
-                    }
-                    else{
-                        touchingWalls = false;
-                    }
-                }
-            });
-        }
+//        for(int i=0; i<numberOfWalls; i++){
+//            if(walls[i] == null)
+//                continue;
+//
+//            final int index = i;
+//
+//            walls[i].boundsInParentProperty().addListener(new ChangeListener<Bounds>() {
+//                @Override
+//                public void changed(ObservableValue<? extends Bounds> observable, Bounds oldValue, Bounds newValue) {
+//                    StackPane ball;
+//                    Wall wall;
+//                    try{
+//                        ball = snake.getFirst();
+//                        wall = (Wall) walls[index];
+//                    } catch (Exception e){
+//                        ball = null;
+//                        wall = null;
+//                    }
+//
+//                    if(ball == null || wall == null)
+//                        return;
+//
+////                    Shape intersect = Shape.intersect(ball, wall);
+////                    if (intersect.getBoundsInLocal().getWidth() != -1) {
+////                        // Please help. I cant think of some approch
+////                        // I might kermit suicide...
+////                        touchingWalls = true;
+////                    }
+//                    if(wall.getBoundsInParent().intersects(ball.getBoundsInParent())){
+//                        touchingWalls = true;
+//                    }
+//                    else{
+//                        touchingWalls = false;
+//                    }
+//                }
+//            });
+//        }
     }
 
     private void wallsFall(){
@@ -1169,18 +1160,6 @@ public class PlayGame extends Application{
         }
     }
 
-    public void moveCursor(int screenX, int screenY) {
-        Platform.runLater(() -> {
-            try {
-                Robot robot = new Robot();
-                robot.mouseMove(screenX, screenY);
-            } catch (AWTException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        });
-    }
-
     private void nextCycle(){
 
         Random rand = new Random();
@@ -1199,7 +1178,7 @@ public class PlayGame extends Application{
 
         // Walls
         numberOfWalls = 1 + rand.nextInt(numberOfBoxes);
-        walls = new StackPane[numberOfWalls];
+        walls = new Wall[numberOfWalls];
         createWalls();
         wallsFall();
 
@@ -1328,21 +1307,21 @@ public class PlayGame extends Application{
                 snakeOldX = snake.getXFirst();
                 double moveSnek = event.getSceneX()-20;
 
+                Ball ball = (Ball) snake.getFirst();
+                touchingWalls = false;
+
+                for(int i=0; i<walls.length; i++){
+                    if(walls[i] == null)
+                        continue;
+
+                    if(walls[i].getBoundsInParent().intersects(ball.getBoundsInParent()))
+                        touchingWalls = true;
+                }
+
                 if(!touchingWalls)
                     snake.moveSnek(moveSnek);
-                else{
-                    if(snakeOldX < moveSnek) {
-                        snake.moveSnek(moveSnek - 20);
-                        System.out.println("jaspreet sucks");
-                        moveCursor((int) moveSnek-30, (int) snake.getYFirst());
-                    }
-                    else {
-                        snake.moveSnek(moveSnek + 20);
-                        System.out.println("aniket sucks");
-                        moveCursor((int) moveSnek+100, (int) snake.getYFirst());
-                    }
-                }
-                nextMouseMove = true;
+
+                touchingWalls = false;
             }
         });
 
