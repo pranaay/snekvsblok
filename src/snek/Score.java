@@ -15,6 +15,14 @@ public class Score {
 		return score;
 	}
 
+	public String getName(){
+		return name;
+	}
+
+	public String getDate(){
+		return date;
+	}
+
 	@Override
 	public String toString(){
 		return score + "\t" + name  + "\t" + date;

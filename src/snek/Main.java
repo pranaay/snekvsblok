@@ -19,9 +19,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.Scene;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class Main extends Application {
 
@@ -136,16 +136,37 @@ public class Main extends Application {
 
         String[] str = new String[11];
         str[0] = " Name      Score       Date";
-        str[1] = "aniket       69      03/11/2018";
-        str[2] = "amoghe      35      03/11/2018";
-        str[3] = "pranaay     420     03/11/2018";
-        str[4] = "aniket       69      03/11/2018";
-        str[5] = "amoghe      35      03/11/2018";
-        str[6] = "pranaay     420     03/11/2018";
-        str[7] = "aniket       69      03/11/2018";
-        str[8] = "amoghe      35      03/11/2018";
-        str[9] = "pranaay     420     03/11/2018";
-        str[10]= "aniket       69      03/11/2018";
+        str[1] = "";
+        str[2] = "";
+        str[3] = "";
+        str[4] = "";
+        str[5] = "";
+        str[6] = "";
+        str[7] = "";
+        str[8] = "";
+        str[9] = "";
+        str[10] = "";
+
+		ArrayList<Score> scores = new ArrayList<>();
+		File file = new File("savedata.txt");
+		try{
+			BufferedReader br = new BufferedReader(new FileReader(file));
+			String st;
+			while ((st = br.readLine()) != null){
+				if(st.equalsIgnoreCase("\n") || st.equalsIgnoreCase(""))
+					continue;
+				String[] data = st.split("\t");
+				Score tempScore = new Score(Integer.parseInt(data[0]), data[1], data[2]);
+				scores.add(tempScore);
+			}
+			for(int i=0, j=1; i<scores.size(); i++, j++){
+				Score tempScore = scores.get(i);
+				String data = tempScore.getName() + "      " + tempScore.getScore() + "      " + tempScore.getDate();
+				str[j] = data;
+			}
+		} catch (Exception e){
+			e.printStackTrace();
+		}
 
         leaderboardlayout.getStylesheets().add(getClass().getResource("lmao.css").toExternalForm());
         board.setLayoutX(510);

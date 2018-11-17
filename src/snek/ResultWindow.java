@@ -106,8 +106,6 @@ public class ResultWindow extends Application {
 				scores.add(tempScore);
 			}
 
-			score = 200;
-
 			Collections.sort(scores, new ScoreComparator());
 			Collections.reverse(scores);
 
