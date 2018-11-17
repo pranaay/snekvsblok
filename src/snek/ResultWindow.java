@@ -4,7 +4,6 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -18,16 +17,10 @@ import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.time.LocalDate;
+import java.io.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class ResultWindow extends Application {
 
@@ -99,6 +92,40 @@ public class ResultWindow extends Application {
         this.score = score;
     }
 
+    private ArrayList<Score> checkIfInTopTen(String date) throws IOException{
+    	ArrayList<Score> scores = new ArrayList<>();
+    	File file = new File("savedata.txt");
+		try{
+			BufferedReader br = new BufferedReader(new FileReader(file));
+			String st;
+			while ((st = br.readLine()) != null){
+				if(st.equalsIgnoreCase("\n") || st.equalsIgnoreCase(""))
+					continue;
+				String[] data = st.split("\t");
+				Score tempScore = new Score(Integer.parseInt(data[0]), data[1], data[2]);
+				scores.add(tempScore);
+			}
+
+			score = 200;
+
+			Collections.sort(scores, new ScoreComparator());
+			Collections.reverse(scores);
+
+			if(scores.size() >= 10 && scores.get(scores.size()-1).getScore() > score)
+				return scores;
+			else if(scores.size() == 10){
+				scores.remove(9);
+			}
+			scores.add(new Score(score, userName.getText(), date));
+			Collections.sort(scores, new ScoreComparator());
+			Collections.reverse(scores);
+			return scores;
+		} catch (FileNotFoundException e){
+			scores.add(new Score(score, userName.getText(), date));
+			return scores;
+		}
+	}
+
     private void saveDetails(){
     	int day, month, year;
 
@@ -107,22 +134,24 @@ public class ResultWindow extends Application {
     	year = LocalDateTime.now().getYear();
 
     	String date = day + "/" + month + "/" + year;
-
-    	Path saveFile = Paths.get("savedata.txt");
-    	String whatToWrite = "";
-
-    	whatToWrite += userName.getText();
-    	whatToWrite += "\t";
-    	whatToWrite += score;
-		whatToWrite += "\t";
-		whatToWrite += date;
-		whatToWrite += "\n";
+    	ArrayList<Score> scores;
 
 		try {
-			Files.write(saveFile, whatToWrite.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-		}catch (IOException e) {
+			scores = checkIfInTopTen(date);
+		} catch (IOException e) {
 			e.printStackTrace();
+			return;
 		}
+
+		File saveFile = new File("savedata.txt");
+
+		try{
+			FileWriter fileWriter = new FileWriter(saveFile.getAbsoluteFile());
+			for(int i=0; i<scores.size(); i++){
+				fileWriter.write((scores.get(i).toString() + System.lineSeparator()));
+			}
+			fileWriter.close();
+		} catch (Exception e){}
 	}
 
     @Override
