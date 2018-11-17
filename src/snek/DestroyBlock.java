@@ -6,6 +6,7 @@ import java.util.Random;
 public class DestroyBlock extends Rectangle {
 
     private int boxValue;
+    private boolean isActive = true;
 
     public DestroyBlock(){
         super();
@@ -43,5 +44,13 @@ public class DestroyBlock extends Rectangle {
     public void reduceValue(int n){
         this.boxValue -= n;
     }
+
+    public void setInactive(){
+        isActive = false;
+    }
+
+    public boolean isActive(){
+    	return isActive;
+	}
 
 }

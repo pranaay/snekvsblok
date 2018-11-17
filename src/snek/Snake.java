@@ -2,7 +2,9 @@ package snek;
 
 
 import javafx.animation.PathTransition;
+import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
@@ -20,35 +22,30 @@ import java.util.TimerTask;
 
 public class Snake extends Region {
 
-    private ArrayList<StackPane> snek;
+    private ArrayList<Ball> snek;
     private ArrayList<Double> Xs, Ys;
+
+    private double scoreY;
+
+    private Text score;
+
+    private Image snakeSkin;
+
+    private String imageName ;
 
     private int length;
 
     private boolean hasShield = false;
 
-    public int getLength() {
-
-        return length;
-    }
-
-    public ArrayList<Double> getXs(){
-        return Xs;
-    }
-
-    public ArrayList<Double> getYs(){
-        return Ys;
-    }
-
     public Snake(){
-        this.snek = new ArrayList<StackPane>();
+        this.snek = new ArrayList<Ball>();
         this.Xs = new ArrayList<Double>();
         this.Ys = new ArrayList<Double>();
         this.length = 0;
     }
 
     public Snake(int n){
-        this.snek = new ArrayList<StackPane>(n);
+        this.snek = new ArrayList<Ball>(n);
         this.Xs = new ArrayList<Double>(n);
         this.Ys = new ArrayList<Double>(n);
         this.length = n;
@@ -103,85 +100,134 @@ public class Snake extends Region {
 
 
     public Snake(int n, GridPane gridPane, double centerX, double centerY){
-        this.snek = new ArrayList<StackPane>();
+        this.snek = new ArrayList<Ball>();
+        score = new Text();
         this.Xs = new ArrayList<Double>(n);
         this.Ys = new ArrayList<Double>(n);
 
         this.length = n;
+        score.setText(String.valueOf(length));
+        score.setFill(Color.WHITE);
 
-        double radius = 10;
+        double radius = 15;
 
-        Ball tempBall = new Ball(radius);
-        tempBall.setFill(getColor());
-        Text text = new Text();
-        text.setText(Integer.toString(n));
-        StackPane firstBall = new StackPane();
-        firstBall.getChildren().addAll(tempBall, text);
+        Ball firstBall = new Ball(radius);
+        firstBall.setFill(getColor());
         firstBall.setTranslateX(centerX);
         firstBall.setTranslateY(centerY);
 
+        scoreY = centerY - 2*radius;
+        score.setTranslateX(centerX);
+        score.setTranslateY(scoreY);
+
         snek.add(firstBall);
-        gridPane.getChildren().add(firstBall);
+        gridPane.getChildren().addAll(firstBall, score);
 
         Xs.add(centerX);
         Ys.add(centerY);
 
         double X = centerX;
-        double Y = centerY + 2*radius;
+        double Y = centerY + 1.75*radius;
 
         for(int i=1; i<n; i++){
             Ball otherBalls = new Ball(radius);
+
             otherBalls.setFill(getColor());
-            StackPane ball = new StackPane();
-            ball.getChildren().add(otherBalls);
-            ball.setTranslateX(X);
-            ball.setTranslateY(Y);
+
+//            ball.getChildren().add(otherBalls);
+            otherBalls.setTranslateX(X);
+            otherBalls.setTranslateY(Y);
 
             Xs.add(X);
             Ys.add(Y);
             Y += 2*radius;
-            ball.setId(Integer.toString(i));
-            snek.add(ball);
-            gridPane.getChildren().add(ball);
+            snek.add(otherBalls);
+            gridPane.getChildren().add(otherBalls);
         }
     }
+
+    public Snake(int n, GridPane gridPane, double centerX, double centerY,Image ii){
+        this.snek = new ArrayList<Ball>();
+        score = new Text();
+        this.Xs = new ArrayList<Double>(n);
+        this.Ys = new ArrayList<Double>(n);
+
+        this.length = n;
+        score.setText(String.valueOf(length));
+        score.setFill(Color.WHITE);
+
+        double radius = 15;
+        snakeSkin = ii;
+
+        Ball firstBall = new Ball(radius);
+        firstBall.setFill(new ImagePattern(ii));
+        firstBall.setTranslateX(centerX);
+        firstBall.setTranslateY(centerY);
+
+        scoreY = centerY - 1.5*radius;
+        score.setTranslateX(centerX);
+        score.setTranslateY(scoreY);
+
+        snek.add(firstBall);
+        gridPane.getChildren().addAll(firstBall, score);
+
+        Xs.add(centerX);
+        Ys.add(centerY);
+
+        double X = centerX;
+        double Y = centerY + 1.75*radius;
+
+        for(int i=1; i<n; i++){
+            Ball otherBalls = new Ball(radius);
+
+            otherBalls.setFill(new ImagePattern(ii));
+
+            otherBalls.setTranslateX(X);
+            otherBalls.setTranslateY(Y);
+
+            Xs.add(X);
+            Ys.add(Y);
+            Y += 2*radius;
+
+            snek.add(otherBalls);
+            gridPane.getChildren().add(otherBalls);
+        }
+    }
+
     public void addBalls(int n,GridPane gridPane){
         //this guys got some balls
-        double radius = 10;
+        double radius = 15;
 
         Double X = Xs.get(this.length-1);
         Double Y = Ys.get(this.length-1);
         Y += 2*radius;
 
         this.length += n;
-        StackPane first = getFirst();
-        Text text = (Text) first.getChildren().get(1);
-        text.setText(String.valueOf(length));
+        score.setText(String.valueOf(length));
 
         for(int i=0; i<n; i++){
             Ball otherBalls = new Ball(radius);
-            otherBalls.setFill(getColor());
-            StackPane ball = new StackPane();
-            ball.getChildren().add(otherBalls);
+            if(snakeSkin == null){
+                otherBalls.setFill(getColor());
+            }
+            else{
+                otherBalls.setFill(new ImagePattern(snakeSkin));
+            }
 
             Xs.add(X);
             Ys.add(Y);
             Y += 2*radius;
-            ball.setId(Integer.toString(length+n));
-            snek.add(ball);
-            gridPane.getChildren().add(ball);
-            ball.setTranslateX(X);
-            ball.setTranslateY(Y);
+            snek.add(otherBalls);
+            gridPane.getChildren().add(otherBalls);
+            otherBalls.setTranslateX(X);
+            otherBalls.setTranslateY(Y);
         }
-
     }
 
     public void removeBalls(int n,GridPane gridPane){
         if(!hasShield) {
             for (int i = length - 1; i >= length - n; i--) {
-                //gridPane.getChildren().indexOf(snek);
-                StackPane ball = snek.get(i);
-                ball.getChildren().remove(0);
+                Ball ball = snek.get(i);
 
                 gridPane.getChildren().remove(ball);
                 Xs.remove(i);
@@ -190,12 +236,10 @@ public class Snake extends Region {
             }
 
             length -= n;
-
-            StackPane first = getFirst();
-            Text text = (Text) first.getChildren().get(1);
-            text.setText(String.valueOf(length));
+            score.setText(String.valueOf(length));
         }
     }
+
     public void moveSnek(double x){
 
         Path[] snekPath = new Path[length];
@@ -205,6 +249,18 @@ public class Snake extends Region {
             if(x == Xs.get(i))
                 continue;
 
+            if(i == 0){
+                Path scorePath = new Path();
+                scorePath.getElements().add(new MoveTo(Xs.get(i) + 15, scoreY-4));
+                scorePath.getElements().add(new LineTo(x + 15, scoreY-4));
+                PathTransition pathTransition = new PathTransition();
+                pathTransition.setDuration(Duration.millis(10));
+                pathTransition.setPath(scorePath);
+                pathTransition.setNode(score);
+                pathTransition.setDelay(new Duration(25*i));
+                pathTransition.play();
+            }
+
             snekPath[i] = new Path();
 
             snekPath[i].getElements().add(new MoveTo(Xs.get(i), Ys.get(i)));
@@ -213,18 +269,50 @@ public class Snake extends Region {
             pathTransition.setDuration(Duration.millis(10));
             pathTransition.setPath(snekPath[i]);
             pathTransition.setNode(snek.get(i));
-            pathTransition.setDelay(new Duration(50*i));
+            pathTransition.setDelay(new Duration(25*i));
             pathTransition.play();
 
             Xs.set(i, x);
         }
     }
 
-    public StackPane getFirst(){
+    public Ball getFirst(){
         return this.snek.get(0);
     }
 
     public boolean isHasShield() {
         return hasShield;
+    }
+
+    public double getXFirst(){
+        return Xs.get(0);
+    }
+
+    public double getXLast(){
+        return Xs.get(Xs.size()-1);
+    }
+
+    public double getYFirst(){
+        return Ys.get(0);
+    }
+
+    public Image getSnakeSkin(){
+        return snakeSkin;
+    }
+
+    public void setSnakeSkin(Image i){
+        this.snakeSkin = i ;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public ArrayList<Double> getXs(){
+        return Xs;
+    }
+
+    public ArrayList<Double> getYs(){
+        return Ys;
     }
 }
