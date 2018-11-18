@@ -29,19 +29,24 @@ public class Snake extends Region {
 
     private Image snakeSkin;
 
-    private String imageName ;
-
     private int length;
 
     private boolean hasShield = false;
 
-    public Snake(){
+	/**
+	 * A simple construcor to create an empty snake object
+	 */
+	public Snake(){
         this.snek = new ArrayList<Ball>();
         this.Xs = new ArrayList<Double>();
         this.Ys = new ArrayList<Double>();
         this.length = 0;
     }
 
+	/**
+	 * A simple constructor to create an empty snake object, of length n
+	 * @param n Length of the snake
+	 */
     public Snake(int n){
         this.snek = new ArrayList<Ball>(n);
         this.Xs = new ArrayList<Double>(n);
@@ -49,6 +54,10 @@ public class Snake extends Region {
         this.length = n;
     }
 
+	/**
+	 * A method to return a random color
+	 * @return Color
+	 */
     private Color getColor(){
         Random random = new Random();
         int n = random.nextInt(10);
@@ -80,6 +89,9 @@ public class Snake extends Region {
         return color;
     }
 
+	/**
+	 * A method to provide the snake a shield for 5 seconds
+	 */
     public void getShield(){
         Timer timer = new Timer();
         this.hasShield = true;
@@ -96,7 +108,15 @@ public class Snake extends Region {
         timer.schedule(task, 5000);
     }
 
-
+	/**
+	 * A constructor to create a snake object, of length n, and then add it to the pane.
+	 *
+	 * @param n Length of the snake
+	 * @param gridPane Pane to which snake is to be added
+	 * @param centerX X co-ordinate of the snake head
+	 * @param centerY Y co-ordinate of the snake head
+	 *
+	 */
     public Snake(int n, GridPane gridPane, double centerX, double centerY){
         this.snek = new ArrayList<Ball>();
         score = new Text();
@@ -144,6 +164,15 @@ public class Snake extends Region {
         }
     }
 
+	/**
+	 * A constructor to create a snake object, of length n, and then add it to the pane. It also adds the skin of the image.
+	 *
+	 *  @param n Length of the snake
+	 * 	@param gridPane Pane to which snake is to be added
+	 * 	@param centerX X co-ordinate of the snake head
+	 * 	@param centerY Y co-ordinate of the snake head
+	 * 	@param ii image background for snake
+	 */
     public Snake(int n, GridPane gridPane, double centerX, double centerY,Image ii){
         this.snek = new ArrayList<Ball>();
         score = new Text();
@@ -192,6 +221,12 @@ public class Snake extends Region {
         }
     }
 
+	/**
+	 * A method to add n number of balls to a snake
+	 *
+	 * @param n Number of balls to be added
+	 * @param gridPane Pane to which snake is to be added
+	 */
     public void addBalls(int n,GridPane gridPane){
         //this guys got some balls
         double radius = 15;
@@ -222,6 +257,12 @@ public class Snake extends Region {
         }
     }
 
+	/**
+	 * A method to remove n number of balls to a snake
+	 *
+	 *  @param n Number of balls to be removed
+	 * 	@param gridPane Pane from which snake is to be removed
+	 */
     public void removeBalls(int n,GridPane gridPane){
         if(!hasShield) {
             for (int i = length - 1; i >= length - n; i--) {
@@ -238,6 +279,11 @@ public class Snake extends Region {
         }
     }
 
+	/**
+	 * A method to move the snake.
+	 *
+	 *  @param x X co-ordinate of the pane. Specifies the position of the snake.
+	 */
     public void moveSnek(double x){
 
         Path[] snekPath = new Path[length];
@@ -274,43 +320,35 @@ public class Snake extends Region {
         }
     }
 
+	/**
+	 * A method to return the first element of the snake, i.e. snake-head.
+	 * @return Ball
+	 */
     public Ball getFirst(){
         return this.snek.get(0);
     }
 
+	/**
+	 * A method to return whether the snake has a shield or not.
+	 * @return boolean
+	 */
     public boolean isHasShield() {
         return hasShield;
     }
 
+	/**
+	 * A method to return the x co-ordinate of the first element of the snake, i.e. snake-head.
+	 * @return Double
+	 */
     public double getXFirst(){
         return Xs.get(0);
     }
 
-    public double getXLast(){
-        return Xs.get(Xs.size()-1);
-    }
-
-    public double getYFirst(){
-        return Ys.get(0);
-    }
-
-    public Image getSnakeSkin(){
-        return snakeSkin;
-    }
-
-    public void setSnakeSkin(Image i){
-        this.snakeSkin = i ;
-    }
-
+	/**
+	 * A method to return the length of the snake.
+	 * @return Integer
+	 */
     public int getLength() {
         return length;
-    }
-
-    public ArrayList<Double> getXs(){
-        return Xs;
-    }
-
-    public ArrayList<Double> getYs(){
-        return Ys;
     }
 }
