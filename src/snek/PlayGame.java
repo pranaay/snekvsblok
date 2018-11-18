@@ -4,13 +4,9 @@ import javafx.animation.PathTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableListValue;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.geometry.*;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
@@ -23,8 +19,6 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.*;
@@ -35,18 +29,14 @@ import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import sun.security.krb5.internal.crypto.Des;
 
-import java.awt.*;
-import java.awt.font.ImageGraphicAttribute;
-import java.io.File;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Random;
-import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * Contains definitions for The Game. Tells how the game start and executes.
+ */
 public class PlayGame extends Application{
     private Label score;
 
@@ -68,7 +58,6 @@ public class PlayGame extends Application{
     private StackPane[] balls;
     private StackPane[] ballsAlternate;
     private StackPane[] coins;
-//    private StackPane[] walls;
     private Wall[] walls;
 
     private StackPane magnet;
@@ -133,19 +122,36 @@ public class PlayGame extends Application{
             "-fx-effect: dropshadow( gaussian , rgba(0,0,0,0.75) , 4,0,0,1 );"+
             "-fx-font-weight: bold;"+
             "-fx-font-size: 1.1em;" ;
-    public void setSnekmage(Image i){
+
+	/**
+	 * Method to set the snake background/skin.
+	 * @param i Image/Skin of the snake.
+	 */
+	public void setSnekmage(Image i){
         this.snekmage = i ;
     }
 
-    public Snake getSnake(){
+	/**
+	 * Returns the snake.
+	 * @return Snake
+	 */
+	public Snake getSnake(){
         return this.snake;
     }
 
-    public void setSnake(Snake i){
+	/**
+	 *  Initialize the snake
+	 * @param i Snake object to initialize the local snake object.
+	 */
+	public void setSnake(Snake i){
         this.snake = i ;
     }
 
-    private DestroyBlock createBlok(){
+	/**
+	 * Method to create a random blok
+	 * @return A random blok
+	 */
+	private DestroyBlock createBlok(){
         DestroyBlock rect = new DestroyBlock(0, -boxHeight, boxWidth, boxHeight);
 
         Random rand = new Random();
@@ -177,7 +183,10 @@ public class PlayGame extends Application{
         return rect;
     }
 
-    private void createBoxes(){
+	/**
+	 * A method to create and initialize bloks. It also sets the listeners for the boxes.
+	 */
+	private void createBoxes(){
         Random rand = new Random();
 
 		int definetlyInactive = rand.nextInt(numberOfBoxes);
@@ -400,7 +409,10 @@ public class PlayGame extends Application{
 		}
     }
 
-    private void stopAllAnim(){
+	/**
+	 * Method to stop all animation.
+	 */
+	private void stopAllAnim(){
         for(int i=0; i<pathBoxes.length; i++){
             if(pathTransitionBoxes[i] != null)
                 pathTransitionBoxes[i].stop();
@@ -436,7 +448,12 @@ public class PlayGame extends Application{
             pathTransitionShield.stop();
     }
 
-    private void addFireAlternate(int index, DestroyBlock blok){
+	/**
+	 * Method to add fire to a blok in alternate boxes which gets destroyed.
+	 * @param index Index of the element where to add fire
+	 * @param blok Blok to get the fire.
+	 */
+	private void addFireAlternate(int index, DestroyBlock blok){
         Timer timer = new Timer();
 
         try{
@@ -466,6 +483,11 @@ public class PlayGame extends Application{
         timer.schedule(timerTask, 500);
     }
 
+	/**
+	 * Method to add fire to a blok which gets destroyed
+	 * @param index Index of the element where to add fire
+	 * @param blok Blok to get the fire.
+	 */
     private void addFire(int index, DestroyBlock blok){
         Timer timer = new Timer();
 
@@ -497,7 +519,10 @@ public class PlayGame extends Application{
         timer.schedule(timerTask, 500);
     }
 
-    private void boxesFall(){
+	/**
+	 * Create animation to bloks falling.
+	 */
+	private void boxesFall(){
         pathBoxes = new Path[boxes.length];
         pathTransitionBoxes = new PathTransition[boxes.length];
 
@@ -545,7 +570,10 @@ public class PlayGame extends Application{
         }
     }
 
-    private void pauseBoxes(){
+	/**
+	 * Pause the animation of all tokens.
+	 */
+	private void pauseBoxes(){
         Timer timer = new Timer();
 
         for(int i=0; i<pathBoxes.length; i++){
@@ -632,7 +660,10 @@ public class PlayGame extends Application{
         timer.schedule(task, 250);
     }
 
-    private void createBalls(){
+	/**
+	 * Creates ball tokens for the game. Also adds collision listeners.
+	 */
+	private void createBalls(){
         Random rand = new Random();
 
         for(int i=0; i<2*numberOfBalls; i++){
@@ -739,7 +770,10 @@ public class PlayGame extends Application{
         }
     }
 
-    private void ballsFall(){
+	/**
+	 * Adds animation to balls, falling down.
+	 */
+	private void ballsFall(){
         Path [] pathBalls = new Path[balls.length];
         Path [] pathBallsAlternate = new Path[balls.length];
         pathTransitionBalls = new PathTransition[balls.length];
@@ -782,7 +816,10 @@ public class PlayGame extends Application{
         }
     }
 
-    private void createCoins(){
+	/**
+	 * Creates coins, and adds collision listeners.
+	 */
+	private void createCoins(){
         Random rand = new Random();
 
         for(int i=0; i<numberOfCoins; i++){
@@ -836,7 +873,10 @@ public class PlayGame extends Application{
         }
     }
 
-    private void coinsFall(){
+	/**
+	 * Adds animation to coins, falling down.
+	 */
+	private void coinsFall(){
         Path [] pathCoins = new Path[numberOfCoins];
         pathTransitionCoins = new PathTransition[numberOfCoins];
         Random rand = new Random();
@@ -856,7 +896,10 @@ public class PlayGame extends Application{
         }
     }
 
-    private void addShield(){
+	/**
+	 * Creates Shield, and adds collision listeners.
+	 */
+	private void addShield(){
         Random rand = new Random();
         shield = new StackPane();
 
@@ -894,7 +937,10 @@ public class PlayGame extends Application{
         });
     }
 
-    private void shieldFall(){
+	/**
+	 * Adds animation to shield, falling down.
+	 */
+	private void shieldFall(){
         Path shieldPath = new Path();
         pathTransitionShield = new PathTransition();
         Random rand = new Random();
@@ -909,7 +955,10 @@ public class PlayGame extends Application{
         pathTransitionShield.play();
     }
 
-    private void addDestroyAll(){
+	/**
+	 * Creates destroyBloks, and adds collision listeners.
+	 */
+	private void addDestroyAll(){
         Random rand = new Random();
         destroyAllShiz = new StackPane();
 
@@ -990,7 +1039,10 @@ public class PlayGame extends Application{
         });
     }
 
-    private void destroyAllFall(){
+	/**
+	 * Adds animation to destroyBloks, falling down.
+	 */
+	private void destroyAllFall(){
         Path destroyPath = new Path();
         pathTransitionDestroyAll = new PathTransition();
         Random rand = new Random();
@@ -1005,7 +1057,10 @@ public class PlayGame extends Application{
         pathTransitionDestroyAll.play();
     }
 
-    private void addMagnet(){
+	/**
+	 * Creates magnet, and adds collision listeners.
+	 */
+	private void addMagnet(){
         Random rand = new Random();
 
         int x = rand.nextInt(numberOfBoxes);
@@ -1080,7 +1135,10 @@ public class PlayGame extends Application{
         });
     }
 
-    private void magnetFall(){
+	/**
+	 * Adds animation to magnet, falling down.
+	 */
+	private void magnetFall(){
         Path magPath = new Path();
         pathTransitionMagnet = new PathTransition();
         Random rand = new Random();
@@ -1095,7 +1153,10 @@ public class PlayGame extends Application{
         pathTransitionMagnet.play();
     }
 
-    private void createWalls(){
+	/**
+	 * Creates walls, and adds collision listeners.
+	 */
+	private void createWalls(){
         Random rand = new Random();
         for (int x = 0; x < numberOfWalls; x++) {
             int needAWall = rand.nextInt(10);
@@ -1152,7 +1213,10 @@ public class PlayGame extends Application{
 //        }
     }
 
-    private void wallsFall(){
+	/**
+	 * Adds animation to walls, falling down.
+	 */
+	private void wallsFall(){
         Path [] pathWalls = new Path[walls.length];
         pathTransitionWalls = new PathTransition[walls.length];
 
@@ -1172,7 +1236,10 @@ public class PlayGame extends Application{
         }
     }
 
-    private void nextCycle(){
+	/**
+	 * The looping function. Repeats the game loop, and makes the game endless.
+	 */
+	private void nextCycle(){
 
         Random rand = new Random();
 
@@ -1243,6 +1310,11 @@ public class PlayGame extends Application{
 		timer.schedule(timerTask, 8000);
 	}
 
+	/**
+	 * Starts the main scene.
+	 * @param primaryStage Window where to show details
+	 * @throws Exception
+	 */
     @Override
     public void start(Stage primaryStage) throws Exception{
 
