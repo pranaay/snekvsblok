@@ -74,6 +74,7 @@ public class PlayGame extends Application{
     private int numberOfCoins;
     private int numberOfWalls;
     private int PlayerScore = 0;
+    private int TransitionTime = 3000;
 
     private ChoiceBox<String> Choices ;
     private Button confirmButton;
@@ -542,7 +543,7 @@ public class PlayGame extends Application{
             pathBoxes[i].getElements().add(new MoveTo(boxes[i].getTranslateX() + boxWidth/2, boxes[i].getTranslateY()));
             pathBoxes[i].getElements().add(new LineTo(boxes[i].getTranslateX() + boxWidth/2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
             pathTransitionBoxes[i] = new PathTransition();
-            pathTransitionBoxes[i].setDuration(Duration.millis(3000));
+            pathTransitionBoxes[i].setDuration(Duration.millis(TransitionTime));
             pathTransitionBoxes[i].setPath(pathBoxes[i]);
             pathTransitionBoxes[i].setNode(boxes[i]);
             pathTransitionBoxes[i].play();
@@ -560,7 +561,7 @@ public class PlayGame extends Application{
                 alternatePathBoxes[i].getElements().add(new MoveTo(boxesAlternate[i].getTranslateX() + boxWidth/2, boxesAlternate[i].getTranslateY()));
                 alternatePathBoxes[i].getElements().add(new LineTo(boxesAlternate[i].getTranslateX() + boxWidth/2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
                 pathTransitionBoxesAlternate[i] = new PathTransition();
-                pathTransitionBoxesAlternate[i].setDuration(Duration.millis(3000));
+                pathTransitionBoxesAlternate[i].setDuration(Duration.millis(TransitionTime));
                 pathTransitionBoxesAlternate[i].setPath(alternatePathBoxes[i]);
                 pathTransitionBoxesAlternate[i].setNode(boxesAlternate[i]);
                 pathTransitionBoxesAlternate[i].setDelay(new Duration(1500));
@@ -799,7 +800,7 @@ public class PlayGame extends Application{
             pathBalls[i].getElements().add(new MoveTo(balls[i].getTranslateX() + boxWidth / 2, balls[i].getTranslateY()));
             pathBalls[i].getElements().add(new LineTo(balls[i].getTranslateX() + boxWidth / 2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
             pathTransitionBalls[i] = new PathTransition();
-            pathTransitionBalls[i].setDuration(Duration.millis(3000));
+            pathTransitionBalls[i].setDuration(Duration.millis(TransitionTime));
             pathTransitionBalls[i].setPath(pathBalls[i]);
             pathTransitionBalls[i].setNode(balls[i]);
             pathTransitionBalls[i].setDelay(new Duration(500 + rand.nextInt(500)));
@@ -813,7 +814,7 @@ public class PlayGame extends Application{
             pathBallsAlternate[i].getElements().add(new MoveTo(ballsAlternate[i].getTranslateX() + boxWidth/2, ballsAlternate[i].getTranslateY()));
             pathBallsAlternate[i].getElements().add(new LineTo(ballsAlternate[i].getTranslateX() + boxWidth/2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
             pathTransitionBallsAlternate[i] = new PathTransition();
-            pathTransitionBallsAlternate[i].setDuration(Duration.millis(3000));
+            pathTransitionBallsAlternate[i].setDuration(Duration.millis(TransitionTime));
             pathTransitionBallsAlternate[i].setPath(pathBallsAlternate[i]);
             pathTransitionBallsAlternate[i].setNode(ballsAlternate[i]);
             pathTransitionBallsAlternate[i].setDelay(new Duration(3000));
@@ -911,7 +912,7 @@ public class PlayGame extends Application{
             pathTransitionCoins[i].setDuration(Duration.millis(3000));
             pathTransitionCoins[i].setPath(pathCoins[i]);
             pathTransitionCoins[i].setNode(coins[i]);
-            pathTransitionCoins[i].setDelay(new Duration(200 + rand.nextInt(500)));
+            pathTransitionCoins[i].setDelay(new Duration(200 + rand.nextInt(TransitionTime/6)));
             pathTransitionCoins[i].play();
         }
     }
@@ -971,7 +972,7 @@ public class PlayGame extends Application{
         pathTransitionShield.setDuration(Duration.millis(3000));
         pathTransitionShield.setPath(shieldPath);
         pathTransitionShield.setNode(shield);
-        pathTransitionShield.setDelay(new Duration(700 + rand.nextInt(600)));
+        pathTransitionShield.setDelay(new Duration(700 + rand.nextInt(TransitionTime/5)));
         pathTransitionShield.play();
     }
 
@@ -1073,7 +1074,7 @@ public class PlayGame extends Application{
         pathTransitionDestroyAll.setDuration(Duration.millis(3000));
         pathTransitionDestroyAll.setPath(destroyPath);
         pathTransitionDestroyAll.setNode(destroyAllShiz);
-        pathTransitionDestroyAll.setDelay(new Duration(700 + rand.nextInt(600)));
+        pathTransitionDestroyAll.setDelay(new Duration(700 + rand.nextInt(TransitionTime/5)));
         pathTransitionDestroyAll.play();
     }
 
@@ -1169,7 +1170,7 @@ public class PlayGame extends Application{
         pathTransitionMagnet.setDuration(Duration.millis(3000));
         pathTransitionMagnet.setPath(magPath);
         pathTransitionMagnet.setNode(magnet);
-        pathTransitionMagnet.setDelay(new Duration(700 + rand.nextInt(600)));
+        pathTransitionMagnet.setDelay(new Duration(700 + rand.nextInt(TransitionTime/5)));
         pathTransitionMagnet.play();
     }
 
@@ -1249,7 +1250,7 @@ public class PlayGame extends Application{
             pathWalls[i].getElements().add(new MoveTo(walls[i].getTranslateX(), walls[i].getTranslateY()));
             pathWalls[i].getElements().add(new LineTo(walls[i].getTranslateX(), gamePaneHeight + (wallHeight+boxHeight+3*boxHeight/2)));
             pathTransitionWalls[i] = new PathTransition();
-            pathTransitionWalls[i].setDuration(Duration.millis(3000));
+            pathTransitionWalls[i].setDuration(Duration.millis(TransitionTime));
             pathTransitionWalls[i].setPath(pathWalls[i]);
             pathTransitionWalls[i].setNode(walls[i]);
             pathTransitionWalls[i].play();
@@ -1318,19 +1319,8 @@ public class PlayGame extends Application{
 		wallsFall();
 		coinsFall();
 
-//		Timer timer = new Timer();
-//		TimerTask timerTask = new TimerTask() {
-//			@Override
-//			public void run() {
-//				Platform.runLater(new Runnable() {
-//					@Override
-//					public void run() {
-//						nextCycle();
-//					}
-//				});
-//			}
-//		};
-//		timer.schedule(timerTask, 10000);
+		TransitionTime = 3000;
+		TransitionTime -= snake.getLength()/10;
 	}
 
 	/**
