@@ -94,7 +94,7 @@ public class Snake extends Region {
 	/**
 	 * A method to provide the snake a shield for 5 seconds
 	 */
-    public void getShield(){
+    public void getShield(int delay){
         Timer timer = new Timer();
         this.hasShield = true;
 
@@ -107,7 +107,7 @@ public class Snake extends Region {
 
         };
 
-        timer.schedule(task, 5000);
+        timer.schedule(task, delay);
     }
 
 	/**

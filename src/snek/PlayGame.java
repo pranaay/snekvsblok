@@ -17,6 +17,8 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -79,6 +81,8 @@ public class PlayGame extends Application{
     private Main main;
     private ResultWindow resultWindow;
     private PlayGame game;
+
+    private String cheat = "";
 
     private boolean alternateFallBoxes = true;
     private boolean touchingWalls = false;
@@ -711,9 +715,6 @@ public class PlayGame extends Application{
             }
         }
 
-        for(int i=0; i<numberOfBalls; i++)
-        	System.out.println(balls[i] + " :: " + ballsAlternate[i]);
-
         for(int x = 0; x<numberOfBalls; x++){
             final int index = x;
 
@@ -943,7 +944,7 @@ public class PlayGame extends Application{
 
                 Shape intersect = Shape.intersect(ball, poly);
                 if (intersect.getBoundsInLocal().getWidth() != -1) {
-                    snake.getShield();
+                    snake.getShield(5000);
                     shield.getChildren().remove(0);
                 }
             }
@@ -1326,6 +1327,10 @@ public class PlayGame extends Application{
 //		timer.schedule(timerTask, 10000);
 	}
 
+	private void resetCheat(){
+		cheat = "";
+	}
+
 	/**
 	 * Starts the main scene.
 	 * @param primaryStage Window where to show details
@@ -1357,7 +1362,7 @@ public class PlayGame extends Application{
         double centerOfGamePaneWidth = gamePaneWidth/2;
 
         Scene scene = new Scene(new Group(hBox));
-        scene.setFill(Color.DARKGREY);
+        scene.setFill(Color.DARKGREEN);
 
         hBox.setTranslateX(20);
         hBox.setTranslateY(20);
@@ -1464,6 +1469,38 @@ public class PlayGame extends Application{
         optionsGridPane.setHalignment(Choices, HPos.CENTER);
         optionsGridPane.setHalignment(confirmButton, HPos.CENTER);
 
+        scene.addEventHandler(KeyEvent.KEY_PRESSED, (key) -> {
+			cheat += key.getText();
+			if(cheat.equalsIgnoreCase("ligma")){
+				// Add shield for 10 seconds
+				snake.getShield(10000);
+				resetCheat();
+			}
+			if(cheat.equalsIgnoreCase("sugma")){
+				// Add 100 points
+				int tempScore = Integer.parseInt(score.getText());
+				tempScore += 100;
+				tempScore += Integer.parseInt(score.getText());
+				score.setText(String.valueOf(tempScore));
+				resetCheat();
+			}
+			if(cheat.equalsIgnoreCase("sawcon")){
+				// Add 10 bolls
+				snake.addBalls(10, gameGridPane);
+				resetCheat();
+			}
+			if(cheat.length() > 6)
+				resetCheat();
+		});
+
+		Timer timer = new Timer();
+		TimerTask timerTask = new TimerTask() {
+			@Override
+			public void run() {
+				resetCheat();
+			}
+		};
+		timer.schedule(timerTask, 0, 6000);
 
         nextCycle();
 
