@@ -573,7 +573,10 @@ public class PlayGame extends Application{
         }
     }
 
-    private void nextCycleBox(){
+	/**
+	 * Method to call the next loop, if the walls reach later than the balls
+	 */
+	private void nextCycleBox(){
 		wallsAltGone = true;
 		if(ballsAltGone)
 			nextCycle();
@@ -822,7 +825,10 @@ public class PlayGame extends Application{
         }
     }
 
-    private void nextCycleBalls(){
+	/**
+	 * Method to call the next loop, if the balls reach later than the walls
+	 */
+	private void nextCycleBalls(){
 		ballsAltGone = true;
 		if(!wallsAltComing)
 			nextCycle();
@@ -1327,6 +1333,9 @@ public class PlayGame extends Application{
 //		timer.schedule(timerTask, 10000);
 	}
 
+	/**
+	 * Method to reset the cheat string.
+	 */
 	private void resetCheat(){
 		cheat = "";
 	}
