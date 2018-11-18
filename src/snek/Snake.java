@@ -3,7 +3,6 @@ package snek;
 
 import javafx.animation.PathTransition;
 import javafx.scene.image.Image;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
@@ -13,7 +12,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
-import sun.security.util.Length;
 
 import java.util.ArrayList;
 import java.util.Random;
