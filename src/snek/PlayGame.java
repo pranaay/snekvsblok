@@ -82,7 +82,9 @@ public class PlayGame extends Application{
 
     private boolean alternateFallBoxes = true;
     private boolean touchingWalls = false;
-    private boolean gameOn = true;
+    private boolean ballsAltGone = false;
+    private boolean wallsAltGone = false;
+	private boolean wallsAltComing = false;
 
     private Snake snake;
 
@@ -317,7 +319,6 @@ public class PlayGame extends Application{
                         }
                         else{
                             try {
-								gameOn = false;
 								PlayGame.super.stop();
                                 stopAllAnim();
                                 window.close();
@@ -392,7 +393,6 @@ public class PlayGame extends Application{
 								blok.reduceValue(5);
 							} else {
 								try {
-									gameOn = false;
 									PlayGame.super.stop();
 									stopAllAnim();
 									window.close();
@@ -494,7 +494,9 @@ public class PlayGame extends Application{
         try{
             boxes[index].getChildren().remove(1);
             boxes[index].getChildren().remove(0);
-        } catch (Exception e){}
+        } catch (Exception e){
+        	e.printStackTrace();
+		}
 
         DestroyBlock rect = createBlok();
         if(boxes[index] == null)
@@ -525,14 +527,14 @@ public class PlayGame extends Application{
 	private void boxesFall(){
         pathBoxes = new Path[boxes.length];
         pathTransitionBoxes = new PathTransition[boxes.length];
+		alternatePathBoxes = new Path[boxesAlternate.length];
+		pathTransitionBoxesAlternate = new PathTransition[boxesAlternate.length];
 
-        boolean setNext = false;
         for(int i=0; i<pathBoxes.length; i++){
             if(boxes[i] == null)
                 continue;
 
             pathBoxes[i] = new Path();
-
             pathBoxes[i].getElements().add(new MoveTo(boxes[i].getTranslateX() + boxWidth/2, boxes[i].getTranslateY()));
             pathBoxes[i].getElements().add(new LineTo(boxes[i].getTranslateX() + boxWidth/2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
             pathTransitionBoxes[i] = new PathTransition();
@@ -540,24 +542,17 @@ public class PlayGame extends Application{
             pathTransitionBoxes[i].setPath(pathBoxes[i]);
             pathTransitionBoxes[i].setNode(boxes[i]);
             pathTransitionBoxes[i].play();
-            if(!setNext) {
-                setNext = true;
-//                pathTransition.setOnFinished(e -> nextCycle());
-            }
         }
 
         if(alternateFallBoxes){
             alternateFallBoxes = false;
-            alternatePathBoxes = new Path[boxesAlternate.length];
-            pathTransitionBoxesAlternate = new PathTransition[boxesAlternate.length];
+            boolean setOnFinished = false;
 
             for(int i=0; i<alternatePathBoxes.length; i++){
-
                 if(boxesAlternate[i] == null)
                     continue;
 
                 alternatePathBoxes[i] = new Path();
-
                 alternatePathBoxes[i].getElements().add(new MoveTo(boxesAlternate[i].getTranslateX() + boxWidth/2, boxesAlternate[i].getTranslateY()));
                 alternatePathBoxes[i].getElements().add(new LineTo(boxesAlternate[i].getTranslateX() + boxWidth/2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
                 pathTransitionBoxesAlternate[i] = new PathTransition();
@@ -565,10 +560,20 @@ public class PlayGame extends Application{
                 pathTransitionBoxesAlternate[i].setPath(alternatePathBoxes[i]);
                 pathTransitionBoxesAlternate[i].setNode(boxesAlternate[i]);
                 pathTransitionBoxesAlternate[i].setDelay(new Duration(1500));
+                if(!setOnFinished){
+                	setOnFinished = true;
+					pathTransitionBoxesAlternate[i].setOnFinished(event -> nextCycleBox());
+				}
                 pathTransitionBoxesAlternate[i].play();
             }
         }
     }
+
+    private void nextCycleBox(){
+		wallsAltGone = true;
+		if(ballsAltGone)
+			nextCycle();
+	}
 
 	/**
 	 * Pause the animation of all tokens.
@@ -810,11 +815,19 @@ public class PlayGame extends Application{
             pathTransitionBallsAlternate[i].setDelay(new Duration(3000));
             if(!setOnFinished) {
                 setOnFinished = true;
-//                pathTransitionBallsAlternate[i].setOnFinished(event -> nextCycle());
+                pathTransitionBallsAlternate[i].setOnFinished(event -> nextCycleBalls());
             }
             pathTransitionBallsAlternate[i].play();
         }
     }
+
+    private void nextCycleBalls(){
+		ballsAltGone = true;
+		if(!wallsAltComing)
+			nextCycle();
+		else if(wallsAltGone)
+			nextCycle();
+	}
 
 	/**
 	 * Creates coins, and adds collision listeners.
@@ -1243,13 +1256,17 @@ public class PlayGame extends Application{
 
         Random rand = new Random();
 
+        wallsAltGone = false;
+        ballsAltGone = false;
+
         // Boxes
         boxes = new StackPane[numberOfBoxes];
         boxesAlternate = new StackPane[numberOfBoxes];
         int alternate = rand.nextInt(3);
-        if(alternate == 0){
+        if(alternate < 2){
             this.alternateFallBoxes = true;
         }
+        wallsAltComing = alternateFallBoxes;
         createBoxes();
 
         // Walls
@@ -1294,20 +1311,19 @@ public class PlayGame extends Application{
 		wallsFall();
 		coinsFall();
 
-		Timer timer = new Timer();
-		TimerTask timerTask = new TimerTask() {
-			@Override
-			public void run() {
-				Platform.runLater(new Runnable() {
-					@Override
-					public void run() {
-						if(gameOn)
-							nextCycle();
-					}
-				});
-			}
-		};
-		timer.schedule(timerTask, 8000);
+//		Timer timer = new Timer();
+//		TimerTask timerTask = new TimerTask() {
+//			@Override
+//			public void run() {
+//				Platform.runLater(new Runnable() {
+//					@Override
+//					public void run() {
+//						nextCycle();
+//					}
+//				});
+//			}
+//		};
+//		timer.schedule(timerTask, 10000);
 	}
 
 	/**
