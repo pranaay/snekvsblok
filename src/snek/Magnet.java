@@ -1,18 +1,25 @@
 package snek;
 
 import javafx.scene.shape.Circle;
+
+/**
+ * Contains definitions for Magnet.
+ */
 public class Magnet extends Circle {
 
-    private double time;
-
+    /**
+     * A simple constructor to create an empty object.
+     */
     public Magnet(){
         super();
-        this.time = 0;
     }
 
-    public Magnet(double radius){
+	/**
+	 * A simple constructor to create an object, of specific radius.
+	 * @param radius Radius of Magnet
+	 */
+	public Magnet(double radius){
         super(radius);
-        this.time = 5;
     }
 
 }

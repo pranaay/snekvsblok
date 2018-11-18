@@ -22,6 +22,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * Contains definitions for ResultWindow. How the score is managed.
+ */
 public class ResultWindow extends Application {
 
     final String IDLE_BUTTON_STYLE = "-fx-padding: 8 15 15 15;"+
@@ -88,10 +91,20 @@ public class ResultWindow extends Application {
     private PlayGame game;
     private Main home;
 
-    public void setScore(int score) {
+	/**
+	 * Set the score of the player. Invoked when game ends.
+	 * @param score Score of the player
+	 */
+	public void setScore(int score) {
         this.score = score;
     }
 
+	/**
+	 * A method to get the top 10 people from the save file, and current save.
+	 * @param date Current date
+	 * @return List of type Score, containing details of top 10 scores.
+	 * @throws IOException
+	 */
     private ArrayList<Score> checkIfInTopTen(String date) throws IOException{
     	ArrayList<Score> scores = new ArrayList<>();
     	File file = new File("savedata.txt");
@@ -124,6 +137,9 @@ public class ResultWindow extends Application {
 		}
 	}
 
+	/**
+	 * Method to write and save details of top 10 scores.
+	 */
     private void saveDetails(){
     	int day, month, year;
 
@@ -152,6 +168,11 @@ public class ResultWindow extends Application {
 		} catch (Exception e){}
 	}
 
+	/**
+	 * Starts the main scene.
+	 * @param primaryStage Window where to show details
+	 * @throws Exception
+	 */
     @Override
     public void start(Stage primaryStage) throws Exception {
 

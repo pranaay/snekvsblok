@@ -23,10 +23,12 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * The Main of the game. Contains the definitions for the mainpage.
+ */
 public class Main extends Application {
 
     private PlayGame game;
-
 
     final String IDLE_BUTTON_STYLE = "-fx-padding: 8 15 15 15;"+
         "-fx-background-insets: 0,0 0 5 0, 0 0 6 0, 0 0 7 0;"+
@@ -80,7 +82,10 @@ public class Main extends Application {
 
     private StackPane playButton;
 
-    public void renderMainpage(){
+	/**
+	 * Method to render the mainpage.
+	 */
+	public void renderMainpage(){
         VBox mainlayout = new VBox();
 
         Image top = new Image(getClass().getResourceAsStream("top.png"));
@@ -118,12 +123,18 @@ public class Main extends Application {
         window.show();
     }
 
-    public void exiting(){
+	/**
+	 * Method to close the window and terminate the program.
+	 */
+	public void exiting(){
         Platform.exit();
         window.close();
     }
 
-    public void renderLeaderboard(){
+	/**
+	 * Method to render the leaderboards.
+	 */
+	public void renderLeaderboard(){
         Pane leaderboardlayout = new Pane();
         BackgroundImage myBI= new BackgroundImage(new Image(getClass().getResource("background.png").toExternalForm(),1281,720,false,true), BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
 
@@ -189,6 +200,12 @@ public class Main extends Application {
         window.show();
     }
 
+	/**
+	 * Method to create an ImageView to be used in the Change Skin menu.
+	 * @param imageFile Image/skin to be used.
+	 * @return ImageView containing the skin.
+	 * @throws Exception
+	 */
     private ImageView createImageView(final File imageFile)throws Exception {
         // DEFAULT_THUMBNAIL_WIDTH is a constant you need to define
         // The last two arguments are: preserveRatio, and use smooth (slower)
@@ -226,7 +243,12 @@ public class Main extends Application {
         }
         return imageView;
     }
-    public void renderChangeSkin()throws Exception{
+
+	/**
+	 * Method to render the changing skin menu.
+	 * @throws Exception
+	 */
+	public void renderChangeSkin()throws Exception{
 
         //stage = window;
 
@@ -263,11 +285,11 @@ public class Main extends Application {
         window.show();
     }
 
-
-
-
-
-
+	/**
+	 * Starts the main scene.
+	 * @param primaryStage Window where to show details
+	 * @throws Exception
+	 */
     @Override
     public void start(Stage primaryStage) throws Exception{
         game = new PlayGame();

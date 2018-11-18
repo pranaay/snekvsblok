@@ -1,6 +1,5 @@
 package snek;
 
-
 import javafx.animation.PathTransition;
 import javafx.scene.image.Image;
 import javafx.scene.paint.ImagePattern;
@@ -18,6 +17,9 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * Contains definitions for Snake. How it moves and responds.
+ */
 public class Snake extends Region {
 
     private ArrayList<Ball> snek;
