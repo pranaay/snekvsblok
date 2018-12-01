@@ -7,6 +7,7 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -16,10 +17,14 @@ import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import java.io.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 
-import java.awt.*;
-import java.io.File;
-
+/**
+ * Contains definitions for ResultWindow. How the score is managed.
+ */
 public class ResultWindow extends Application {
 
     final String IDLE_BUTTON_STYLE = "-fx-padding: 8 15 15 15;"+
@@ -73,23 +78,105 @@ public class ResultWindow extends Application {
     private Button restartButton;
     private Button homeButton;
     private Button quitButton;
+    private Button userSaveButton;
 
     private Label scoreLabel;
     private Label scoreLabelLabel;
+    private Label userNameLabel;
+
+    private TextField userName;
 
     private Stage window;
 
     private PlayGame game;
     private Main home;
 
-    public void setScore(int score) {
+	/**
+	 * Set the score of the player. Invoked when game ends.
+	 * @param score Score of the player
+	 */
+	public void setScore(int score) {
         this.score = score;
     }
 
+	/**
+	 * A method to get the top 10 people from the save file, and current save.
+	 * @param date Current date
+	 * @return List of type Score, containing details of top 10 scores.
+	 * @throws IOException
+	 */
+    private ArrayList<Score> checkIfInTopTen(String date) throws IOException{
+    	ArrayList<Score> scores = new ArrayList<>();
+    	File file = new File("savedata.txt");
+		try{
+			BufferedReader br = new BufferedReader(new FileReader(file));
+			String st;
+			while ((st = br.readLine()) != null){
+				if(st.equalsIgnoreCase("\n") || st.equalsIgnoreCase(""))
+					continue;
+				String[] data = st.split("\t");
+				Score tempScore = new Score(Integer.parseInt(data[0]), data[1], data[2]);
+				scores.add(tempScore);
+			}
+
+			Collections.sort(scores, new ScoreComparator());
+			Collections.reverse(scores);
+
+			if(scores.size() >= 10 && scores.get(scores.size()-1).getScore() > score)
+				return scores;
+			else if(scores.size() == 10){
+				scores.remove(9);
+			}
+			scores.add(new Score(score, userName.getText(), date));
+			Collections.sort(scores, new ScoreComparator());
+			Collections.reverse(scores);
+			return scores;
+		} catch (FileNotFoundException e){
+			scores.add(new Score(score, userName.getText(), date));
+			return scores;
+		}
+	}
+
+	/**
+	 * Method to write and save details of top 10 scores.
+	 */
+    private void saveDetails(){
+    	int day, month, year;
+
+    	day = LocalDateTime.now().getDayOfMonth();
+    	month = LocalDateTime.now().getMonthValue();
+    	year = LocalDateTime.now().getYear();
+
+    	String date = day + "/" + month + "/" + year;
+    	ArrayList<Score> scores;
+
+		try {
+			scores = checkIfInTopTen(date);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
+
+		File saveFile = new File("savedata.txt");
+
+		try{
+			FileWriter fileWriter = new FileWriter(saveFile.getAbsoluteFile());
+			for(int i=0; i<scores.size(); i++){
+				fileWriter.write((scores.get(i).toString() + System.lineSeparator()));
+			}
+			fileWriter.close();
+		} catch (Exception e){}
+	}
+
+	/**
+	 * Starts the main scene.
+	 * @param primaryStage Window where to show details
+	 * @throws Exception
+	 */
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        String musicFile = "roblox.mp3";     // For example
+		String musicFile = "roblox.mp3";     // For example
 
         Media sound = new Media(new File(musicFile).toURI().toString());
         MediaPlayer mediaPlayer = new MediaPlayer(sound);
@@ -102,6 +189,27 @@ public class ResultWindow extends Application {
         restartButton = new Button();
         homeButton = new Button();
         quitButton = new Button();
+        userSaveButton = new Button();
+
+        userNameLabel = new Label("Please enter your name:");
+		userNameLabel.setFont(Font.font("Roboto", 15));
+		userNameLabel.setStyle("-fx-font-weight: bold");
+
+		userName = new TextField();
+		// Set Hint
+		userName.setFocusTraversable(false);
+		userName.setPromptText("User Name");
+		//Set Width
+		userName.setMaxWidth(200);
+
+		userSaveButton.setText("SAVE");
+
+		GridPane highScoreGroup = new GridPane();
+		highScoreGroup.setHgap(20);
+		highScoreGroup.setAlignment(Pos.CENTER);
+		highScoreGroup.add(userNameLabel, 0, 0);
+		highScoreGroup.add(userName, 1, 0);
+		highScoreGroup.add(userSaveButton, 2, 0);
 
         scoreLabel = new Label(String.valueOf(score));
         scoreLabel.setFont(Font.font("Roboto", 20));
@@ -120,9 +228,10 @@ public class ResultWindow extends Application {
         mainlayout.getChildren().add(topp);
         mainlayout.getChildren().add(scoreLabelLabel);
         mainlayout.getChildren().add(scoreLabel);
+        mainlayout.getChildren().add(highScoreGroup);
         mainlayout.getChildren().addAll(restartButton, homeButton, quitButton);
 
-        mainlayout.setSpacing(75);
+        mainlayout.setSpacing(50);
 
         BackgroundImage myBI= new BackgroundImage(new Image(getClass().getResource("background.png").toExternalForm(),1281,720,false,true), BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
         mainlayout.setBackground(new Background(myBI));
@@ -131,6 +240,23 @@ public class ResultWindow extends Application {
         Rectangle2D bounds = screen.getVisualBounds();
 
         Scene mainScreen = new Scene(mainlayout);
+
+		////////////////////////////////////////////////////////////////
+		userSaveButton.setOnMousePressed(e -> {
+			userSaveButton.setStyle(PRESSED_BUTTON_STYLE);
+		});
+		userSaveButton.setOnAction((e->{
+			userSaveButton.setText("SAVED");
+			userSaveButton.setDisable(true);
+			userName.setDisable(true);
+
+			// SAVE THE SHIT OUT OF IT!
+			saveDetails();
+		}));
+
+		userSaveButton.setOnMouseEntered(e -> userSaveButton.setStyle(HOVEROVER_BUTTON_STYLE));
+		userSaveButton.setOnMouseExited(e -> userSaveButton.setStyle(IDLE_BUTTON_STYLE));
+		userSaveButton.setStyle(IDLE_BUTTON_STYLE);
 
         ////////////////////////////////////////////////////////////////
         restartButton.setOnMousePressed(e -> {

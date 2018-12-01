@@ -19,14 +19,16 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.Scene;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
 
+/**
+ * The Main of the game. Contains the definitions for the mainpage.
+ */
 public class Main extends Application {
 
     private PlayGame game;
-
 
     final String IDLE_BUTTON_STYLE = "-fx-padding: 8 15 15 15;"+
         "-fx-background-insets: 0,0 0 5 0, 0 0 6 0, 0 0 7 0;"+
@@ -80,7 +82,10 @@ public class Main extends Application {
 
     private StackPane playButton;
 
-    public void renderMainpage(){
+	/**
+	 * Method to render the mainpage.
+	 */
+	public void renderMainpage(){
         VBox mainlayout = new VBox();
 
         Image top = new Image(getClass().getResourceAsStream("top.png"));
@@ -118,12 +123,18 @@ public class Main extends Application {
         window.show();
     }
 
-    public void exiting(){
+	/**
+	 * Method to close the window and terminate the program.
+	 */
+	public void exiting(){
         Platform.exit();
         window.close();
     }
 
-    public void renderLeaderboard(){
+	/**
+	 * Method to render the leaderboards.
+	 */
+	public void renderLeaderboard(){
         Pane leaderboardlayout = new Pane();
         BackgroundImage myBI= new BackgroundImage(new Image(getClass().getResource("background.png").toExternalForm(),1281,720,false,true), BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
 
@@ -136,16 +147,37 @@ public class Main extends Application {
 
         String[] str = new String[11];
         str[0] = " Name      Score       Date";
-        str[1] = "aniket       69      03/11/2018";
-        str[2] = "amoghe      35      03/11/2018";
-        str[3] = "pranaay     420     03/11/2018";
-        str[4] = "aniket       69      03/11/2018";
-        str[5] = "amoghe      35      03/11/2018";
-        str[6] = "pranaay     420     03/11/2018";
-        str[7] = "aniket       69      03/11/2018";
-        str[8] = "amoghe      35      03/11/2018";
-        str[9] = "pranaay     420     03/11/2018";
-        str[10]= "aniket       69      03/11/2018";
+        str[1] = "";
+        str[2] = "";
+        str[3] = "";
+        str[4] = "";
+        str[5] = "";
+        str[6] = "";
+        str[7] = "";
+        str[8] = "";
+        str[9] = "";
+        str[10] = "";
+
+		ArrayList<Score> scores = new ArrayList<>();
+		File file = new File("savedata.txt");
+		try{
+			BufferedReader br = new BufferedReader(new FileReader(file));
+			String st;
+			while ((st = br.readLine()) != null){
+				if(st.equalsIgnoreCase("\n") || st.equalsIgnoreCase(""))
+					continue;
+				String[] data = st.split("\t");
+				Score tempScore = new Score(Integer.parseInt(data[0]), data[1], data[2]);
+				scores.add(tempScore);
+			}
+			for(int i=0, j=1; i<scores.size(); i++, j++){
+				Score tempScore = scores.get(i);
+				String data = tempScore.getName() + "      " + tempScore.getScore() + "      " + tempScore.getDate();
+				str[j] = data;
+			}
+		} catch (Exception e){
+			e.printStackTrace();
+		}
 
         leaderboardlayout.getStylesheets().add(getClass().getResource("lmao.css").toExternalForm());
         board.setLayoutX(510);
@@ -168,6 +200,12 @@ public class Main extends Application {
         window.show();
     }
 
+	/**
+	 * Method to create an ImageView to be used in the Change Skin menu.
+	 * @param imageFile Image/skin to be used.
+	 * @return ImageView containing the skin.
+	 * @throws Exception
+	 */
     private ImageView createImageView(final File imageFile)throws Exception {
         // DEFAULT_THUMBNAIL_WIDTH is a constant you need to define
         // The last two arguments are: preserveRatio, and use smooth (slower)
@@ -205,7 +243,12 @@ public class Main extends Application {
         }
         return imageView;
     }
-    public void renderChangeSkin()throws Exception{
+
+	/**
+	 * Method to render the changing skin menu.
+	 * @throws Exception
+	 */
+	public void renderChangeSkin()throws Exception{
 
         //stage = window;
 
@@ -242,11 +285,11 @@ public class Main extends Application {
         window.show();
     }
 
-
-
-
-
-
+	/**
+	 * Starts the main scene.
+	 * @param primaryStage Window where to show details
+	 * @throws Exception
+	 */
     @Override
     public void start(Stage primaryStage) throws Exception{
         game = new PlayGame();
