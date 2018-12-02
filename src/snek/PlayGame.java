@@ -1484,8 +1484,6 @@ public class PlayGame extends Application{
 					snakeOldX = snake.getXFirst();
 					double moveSnek = snakeOldX + moveOffset;
 
-					System.out.println(moveSnek);
-
 					if(moveSnek > 2 && moveSnek < (limitWidth)){
 						Ball ball = (Ball) snake.getFirst();
 						touchingWalls = false;
@@ -1506,8 +1504,6 @@ public class PlayGame extends Application{
 				if(key.getCode() == KeyCode.LEFT){
 					snakeOldX = snake.getXFirst();
 					double moveSnek = snakeOldX - moveOffset;
-
-					System.out.println(moveSnek);
 
 					if(moveSnek > 2 && moveSnek < (limitWidth)) {
 						Ball ball = (Ball) snake.getFirst();

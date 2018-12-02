@@ -344,7 +344,13 @@ public class Main extends Application {
 		toStartGame.getItems().add(item1);
 
 		item1.setOnAction((event -> {
-			System.out.println("keyboard press");
+			game.setMouseMove(false);
+			try {
+//                ((Node)(e.getSource())).getScene().getWindow().hide();
+                game.start(window);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
 		}));
 
 		File mouse = new File("KeyboardMouse/mouse.png");
@@ -354,7 +360,13 @@ public class Main extends Application {
 		toStartGame.getItems().add(item2);
 
 		item2.setOnAction((event -> {
-			System.out.println("mouse press");
+			game.setMouseMove(true);
+			try {
+//                ((Node)(e.getSource())).getScene().getWindow().hide();
+				game.start(window);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
 		}));
 
 		playButton = new StackPane();
