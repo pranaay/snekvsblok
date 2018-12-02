@@ -90,6 +90,7 @@ public class PlayGame extends Application{
     private boolean ballsAltGone = false;
     private boolean wallsAltGone = false;
 	private boolean wallsAltComing = false;
+	private boolean mouseMove = false;
 
     private Snake snake;
 
@@ -129,6 +130,10 @@ public class PlayGame extends Application{
             "-fx-effect: dropshadow( gaussian , rgba(0,0,0,0.75) , 4,0,0,1 );"+
             "-fx-font-weight: bold;"+
             "-fx-font-size: 1.1em;" ;
+
+    public void setMouseMove(boolean value){
+    	this.mouseMove = value;
+	}
 
 	/**
 	 * Method to set the snake background/skin.
@@ -1418,29 +1423,31 @@ public class PlayGame extends Application{
             snake =  new Snake(10, gameGridPane, centerOfGamePaneHeight, centerOfGamePaneWidth,snekmage);
         }
 
-        gameGridPane.setOnMouseMoved(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                snakeOldX = snake.getXFirst();
-                double moveSnek = event.getSceneX()-20;
+        if(mouseMove){
+			gameGridPane.setOnMouseMoved(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
+					snakeOldX = snake.getXFirst();
+					double moveSnek = event.getSceneX()-20;
 
-                Ball ball = (Ball) snake.getFirst();
-                touchingWalls = false;
+					Ball ball = (Ball) snake.getFirst();
+					touchingWalls = false;
 
-                for(int i=0; i<walls.length; i++){
-                    if(walls[i] == null)
-                        continue;
+					for(int i=0; i<walls.length; i++){
+						if(walls[i] == null)
+							continue;
 
-                    if(walls[i].getBoundsInParent().intersects(ball.getBoundsInParent()))
-                        touchingWalls = true;
-                }
+						if(walls[i].getBoundsInParent().intersects(ball.getBoundsInParent()))
+							touchingWalls = true;
+					}
 
-                if(!touchingWalls)
-                    snake.moveSnek(moveSnek);
+					if(!touchingWalls)
+						snake.moveSnek(moveSnek);
 
-                touchingWalls = false;
-            }
-        });
+					touchingWalls = false;
+				}
+			});
+		}
 
         SplitPane optionsPane = new SplitPane();
         optionsPane.setOrientation(Orientation.VERTICAL);
@@ -1469,27 +1476,76 @@ public class PlayGame extends Application{
         optionsGridPane.setHalignment(confirmButton, HPos.CENTER);
 
         scene.addEventHandler(KeyEvent.KEY_PRESSED, (key) -> {
-			cheat += key.getText();
-			if(cheat.equalsIgnoreCase("ligma")){
-				// Add shield for 10 seconds
-				snake.getShield(10000);
-				resetCheat();
+        	double moveOffset = 40;
+        	double limitWidth = gameGridPane.getWidth();
+
+        	if(!mouseMove){
+				if(key.getCode() == KeyCode.RIGHT){
+					snakeOldX = snake.getXFirst();
+					double moveSnek = snakeOldX + moveOffset;
+
+					if(moveSnek > 2 && moveSnek < (limitWidth)){
+						Ball ball = (Ball) snake.getFirst();
+						touchingWalls = false;
+
+						for(int i=0; i<walls.length; i++){
+							if(walls[i] == null)
+								continue;
+							if(walls[i].getBoundsInParent().intersects(ball.getBoundsInParent()))
+								touchingWalls = true;
+						}
+
+						if(!touchingWalls)
+							snake.moveSnek(moveSnek);
+
+						touchingWalls = false;
+					}
+				}
+				if(key.getCode() == KeyCode.LEFT){
+					snakeOldX = snake.getXFirst();
+					double moveSnek = snakeOldX - moveOffset;
+
+					if(moveSnek > 2 && moveSnek < (limitWidth)) {
+						Ball ball = (Ball) snake.getFirst();
+						touchingWalls = false;
+
+						for(int i=0; i<walls.length; i++){
+							if(walls[i] == null)
+								continue;
+							if(walls[i].getBoundsInParent().intersects(ball.getBoundsInParent()))
+								touchingWalls = true;
+						}
+
+						if(!touchingWalls)
+							snake.moveSnek(moveSnek);
+
+						touchingWalls = false;
+					}
+				}
 			}
-			if(cheat.equalsIgnoreCase("sugma")){
-				// Add 100 points
-				int tempScore = Integer.parseInt(score.getText());
-				tempScore += 100;
-				tempScore += Integer.parseInt(score.getText());
-				score.setText(String.valueOf(tempScore));
-				resetCheat();
+			else{
+				cheat += key.getText();
+				if(cheat.equalsIgnoreCase("ligma")){
+					// Add shield for 10 seconds
+					snake.getShield(10000);
+					resetCheat();
+				}
+				if(cheat.equalsIgnoreCase("sugma")){
+					// Add 100 points
+					int tempScore = Integer.parseInt(score.getText());
+					tempScore += 100;
+					tempScore += Integer.parseInt(score.getText());
+					score.setText(String.valueOf(tempScore));
+					resetCheat();
+				}
+				if(cheat.equalsIgnoreCase("sawcon")){
+					// Add 10 bolls
+					snake.addBalls(10, gameGridPane);
+					resetCheat();
+				}
+				if(cheat.length() > 6)
+					resetCheat();
 			}
-			if(cheat.equalsIgnoreCase("sawcon")){
-				// Add 10 bolls
-				snake.addBalls(10, gameGridPane);
-				resetCheat();
-			}
-			if(cheat.length() > 6)
-				resetCheat();
 		});
 
 		Timer timer = new Timer();
