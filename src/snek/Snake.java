@@ -24,6 +24,7 @@ import java.util.TimerTask;
 public class Snake extends Region implements Serializable {
 
     transient private ArrayList<Ball> snek;
+
     private ArrayList<Double> Xs, Ys;
 
     private double scoreY;
@@ -46,12 +47,22 @@ public class Snake extends Region implements Serializable {
         this.length = 0;
     }
 
-    public void setSchore(int schore) {
+	/**
+	 * Sets score.
+	 * @param schore
+	 */
+	public void setSchore(int schore) {
         this.schore = schore;
     }
-    public int getSchore(){
+
+	/**
+	 * Gets score
+	 * @return int
+	 */
+	public int getSchore(){
 	    return this.schore;
     }
+
     /**
 	 * A simple constructor to create an empty snake object, of length n
 	 * @param n Length of the snake
@@ -62,6 +73,7 @@ public class Snake extends Region implements Serializable {
         this.Ys = new ArrayList<Double>(n);
         this.length = n;
     }
+
 	/**
 	 * A method to return a random color
 	 * @return Color
@@ -352,7 +364,11 @@ public class Snake extends Region implements Serializable {
         return Xs.get(0);
     }
 
-    public double getYFirst(){
+	/**
+	 * Returns Y coordinate of the first snake ball
+	 * @return double
+	 */
+	public double getYFirst(){
         return Ys.get(0);
     }
 

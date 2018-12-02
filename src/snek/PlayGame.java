@@ -134,7 +134,11 @@ public class PlayGame extends Application{
             "-fx-font-weight: bold;"+
             "-fx-font-size: 1.1em;" ;
 
-    public void serialize()throws IOException {
+	/**
+	 * Serializes the data, like Snek, score, stuff.
+	 * @throws IOException
+	 */
+	public void serialize()throws IOException {
         Snake s1 = snake ;
         ObjectOutputStream out = null ;
         try{
@@ -145,7 +149,12 @@ public class PlayGame extends Application{
         }
     }
 
-    public void deserialize()throws IOException,ClassNotFoundException{
+	/**
+	 * Deserializes data, like Snek, score and stuff.
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
+	public void deserialize()throws IOException,ClassNotFoundException{
         ObjectInputStream in =null ;
         try{
             in =  new ObjectInputStream(new FileInputStream("out.txt"));
@@ -163,10 +172,18 @@ public class PlayGame extends Application{
 
     }
 
-    public void setMouseMove(boolean value){
+	/**
+	 * Enables movement by mouse.
+	 * @param Boolean value
+	 */
+	public void setMouseMove(boolean value){
     	this.mouseMove = value;
 	}
 
+	/**
+	 * Enables serialization.
+	 * @param value
+	 */
 	public void setLoad(boolean value){
 		this.loadPress = value;
 	}

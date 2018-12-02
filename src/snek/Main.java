@@ -290,10 +290,11 @@ public class Main extends Application {
         window.show();
     }
 
-	private static final ImageView wiz = new ImageView(
-			"http://icons.iconarchive.com/icons/aha-soft/free-large-boss/128/Wizard-icon.png"
-	);
-
+	/**
+	 * Creates a VBox of of required images.
+	 * @param ImageView
+	 * @return VBox
+	 */
 	private VBox createPopupContent(final ImageView wiz) {
 		final VBox wizBox = new VBox(5);
 		wizBox.setAlignment(Pos.CENTER);
