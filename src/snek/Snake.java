@@ -31,7 +31,7 @@ public class Snake extends Region implements Serializable {
     transient private Text score;
 
     transient private Image snakeSkin;
-
+    private int schore;
     private int length;
 
     private boolean hasShield = false;
@@ -46,7 +46,13 @@ public class Snake extends Region implements Serializable {
         this.length = 0;
     }
 
-	/**
+    public void setSchore(int schore) {
+        this.schore = schore;
+    }
+    public int getSchore(){
+	    return this.schore;
+    }
+    /**
 	 * A simple constructor to create an empty snake object, of length n
 	 * @param n Length of the snake
 	 */

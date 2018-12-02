@@ -150,6 +150,8 @@ public class PlayGame extends Application{
             in =  new ObjectInputStream(new FileInputStream("out.txt"));
             Snake s1 = (Snake) in.readObject();
             this.snake = new Snake(s1.getLength(),this.gameGridPane,s1.getXFirst(),s1.getYFirst());
+            this.PlayerScore = s1.getSchore();
+            System.out.println(this.PlayerScore);
             this.savegame = true ;
         }catch(EOFException e){
 
@@ -331,6 +333,7 @@ public class PlayGame extends Application{
                             tempScore += blok.getBoxValue();
                             tempScore += Integer.parseInt(score.getText());
                             score.setText(String.valueOf(tempScore));
+                            snake.setSchore(tempScore);
 
                             addFire(index, blok);
                         }
@@ -340,6 +343,8 @@ public class PlayGame extends Application{
                             tempScore += blok.getBoxValue();
                             tempScore += Integer.parseInt(score.getText());
                             score.setText(String.valueOf(tempScore));
+                            snake.setSchore(tempScore);
+                            snake.setSchore(tempScore);
 
                             addFire(index, blok);
                         }
@@ -349,7 +354,7 @@ public class PlayGame extends Application{
                             tempScore += 5;
                             tempScore += Integer.parseInt(score.getText());
                             score.setText(String.valueOf(tempScore));
-
+                            snake.setSchore(tempScore);
                             snake.removeBalls(5, gameGridPane);
 
                             Text text = (Text) boxes[index].getChildren().get(1);
@@ -408,7 +413,7 @@ public class PlayGame extends Application{
 								tempScore += blok.getBoxValue();
 								tempScore += Integer.parseInt(score.getText());
 								score.setText(String.valueOf(tempScore));
-
+                                snake.setSchore(tempScore);
 								addFireAlternate(index, blok);
 							} else if (hit && blok.getBoxValue() <= 5) {
 								snake.removeBalls(blok.getBoxValue(), gameGridPane);
@@ -416,6 +421,7 @@ public class PlayGame extends Application{
 								tempScore += blok.getBoxValue();
 								tempScore += Integer.parseInt(score.getText());
 								score.setText(String.valueOf(tempScore));
+                                snake.setSchore(tempScore);
 
 								addFireAlternate(index, blok);
 							} else if (blok.getBoxValue() > 5 && hit) {
@@ -424,7 +430,7 @@ public class PlayGame extends Application{
 								tempScore += 5;
 								tempScore += Integer.parseInt(score.getText());
 								score.setText(String.valueOf(tempScore));
-
+                                snake.setSchore(tempScore);
 								snake.removeBalls(5, gameGridPane);
 
 								Text text = (Text) boxesAlternate[index].getChildren().get(1);
@@ -921,6 +927,8 @@ public class PlayGame extends Application{
                         PlayerScore = Integer.parseInt(score.getText());
                         PlayerScore++;
                         score.setText(String.valueOf(PlayerScore));
+                        snake.setSchore(PlayerScore);
+
                         coins[index].getChildren().remove(0);
                     }
                 }
@@ -1089,6 +1097,8 @@ public class PlayGame extends Application{
                     }
                     tempScore += Integer.parseInt(score.getText());
                     score.setText(String.valueOf(tempScore));
+                    snake.setSchore(tempScore);
+
                 }
             }
         });
@@ -1175,6 +1185,7 @@ public class PlayGame extends Application{
                             // Add the coin to score. :#
                             PlayerScore++;
                             score.setText(String.valueOf(PlayerScore));
+                            snake.setSchore(PlayerScore);
 
                             // take the coins.
                             StackPane theCoin = coins[i];
@@ -1497,7 +1508,7 @@ public class PlayGame extends Application{
         optionsPane.getItems().add(optionsGridPane);
 
         score = new Label();
-        score.setText(String.valueOf(0));
+        score.setText(String.valueOf(this.PlayerScore));
         score.setAlignment(Pos.CENTER);
 
         Label scoreLabel = new Label();
@@ -1577,7 +1588,9 @@ public class PlayGame extends Application{
 					tempScore += 100;
 					tempScore += Integer.parseInt(score.getText());
 					score.setText(String.valueOf(tempScore));
-					resetCheat();
+                    snake.setSchore(tempScore);
+
+                    resetCheat();
 				}
 				if(cheat.equalsIgnoreCase("sawcon")){
 					// Add 10 bolls
