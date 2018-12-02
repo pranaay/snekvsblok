@@ -93,6 +93,7 @@ public class PlayGame extends Application{
     private boolean wallsAltGone = false;
 	private boolean wallsAltComing = false;
 	private boolean mouseMove = false;
+	private boolean loadPress = false;
 
     private Snake snake;
 
@@ -133,7 +134,11 @@ public class PlayGame extends Application{
             "-fx-font-weight: bold;"+
             "-fx-font-size: 1.1em;" ;
 
-    public void serialize()throws IOException {
+	/**
+	 * Serializes the data, like Snek, score, stuff.
+	 * @throws IOException
+	 */
+	public void serialize()throws IOException {
         Snake s1 = snake ;
         ObjectOutputStream out = null ;
         try{
@@ -144,7 +149,12 @@ public class PlayGame extends Application{
         }
     }
 
-    public void deserialize()throws IOException,ClassNotFoundException{
+	/**
+	 * Deserializes data, like Snek, score and stuff.
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
+	public void deserialize()throws IOException,ClassNotFoundException{
         ObjectInputStream in =null ;
         try{
             in =  new ObjectInputStream(new FileInputStream("out.txt"));
@@ -152,7 +162,7 @@ public class PlayGame extends Application{
             this.snake = new Snake(s1.getLength(),this.gameGridPane,s1.getXFirst(),s1.getYFirst());
             this.PlayerScore = s1.getSchore();
             System.out.println(this.PlayerScore);
-            this.savegame = true ;
+            this.savegame = true;
         }catch(EOFException e){
 
         }
@@ -162,8 +172,20 @@ public class PlayGame extends Application{
 
     }
 
-    public void setMouseMove(boolean value){
+	/**
+	 * Enables movement by mouse.
+	 * @param Boolean value
+	 */
+	public void setMouseMove(boolean value){
     	this.mouseMove = value;
+	}
+
+	/**
+	 * Enables serialization.
+	 * @param value
+	 */
+	public void setLoad(boolean value){
+		this.loadPress = value;
 	}
 
 	/**
@@ -1389,7 +1411,10 @@ public class PlayGame extends Application{
         Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 
         gameGridPane = new GridPane();
-        this.deserialize();
+
+        if(this.loadPress)
+        	this.deserialize();
+
         optionsGridPane = new GridPane();
         HBox hBox = new HBox();
         confirmButton = new Button();
