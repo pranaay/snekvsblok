@@ -12,6 +12,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
@@ -20,16 +21,16 @@ import java.util.TimerTask;
 /**
  * Contains definitions for Snake. How it moves and responds.
  */
-public class Snake extends Region {
+public class Snake extends Region implements Serializable {
 
-    private ArrayList<Ball> snek;
+    transient private ArrayList<Ball> snek;
     private ArrayList<Double> Xs, Ys;
 
     private double scoreY;
 
-    private Text score;
+    transient private Text score;
 
-    private Image snakeSkin;
+    transient private Image snakeSkin;
 
     private int length;
 
@@ -55,7 +56,6 @@ public class Snake extends Region {
         this.Ys = new ArrayList<Double>(n);
         this.length = n;
     }
-
 	/**
 	 * A method to return a random color
 	 * @return Color
@@ -346,7 +346,12 @@ public class Snake extends Region {
         return Xs.get(0);
     }
 
-	/**
+    public double getYFirst(){
+        return Ys.get(0);
+    }
+
+
+    /**
 	 * A method to return the length of the snake.
 	 * @return Integer
 	 */

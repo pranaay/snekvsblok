@@ -32,6 +32,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.*;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -54,6 +55,7 @@ public class PlayGame extends Application{
     private double optionsPaneHeight;
     private double wallHeight = 200;
     private double snakeOldX = 0;
+    private boolean savegame = false ;
 
     private StackPane[] boxes;
     private StackPane[] boxesAlternate;
@@ -130,6 +132,33 @@ public class PlayGame extends Application{
             "-fx-effect: dropshadow( gaussian , rgba(0,0,0,0.75) , 4,0,0,1 );"+
             "-fx-font-weight: bold;"+
             "-fx-font-size: 1.1em;" ;
+
+    public void serialize()throws IOException {
+        Snake s1 = snake ;
+        ObjectOutputStream out = null ;
+        try{
+            out= new ObjectOutputStream(new FileOutputStream("out.txt"));
+            out.writeObject(s1);
+        } finally{
+            out.close();
+        }
+    }
+
+    public void deserialize()throws IOException,ClassNotFoundException{
+        ObjectInputStream in =null ;
+        try{
+            in =  new ObjectInputStream(new FileInputStream("out.txt"));
+            Snake s1 = (Snake) in.readObject();
+            this.snake = new Snake(s1.getLength(),this.gameGridPane,s1.getXFirst(),s1.getYFirst());
+            this.savegame = true ;
+        }catch(EOFException e){
+
+        }
+        catch(FileNotFoundException e){
+
+        }
+
+    }
 
     public void setMouseMove(boolean value){
     	this.mouseMove = value;
@@ -1342,7 +1371,6 @@ public class PlayGame extends Application{
 	 */
     @Override
     public void start(Stage primaryStage) throws Exception{
-
         main = new Main();
         game = new PlayGame();
         resultWindow = new ResultWindow();
@@ -1350,6 +1378,7 @@ public class PlayGame extends Application{
         Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 
         gameGridPane = new GridPane();
+        this.deserialize();
         optionsGridPane = new GridPane();
         HBox hBox = new HBox();
         confirmButton = new Button();
@@ -1384,6 +1413,13 @@ public class PlayGame extends Application{
         confirmButton.setText("Confirm");
         confirmButton.setPrefHeight(30);
         confirmButton.setPrefWidth(200);
+        window.setOnCloseRequest(e->{
+            try {
+                this.serialize();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        });
         confirmButton.setOnAction(e->{
             if(Choices.getValue().equalsIgnoreCase("RESTART")){
                 try {
@@ -1395,6 +1431,7 @@ public class PlayGame extends Application{
             }
             if(Choices.getValue().equalsIgnoreCase("GO Back")){
                 try {
+                    this.serialize();
                     ((Node)(e.getSource())).getScene().getWindow().hide();
                     main.start(primaryStage);
                 } catch (Exception e1) {
@@ -1416,11 +1453,15 @@ public class PlayGame extends Application{
         gamePane.getItems().add(gameGridPane);
 
         gamePane.setStyle("-fx-background-color: #000000");
-        if(snekmage == null){
-            snake = new Snake(10, gameGridPane, centerOfGamePaneHeight, centerOfGamePaneWidth);
-        }
-        else{
-            snake =  new Snake(10, gameGridPane, centerOfGamePaneHeight, centerOfGamePaneWidth,snekmage);
+
+        if(!savegame){
+
+            if(snekmage == null){
+                snake = new Snake(10, gameGridPane, centerOfGamePaneHeight, centerOfGamePaneWidth);
+            }
+            else{
+                snake =  new Snake(10, gameGridPane, centerOfGamePaneHeight, centerOfGamePaneWidth,snekmage);
+            }
         }
 
         if(mouseMove){
