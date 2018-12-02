@@ -2,16 +2,20 @@ package snek;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
+import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.scene.input.MouseButton;
@@ -76,8 +80,9 @@ public class Main extends Application {
             "-fx-font-weight: bold;"+
             "-fx-font-size: 1.1em;" ;
     Stage window;
-    Scene mainScreen , leaderBoards , changeSkin , pause , mainGame ;
-    Button toMainScreen,toLeaderPage,toSkinChangePage, Quit, toStartGame, confirmButton, resumeButton;
+    Scene mainScreen , leaderBoards , changeSkin , pause , mainGame;
+    MenuButton toStartGame;
+    Button toMainScreen,toLeaderPage,toSkinChangePage, Quit, confirmButton, resumeButton;
     ChoiceBox<String> Choices ;
 
     private StackPane playButton;
@@ -257,7 +262,7 @@ public class Main extends Application {
         toMainScreen.setLayoutX(8.0);
         toMainScreen.setLayoutY(8.0);
 
-        BackgroundImage myBI= new BackgroundImage(new Image(getClass().getResourceAsStream("background.png"),1281,720,false,true), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
+        BackgroundImage myBI = new BackgroundImage(new Image(getClass().getResourceAsStream("background.png"),1281,720,false,true), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
         tile.getChildren().add(toMainScreen);
 
         tile.setPadding(new Insets(15, 15, 15, 15));
@@ -266,7 +271,6 @@ public class Main extends Application {
         String path = "CreepyPictures";
 
         File folder = new File(path);
-        System.out.println(folder.getAbsolutePath());
         File[] listOfFiles = folder.listFiles();
 
         for (final File file : listOfFiles) {
@@ -284,6 +288,20 @@ public class Main extends Application {
         window.setScene(scene);
         window.show();
     }
+
+	private static final ImageView wiz = new ImageView(
+			"http://icons.iconarchive.com/icons/aha-soft/free-large-boss/128/Wizard-icon.png"
+	);
+
+	private VBox createPopupContent(final ImageView wiz) {
+		final VBox wizBox = new VBox(5);
+		wizBox.setAlignment(Pos.CENTER);
+		wizBox.getChildren().setAll(
+				wiz
+		);
+
+		return wizBox;
+	}
 
 	/**
 	 * Starts the main scene.
@@ -315,10 +333,31 @@ public class Main extends Application {
         toSkinChangePage.setStyle(IDLE_BUTTON_STYLE);
 
         //////////////////////////////////
-        toStartGame = new Button();
-        toStartGame.setStyle(IDLE_BUTTON_STYLE);
+		toStartGame = new MenuButton();
+		toStartGame.setStyle(IDLE_BUTTON_STYLE);
+		toStartGame.setPopupSide(Side.RIGHT);
 
-        playButton = new StackPane();
+		File keyboard = new File("KeyboardMouse/KeyBoard.png");
+		ImageView imageView = createImageView(keyboard);
+		MenuItem item1 = new MenuItem();
+		item1.setGraphic(createPopupContent(imageView));
+		toStartGame.getItems().add(item1);
+
+		item1.setOnAction((event -> {
+			System.out.println("keyboard press");
+		}));
+
+		File mouse = new File("KeyboardMouse/mouse.png");
+		imageView = createImageView(mouse);
+		MenuItem item2 = new MenuItem();
+		item2.setGraphic(createPopupContent(imageView));
+		toStartGame.getItems().add(item2);
+
+		item2.setOnAction((event -> {
+			System.out.println("mouse press");
+		}));
+
+		playButton = new StackPane();
 
         Polygon polygon = new Polygon();
         polygon.getPoints().addAll(0.0, 0.0, 20.0, 10.0, 0.0, 20.0);
@@ -354,18 +393,18 @@ public class Main extends Application {
 
 ///////////////////////////////////////////////////////////////////start game button
 
-        toStartGame.setOnMousePressed(e -> {
-            toStartGame.setStyle(PRESSED_BUTTON_STYLE);
-        });
+//        toStartGame.setOnMousePressed(e -> {
+//            toStartGame.setStyle(PRESSED_BUTTON_STYLE);
+//        });
 
-        toStartGame.setOnAction((e->{
-            try {
-//                ((Node)(e.getSource())).getScene().getWindow().hide();
-                game.start(window);
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
-        }));
+//        toStartGame.setOnAction((e->{
+//            try {
+////                ((Node)(e.getSource())).getScene().getWindow().hide();
+//                game.start(window);
+//            } catch (Exception e1) {
+//                e1.printStackTrace();
+//            }
+//        }));
 
         toStartGame.setOnMouseEntered(e -> toStartGame.setStyle(HOVEROVER_BUTTON_STYLE));
         toStartGame.setOnMouseExited(e -> toStartGame.setStyle(IDLE_BUTTON_STYLE));
