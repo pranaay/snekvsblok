@@ -134,7 +134,8 @@ public class Main extends Application {
 	public void exiting(){
         Platform.exit();
         window.close();
-    }
+
+        }
 
 	/**
 	 * Method to render the leaderboards.
