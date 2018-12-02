@@ -17,6 +17,8 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -30,6 +32,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.*;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -52,6 +55,7 @@ public class PlayGame extends Application{
     private double optionsPaneHeight;
     private double wallHeight = 200;
     private double snakeOldX = 0;
+    private boolean savegame = false ;
 
     private StackPane[] boxes;
     private StackPane[] boxesAlternate;
@@ -72,6 +76,7 @@ public class PlayGame extends Application{
     private int numberOfCoins;
     private int numberOfWalls;
     private int PlayerScore = 0;
+    private int TransitionTime = 3000;
 
     private ChoiceBox<String> Choices ;
     private Button confirmButton;
@@ -80,9 +85,14 @@ public class PlayGame extends Application{
     private ResultWindow resultWindow;
     private PlayGame game;
 
+    private String cheat = "";
+
     private boolean alternateFallBoxes = true;
     private boolean touchingWalls = false;
-    private boolean gameOn = true;
+    private boolean ballsAltGone = false;
+    private boolean wallsAltGone = false;
+	private boolean wallsAltComing = false;
+	private boolean mouseMove = false;
 
     private Snake snake;
 
@@ -122,6 +132,39 @@ public class PlayGame extends Application{
             "-fx-effect: dropshadow( gaussian , rgba(0,0,0,0.75) , 4,0,0,1 );"+
             "-fx-font-weight: bold;"+
             "-fx-font-size: 1.1em;" ;
+
+    public void serialize()throws IOException {
+        Snake s1 = snake ;
+        ObjectOutputStream out = null ;
+        try{
+            out= new ObjectOutputStream(new FileOutputStream("out.txt"));
+            out.writeObject(s1);
+        } finally{
+            out.close();
+        }
+    }
+
+    public void deserialize()throws IOException,ClassNotFoundException{
+        ObjectInputStream in =null ;
+        try{
+            in =  new ObjectInputStream(new FileInputStream("out.txt"));
+            Snake s1 = (Snake) in.readObject();
+            this.snake = new Snake(s1.getLength(),this.gameGridPane,s1.getXFirst(),s1.getYFirst());
+            this.PlayerScore = s1.getSchore();
+            System.out.println(this.PlayerScore);
+            this.savegame = true ;
+        }catch(EOFException e){
+
+        }
+        catch(FileNotFoundException e){
+
+        }
+
+    }
+
+    public void setMouseMove(boolean value){
+    	this.mouseMove = value;
+	}
 
 	/**
 	 * Method to set the snake background/skin.
@@ -290,6 +333,7 @@ public class PlayGame extends Application{
                             tempScore += blok.getBoxValue();
                             tempScore += Integer.parseInt(score.getText());
                             score.setText(String.valueOf(tempScore));
+                            snake.setSchore(tempScore);
 
                             addFire(index, blok);
                         }
@@ -299,6 +343,8 @@ public class PlayGame extends Application{
                             tempScore += blok.getBoxValue();
                             tempScore += Integer.parseInt(score.getText());
                             score.setText(String.valueOf(tempScore));
+                            snake.setSchore(tempScore);
+                            snake.setSchore(tempScore);
 
                             addFire(index, blok);
                         }
@@ -308,7 +354,7 @@ public class PlayGame extends Application{
                             tempScore += 5;
                             tempScore += Integer.parseInt(score.getText());
                             score.setText(String.valueOf(tempScore));
-
+                            snake.setSchore(tempScore);
                             snake.removeBalls(5, gameGridPane);
 
                             Text text = (Text) boxes[index].getChildren().get(1);
@@ -317,7 +363,6 @@ public class PlayGame extends Application{
                         }
                         else{
                             try {
-								gameOn = false;
 								PlayGame.super.stop();
                                 stopAllAnim();
                                 window.close();
@@ -368,7 +413,7 @@ public class PlayGame extends Application{
 								tempScore += blok.getBoxValue();
 								tempScore += Integer.parseInt(score.getText());
 								score.setText(String.valueOf(tempScore));
-
+                                snake.setSchore(tempScore);
 								addFireAlternate(index, blok);
 							} else if (hit && blok.getBoxValue() <= 5) {
 								snake.removeBalls(blok.getBoxValue(), gameGridPane);
@@ -376,6 +421,7 @@ public class PlayGame extends Application{
 								tempScore += blok.getBoxValue();
 								tempScore += Integer.parseInt(score.getText());
 								score.setText(String.valueOf(tempScore));
+                                snake.setSchore(tempScore);
 
 								addFireAlternate(index, blok);
 							} else if (blok.getBoxValue() > 5 && hit) {
@@ -384,7 +430,7 @@ public class PlayGame extends Application{
 								tempScore += 5;
 								tempScore += Integer.parseInt(score.getText());
 								score.setText(String.valueOf(tempScore));
-
+                                snake.setSchore(tempScore);
 								snake.removeBalls(5, gameGridPane);
 
 								Text text = (Text) boxesAlternate[index].getChildren().get(1);
@@ -392,7 +438,6 @@ public class PlayGame extends Application{
 								blok.reduceValue(5);
 							} else {
 								try {
-									gameOn = false;
 									PlayGame.super.stop();
 									stopAllAnim();
 									window.close();
@@ -494,7 +539,9 @@ public class PlayGame extends Application{
         try{
             boxes[index].getChildren().remove(1);
             boxes[index].getChildren().remove(0);
-        } catch (Exception e){}
+        } catch (Exception e){
+        	e.printStackTrace();
+		}
 
         DestroyBlock rect = createBlok();
         if(boxes[index] == null)
@@ -525,50 +572,56 @@ public class PlayGame extends Application{
 	private void boxesFall(){
         pathBoxes = new Path[boxes.length];
         pathTransitionBoxes = new PathTransition[boxes.length];
+		alternatePathBoxes = new Path[boxesAlternate.length];
+		pathTransitionBoxesAlternate = new PathTransition[boxesAlternate.length];
 
-        boolean setNext = false;
         for(int i=0; i<pathBoxes.length; i++){
             if(boxes[i] == null)
                 continue;
 
             pathBoxes[i] = new Path();
-
             pathBoxes[i].getElements().add(new MoveTo(boxes[i].getTranslateX() + boxWidth/2, boxes[i].getTranslateY()));
             pathBoxes[i].getElements().add(new LineTo(boxes[i].getTranslateX() + boxWidth/2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
             pathTransitionBoxes[i] = new PathTransition();
-            pathTransitionBoxes[i].setDuration(Duration.millis(3000));
+            pathTransitionBoxes[i].setDuration(Duration.millis(TransitionTime));
             pathTransitionBoxes[i].setPath(pathBoxes[i]);
             pathTransitionBoxes[i].setNode(boxes[i]);
             pathTransitionBoxes[i].play();
-            if(!setNext) {
-                setNext = true;
-//                pathTransition.setOnFinished(e -> nextCycle());
-            }
         }
 
         if(alternateFallBoxes){
             alternateFallBoxes = false;
-            alternatePathBoxes = new Path[boxesAlternate.length];
-            pathTransitionBoxesAlternate = new PathTransition[boxesAlternate.length];
+            boolean setOnFinished = false;
 
             for(int i=0; i<alternatePathBoxes.length; i++){
-
                 if(boxesAlternate[i] == null)
                     continue;
 
                 alternatePathBoxes[i] = new Path();
-
                 alternatePathBoxes[i].getElements().add(new MoveTo(boxesAlternate[i].getTranslateX() + boxWidth/2, boxesAlternate[i].getTranslateY()));
                 alternatePathBoxes[i].getElements().add(new LineTo(boxesAlternate[i].getTranslateX() + boxWidth/2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
                 pathTransitionBoxesAlternate[i] = new PathTransition();
-                pathTransitionBoxesAlternate[i].setDuration(Duration.millis(3000));
+                pathTransitionBoxesAlternate[i].setDuration(Duration.millis(TransitionTime));
                 pathTransitionBoxesAlternate[i].setPath(alternatePathBoxes[i]);
                 pathTransitionBoxesAlternate[i].setNode(boxesAlternate[i]);
                 pathTransitionBoxesAlternate[i].setDelay(new Duration(1500));
+                if(!setOnFinished){
+                	setOnFinished = true;
+					pathTransitionBoxesAlternate[i].setOnFinished(event -> nextCycleBox());
+				}
                 pathTransitionBoxesAlternate[i].play();
             }
         }
     }
+
+	/**
+	 * Method to call the next loop, if the walls reach later than the balls
+	 */
+	private void nextCycleBox(){
+		wallsAltGone = true;
+		if(ballsAltGone)
+			nextCycle();
+	}
 
 	/**
 	 * Pause the animation of all tokens.
@@ -706,9 +759,6 @@ public class PlayGame extends Application{
             }
         }
 
-        for(int i=0; i<numberOfBalls; i++)
-        	System.out.println(balls[i] + " :: " + ballsAlternate[i]);
-
         for(int x = 0; x<numberOfBalls; x++){
             final int index = x;
 
@@ -790,7 +840,7 @@ public class PlayGame extends Application{
             pathBalls[i].getElements().add(new MoveTo(balls[i].getTranslateX() + boxWidth / 2, balls[i].getTranslateY()));
             pathBalls[i].getElements().add(new LineTo(balls[i].getTranslateX() + boxWidth / 2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
             pathTransitionBalls[i] = new PathTransition();
-            pathTransitionBalls[i].setDuration(Duration.millis(3000));
+            pathTransitionBalls[i].setDuration(Duration.millis(TransitionTime));
             pathTransitionBalls[i].setPath(pathBalls[i]);
             pathTransitionBalls[i].setNode(balls[i]);
             pathTransitionBalls[i].setDelay(new Duration(500 + rand.nextInt(500)));
@@ -804,17 +854,28 @@ public class PlayGame extends Application{
             pathBallsAlternate[i].getElements().add(new MoveTo(ballsAlternate[i].getTranslateX() + boxWidth/2, ballsAlternate[i].getTranslateY()));
             pathBallsAlternate[i].getElements().add(new LineTo(ballsAlternate[i].getTranslateX() + boxWidth/2, gamePaneHeight + (wallHeight+boxHeight+boxHeight)));
             pathTransitionBallsAlternate[i] = new PathTransition();
-            pathTransitionBallsAlternate[i].setDuration(Duration.millis(3000));
+            pathTransitionBallsAlternate[i].setDuration(Duration.millis(TransitionTime));
             pathTransitionBallsAlternate[i].setPath(pathBallsAlternate[i]);
             pathTransitionBallsAlternate[i].setNode(ballsAlternate[i]);
             pathTransitionBallsAlternate[i].setDelay(new Duration(3000));
             if(!setOnFinished) {
                 setOnFinished = true;
-//                pathTransitionBallsAlternate[i].setOnFinished(event -> nextCycle());
+                pathTransitionBallsAlternate[i].setOnFinished(event -> nextCycleBalls());
             }
             pathTransitionBallsAlternate[i].play();
         }
     }
+
+	/**
+	 * Method to call the next loop, if the balls reach later than the walls
+	 */
+	private void nextCycleBalls(){
+		ballsAltGone = true;
+		if(!wallsAltComing)
+			nextCycle();
+		else if(wallsAltGone)
+			nextCycle();
+	}
 
 	/**
 	 * Creates coins, and adds collision listeners.
@@ -866,6 +927,8 @@ public class PlayGame extends Application{
                         PlayerScore = Integer.parseInt(score.getText());
                         PlayerScore++;
                         score.setText(String.valueOf(PlayerScore));
+                        snake.setSchore(PlayerScore);
+
                         coins[index].getChildren().remove(0);
                     }
                 }
@@ -891,7 +954,7 @@ public class PlayGame extends Application{
             pathTransitionCoins[i].setDuration(Duration.millis(3000));
             pathTransitionCoins[i].setPath(pathCoins[i]);
             pathTransitionCoins[i].setNode(coins[i]);
-            pathTransitionCoins[i].setDelay(new Duration(200 + rand.nextInt(500)));
+            pathTransitionCoins[i].setDelay(new Duration(200 + rand.nextInt(TransitionTime/6)));
             pathTransitionCoins[i].play();
         }
     }
@@ -930,7 +993,7 @@ public class PlayGame extends Application{
 
                 Shape intersect = Shape.intersect(ball, poly);
                 if (intersect.getBoundsInLocal().getWidth() != -1) {
-                    snake.getShield();
+                    snake.getShield(5000);
                     shield.getChildren().remove(0);
                 }
             }
@@ -951,7 +1014,7 @@ public class PlayGame extends Application{
         pathTransitionShield.setDuration(Duration.millis(3000));
         pathTransitionShield.setPath(shieldPath);
         pathTransitionShield.setNode(shield);
-        pathTransitionShield.setDelay(new Duration(700 + rand.nextInt(600)));
+        pathTransitionShield.setDelay(new Duration(700 + rand.nextInt(TransitionTime/5)));
         pathTransitionShield.play();
     }
 
@@ -1034,6 +1097,8 @@ public class PlayGame extends Application{
                     }
                     tempScore += Integer.parseInt(score.getText());
                     score.setText(String.valueOf(tempScore));
+                    snake.setSchore(tempScore);
+
                 }
             }
         });
@@ -1053,7 +1118,7 @@ public class PlayGame extends Application{
         pathTransitionDestroyAll.setDuration(Duration.millis(3000));
         pathTransitionDestroyAll.setPath(destroyPath);
         pathTransitionDestroyAll.setNode(destroyAllShiz);
-        pathTransitionDestroyAll.setDelay(new Duration(700 + rand.nextInt(600)));
+        pathTransitionDestroyAll.setDelay(new Duration(700 + rand.nextInt(TransitionTime/5)));
         pathTransitionDestroyAll.play();
     }
 
@@ -1120,6 +1185,7 @@ public class PlayGame extends Application{
                             // Add the coin to score. :#
                             PlayerScore++;
                             score.setText(String.valueOf(PlayerScore));
+                            snake.setSchore(PlayerScore);
 
                             // take the coins.
                             StackPane theCoin = coins[i];
@@ -1149,7 +1215,7 @@ public class PlayGame extends Application{
         pathTransitionMagnet.setDuration(Duration.millis(3000));
         pathTransitionMagnet.setPath(magPath);
         pathTransitionMagnet.setNode(magnet);
-        pathTransitionMagnet.setDelay(new Duration(700 + rand.nextInt(600)));
+        pathTransitionMagnet.setDelay(new Duration(700 + rand.nextInt(TransitionTime/5)));
         pathTransitionMagnet.play();
     }
 
@@ -1229,7 +1295,7 @@ public class PlayGame extends Application{
             pathWalls[i].getElements().add(new MoveTo(walls[i].getTranslateX(), walls[i].getTranslateY()));
             pathWalls[i].getElements().add(new LineTo(walls[i].getTranslateX(), gamePaneHeight + (wallHeight+boxHeight+3*boxHeight/2)));
             pathTransitionWalls[i] = new PathTransition();
-            pathTransitionWalls[i].setDuration(Duration.millis(3000));
+            pathTransitionWalls[i].setDuration(Duration.millis(TransitionTime));
             pathTransitionWalls[i].setPath(pathWalls[i]);
             pathTransitionWalls[i].setNode(walls[i]);
             pathTransitionWalls[i].play();
@@ -1243,13 +1309,17 @@ public class PlayGame extends Application{
 
         Random rand = new Random();
 
+        wallsAltGone = false;
+        ballsAltGone = false;
+
         // Boxes
         boxes = new StackPane[numberOfBoxes];
         boxesAlternate = new StackPane[numberOfBoxes];
         int alternate = rand.nextInt(3);
-        if(alternate == 0){
+        if(alternate < 2){
             this.alternateFallBoxes = true;
         }
+        wallsAltComing = alternateFallBoxes;
         createBoxes();
 
         // Walls
@@ -1294,20 +1364,15 @@ public class PlayGame extends Application{
 		wallsFall();
 		coinsFall();
 
-		Timer timer = new Timer();
-		TimerTask timerTask = new TimerTask() {
-			@Override
-			public void run() {
-				Platform.runLater(new Runnable() {
-					@Override
-					public void run() {
-						if(gameOn)
-							nextCycle();
-					}
-				});
-			}
-		};
-		timer.schedule(timerTask, 8000);
+		TransitionTime = 3000;
+		TransitionTime -= snake.getLength()/10;
+	}
+
+	/**
+	 * Method to reset the cheat string.
+	 */
+	private void resetCheat(){
+		cheat = "";
 	}
 
 	/**
@@ -1317,7 +1382,6 @@ public class PlayGame extends Application{
 	 */
     @Override
     public void start(Stage primaryStage) throws Exception{
-
         main = new Main();
         game = new PlayGame();
         resultWindow = new ResultWindow();
@@ -1325,6 +1389,7 @@ public class PlayGame extends Application{
         Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 
         gameGridPane = new GridPane();
+        this.deserialize();
         optionsGridPane = new GridPane();
         HBox hBox = new HBox();
         confirmButton = new Button();
@@ -1341,7 +1406,7 @@ public class PlayGame extends Application{
         double centerOfGamePaneWidth = gamePaneWidth/2;
 
         Scene scene = new Scene(new Group(hBox));
-        scene.setFill(Color.DARKGREY);
+        scene.setFill(Color.DARKGREEN);
 
         hBox.setTranslateX(20);
         hBox.setTranslateY(20);
@@ -1359,6 +1424,13 @@ public class PlayGame extends Application{
         confirmButton.setText("Confirm");
         confirmButton.setPrefHeight(30);
         confirmButton.setPrefWidth(200);
+        window.setOnCloseRequest(e->{
+            try {
+                this.serialize();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        });
         confirmButton.setOnAction(e->{
             if(Choices.getValue().equalsIgnoreCase("RESTART")){
                 try {
@@ -1370,6 +1442,7 @@ public class PlayGame extends Application{
             }
             if(Choices.getValue().equalsIgnoreCase("GO Back")){
                 try {
+                    this.serialize();
                     ((Node)(e.getSource())).getScene().getWindow().hide();
                     main.start(primaryStage);
                 } catch (Exception e1) {
@@ -1391,36 +1464,42 @@ public class PlayGame extends Application{
         gamePane.getItems().add(gameGridPane);
 
         gamePane.setStyle("-fx-background-color: #000000");
-        if(snekmage == null){
-            snake = new Snake(10, gameGridPane, centerOfGamePaneHeight, centerOfGamePaneWidth);
-        }
-        else{
-            snake =  new Snake(10, gameGridPane, centerOfGamePaneHeight, centerOfGamePaneWidth,snekmage);
-        }
 
-        gameGridPane.setOnMouseMoved(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                snakeOldX = snake.getXFirst();
-                double moveSnek = event.getSceneX()-20;
+        if(!savegame){
 
-                Ball ball = (Ball) snake.getFirst();
-                touchingWalls = false;
-
-                for(int i=0; i<walls.length; i++){
-                    if(walls[i] == null)
-                        continue;
-
-                    if(walls[i].getBoundsInParent().intersects(ball.getBoundsInParent()))
-                        touchingWalls = true;
-                }
-
-                if(!touchingWalls)
-                    snake.moveSnek(moveSnek);
-
-                touchingWalls = false;
+            if(snekmage == null){
+                snake = new Snake(10, gameGridPane, centerOfGamePaneHeight, centerOfGamePaneWidth);
             }
-        });
+            else{
+                snake =  new Snake(10, gameGridPane, centerOfGamePaneHeight, centerOfGamePaneWidth,snekmage);
+            }
+        }
+
+        if(mouseMove){
+			gameGridPane.setOnMouseMoved(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
+					snakeOldX = snake.getXFirst();
+					double moveSnek = event.getSceneX()-20;
+
+					Ball ball = (Ball) snake.getFirst();
+					touchingWalls = false;
+
+					for(int i=0; i<walls.length; i++){
+						if(walls[i] == null)
+							continue;
+
+						if(walls[i].getBoundsInParent().intersects(ball.getBoundsInParent()))
+							touchingWalls = true;
+					}
+
+					if(!touchingWalls)
+						snake.moveSnek(moveSnek);
+
+					touchingWalls = false;
+				}
+			});
+		}
 
         SplitPane optionsPane = new SplitPane();
         optionsPane.setOrientation(Orientation.VERTICAL);
@@ -1429,7 +1508,7 @@ public class PlayGame extends Application{
         optionsPane.getItems().add(optionsGridPane);
 
         score = new Label();
-        score.setText(String.valueOf(0));
+        score.setText(String.valueOf(this.PlayerScore));
         score.setAlignment(Pos.CENTER);
 
         Label scoreLabel = new Label();
@@ -1448,6 +1527,89 @@ public class PlayGame extends Application{
         optionsGridPane.setHalignment(Choices, HPos.CENTER);
         optionsGridPane.setHalignment(confirmButton, HPos.CENTER);
 
+        scene.addEventHandler(KeyEvent.KEY_PRESSED, (key) -> {
+        	double moveOffset = 40;
+        	double limitWidth = gameGridPane.getWidth();
+
+        	if(!mouseMove){
+				if(key.getCode() == KeyCode.RIGHT){
+					snakeOldX = snake.getXFirst();
+					double moveSnek = snakeOldX + moveOffset;
+
+					if(moveSnek > 2 && moveSnek < (limitWidth)){
+						Ball ball = (Ball) snake.getFirst();
+						touchingWalls = false;
+
+						for(int i=0; i<walls.length; i++){
+							if(walls[i] == null)
+								continue;
+							if(walls[i].getBoundsInParent().intersects(ball.getBoundsInParent()))
+								touchingWalls = true;
+						}
+
+						if(!touchingWalls)
+							snake.moveSnek(moveSnek);
+
+						touchingWalls = false;
+					}
+				}
+				if(key.getCode() == KeyCode.LEFT){
+					snakeOldX = snake.getXFirst();
+					double moveSnek = snakeOldX - moveOffset;
+
+					if(moveSnek > 2 && moveSnek < (limitWidth)) {
+						Ball ball = (Ball) snake.getFirst();
+						touchingWalls = false;
+
+						for(int i=0; i<walls.length; i++){
+							if(walls[i] == null)
+								continue;
+							if(walls[i].getBoundsInParent().intersects(ball.getBoundsInParent()))
+								touchingWalls = true;
+						}
+
+						if(!touchingWalls)
+							snake.moveSnek(moveSnek);
+
+						touchingWalls = false;
+					}
+				}
+			}
+			else{
+				cheat += key.getText();
+				if(cheat.equalsIgnoreCase("ligma")){
+					// Add shield for 10 seconds
+					snake.getShield(10000);
+					resetCheat();
+				}
+				if(cheat.equalsIgnoreCase("sugma")){
+					// Add 100 points
+					int tempScore = Integer.parseInt(score.getText());
+					tempScore += 100;
+					tempScore += Integer.parseInt(score.getText());
+					score.setText(String.valueOf(tempScore));
+                    snake.setSchore(tempScore);
+
+                    resetCheat();
+				}
+				if(cheat.equalsIgnoreCase("sawcon")){
+					// Add 10 bolls
+					snake.addBalls(10, gameGridPane);
+					resetCheat();
+				}
+				if(cheat.length() > 6)
+					resetCheat();
+			}
+		});
+
+		Timer timer = new Timer();
+		TimerTask timerTask = new TimerTask() {
+			@Override
+			public void run() {
+				resetCheat();
+			}
+		};
+		timer.schedule(timerTask, 0, 6000);
 
         nextCycle();
 
