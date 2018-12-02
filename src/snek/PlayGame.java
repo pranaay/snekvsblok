@@ -93,6 +93,7 @@ public class PlayGame extends Application{
     private boolean wallsAltGone = false;
 	private boolean wallsAltComing = false;
 	private boolean mouseMove = false;
+	private boolean loadPress = false;
 
     private Snake snake;
 
@@ -152,7 +153,7 @@ public class PlayGame extends Application{
             this.snake = new Snake(s1.getLength(),this.gameGridPane,s1.getXFirst(),s1.getYFirst());
             this.PlayerScore = s1.getSchore();
             System.out.println(this.PlayerScore);
-            this.savegame = true ;
+            this.savegame = true;
         }catch(EOFException e){
 
         }
@@ -164,6 +165,10 @@ public class PlayGame extends Application{
 
     public void setMouseMove(boolean value){
     	this.mouseMove = value;
+	}
+
+	public void setLoad(boolean value){
+		this.loadPress = value;
 	}
 
 	/**
@@ -1389,7 +1394,10 @@ public class PlayGame extends Application{
         Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 
         gameGridPane = new GridPane();
-        this.deserialize();
+
+        if(this.loadPress)
+        	this.deserialize();
+
         optionsGridPane = new GridPane();
         HBox hBox = new HBox();
         confirmButton = new Button();

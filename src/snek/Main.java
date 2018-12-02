@@ -81,8 +81,8 @@ public class Main extends Application {
             "-fx-font-size: 1.1em;" ;
     Stage window;
     Scene mainScreen , leaderBoards , changeSkin , pause , mainGame;
-    MenuButton toStartGame;
-    Button toMainScreen,toLeaderPage,toSkinChangePage, Quit, confirmButton, resumeButton;
+    MenuButton toStartGame, resumeButton;
+    Button toMainScreen,toLeaderPage,toSkinChangePage, Quit, confirmButton;
     ChoiceBox<String> Choices ;
 
     private StackPane playButton;
@@ -324,7 +324,7 @@ public class Main extends Application {
         toLeaderPage.setStyle(IDLE_BUTTON_STYLE);
 
         ///////////////////////////////////
-        resumeButton = new Button();
+        resumeButton = new MenuButton();
         resumeButton.setText("Resume");
         resumeButton.setStyle(IDLE_BUTTON_STYLE);
 
@@ -406,19 +406,6 @@ public class Main extends Application {
 
 ///////////////////////////////////////////////////////////////////start game button
 
-//        toStartGame.setOnMousePressed(e -> {
-//            toStartGame.setStyle(PRESSED_BUTTON_STYLE);
-//        });
-
-//        toStartGame.setOnAction((e->{
-//            try {
-////                ((Node)(e.getSource())).getScene().getWindow().hide();
-//                game.start(window);
-//            } catch (Exception e1) {
-//                e1.printStackTrace();
-//            }
-//        }));
-
         toStartGame.setOnMouseEntered(e -> toStartGame.setStyle(HOVEROVER_BUTTON_STYLE));
         toStartGame.setOnMouseExited(e -> toStartGame.setStyle(IDLE_BUTTON_STYLE));
 
@@ -439,14 +426,44 @@ public class Main extends Application {
         toLeaderPage.setOnMouseExited(e -> toLeaderPage.setStyle(IDLE_BUTTON_STYLE));
 
         //////////////////////////////////////////////////////////////////////
-        resumeButton.setOnAction(e -> {
-            //TODO
-        });
-        resumeButton.setOnMousePressed(e -> {
-            resumeButton.setStyle(PRESSED_BUTTON_STYLE);
-        });
 
-        resumeButton.setOnMouseEntered(e -> resumeButton.setStyle(HOVEROVER_BUTTON_STYLE));
+		imageView = createImageView(keyboard);
+		MenuItem item3 = new MenuItem();
+		item3.setGraphic(createPopupContent(imageView));
+		toStartGame.getItems().add(item3);
+
+		item3.setOnAction((event -> {
+			game.setMouseMove(false);
+			try {
+//                ((Node)(e.getSource())).getScene().getWindow().hide();
+				game.setLoad(true);
+				game.start(window);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		}));
+
+		imageView = createImageView(mouse);
+		MenuItem item4 = new MenuItem();
+		item4.setGraphic(createPopupContent(imageView));
+		toStartGame.getItems().add(item4);
+
+		item4.setOnAction((event -> {
+			game.setMouseMove(true);
+			game.setLoad(true);
+			try {
+//                ((Node)(e.getSource())).getScene().getWindow().hide();
+				game.start(window);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		}));
+
+		resumeButton.getItems().add(item3);
+		resumeButton.getItems().add(item4);
+		resumeButton.setPopupSide(Side.RIGHT);
+
+		resumeButton.setOnMouseEntered(e -> resumeButton.setStyle(HOVEROVER_BUTTON_STYLE));
         resumeButton.setOnMouseExited(e -> resumeButton.setStyle(IDLE_BUTTON_STYLE));
 
         /////////////////////////////////////////////////////////////////////////////quit button
